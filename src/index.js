@@ -17,10 +17,9 @@ const cache = new InMemoryCache();
 const client = new ApolloClient({
   cache,
   link: new HttpLink({
-    uri: "http://localhost:8080/graphql",
+    uri: "http://localhost:8080/query",
     headers: {
-      authorization: localStorage.getItem("token"),
-      "client-name": "Space Explorer [web]",
+      "client-name": "Betty",
       "client-version": "1.0.0"
     }
   }),
