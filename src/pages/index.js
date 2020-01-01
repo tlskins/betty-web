@@ -1,13 +1,13 @@
 import React, { Fragment } from "react";
 import { Router } from "@reach/router";
 
-import Players from "./players";
+import { PlayerSearch } from "./playerSearch";
 
 export default function Pages() {
   return (
     <Fragment>
       <Router primary={false} component={Fragment}>
-        <Players path="/" />
+        <PlayerSearch path="/" />
       </Router>
     </Fragment>
   );
