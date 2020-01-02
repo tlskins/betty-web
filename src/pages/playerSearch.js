@@ -10,6 +10,7 @@ import ListItemText from "@material-ui/core/ListItemText";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import Avatar from "@material-ui/core/Avatar";
 import Typography from "@material-ui/core/Typography";
+import Grow from "@material-ui/core/Grow";
 
 import { useThrottle } from "../utils";
 
@@ -40,22 +41,49 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-function Change(e, execute) {
-  const name = e.target.value;
-  // if (name.length == 0) return;
-  useThrottle(() => execute({ variables: { name } }), 300);
-}
+export const PlayerItem = props => {
+  const { player, classes, style } = props;
+
+  return (
+    <Fragment>
+      <ListItem alignItems="flex-start" style={style}>
+        <ListItemAvatar>
+          <Avatar
+            alt={player.name}
+            src={`https://d395i9ljze9h3x.cloudfront.net/req/20180910/images/headshots/${player.id}_2018.jpg`}
+          />
+        </ListItemAvatar>
+        <ListItemText
+          primary={player.name}
+          secondary={
+            <React.Fragment>
+              <Typography
+                component="span"
+                variant="body2"
+                className={classes.inline}
+                color="textPrimary"
+              >
+                {player.teamName}
+              </Typography>
+              &nbsp; - {player.position}
+            </React.Fragment>
+          }
+        />
+      </ListItem>
+      <Divider variant="inset" component="li" />
+    </Fragment>
+  );
+};
 
 export function PlayerSearch() {
   const [execute, { loading, data, error }] = useLazyQuery(SEARCH_PLAYER);
   const search = useThrottle(execute, 300);
+  const classes = useStyles();
 
   let msg;
   if (loading) msg = "Loading...";
   if (error) msg = `Error: ${error.message}`;
   console.log(loading, error, data);
-
-  const classes = useStyles();
 
   const onChange = e => {
     const name = e.target.value;
@@ -71,33 +99,9 @@ export function PlayerSearch() {
         {data &&
           data.findPlayers &&
           data.findPlayers.map(player => (
-            <Fragment>
-              <ListItem key={player.id} alignItems="flex-start">
-                <ListItemAvatar>
-                  <Avatar
-                    alt={player.name}
-                    src={`https://d395i9ljze9h3x.cloudfront.net/req/20180910/images/headshots/${player.id}_2018.jpg`}
-                  />
-                </ListItemAvatar>
-                <ListItemText
-                  primary={player.name}
-                  secondary={
-                    <React.Fragment>
-                      <Typography
-                        component="span"
-                        variant="body2"
-                        className={classes.inline}
-                        color="textPrimary"
-                      >
-                        {player.teamName}
-                      </Typography>
-                      &nbsp; - {player.position}
-                    </React.Fragment>
-                  }
-                />
-              </ListItem>
-              <Divider variant="inset" component="li" />
-            </Fragment>
+            <Grow key={player.id} in={true} timeout={400}>
+              <PlayerItem player={player} classes={classes} />
+            </Grow>
           ))}
       </List>
     </Fragment>
