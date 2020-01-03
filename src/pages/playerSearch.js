@@ -38,6 +38,14 @@ const useStyles = makeStyles(theme => ({
   },
   inline: {
     display: "inline"
+  },
+  item: {
+    // backgroundColor: "WhiteSmoke",
+    // borderStyle: "solid",
+    // borderWidth: "1px",
+    // borderColor: "Silver",
+    // borderRadius: "7px",
+    marginTop: "2px"
   }
 }));
 
@@ -46,7 +54,7 @@ export const PlayerItem = props => {
 
   return (
     <Fragment>
-      <ListItem alignItems="flex-start" style={style}>
+      <ListItem alignItems="flex-start" className={classes.item} style={style}>
         <ListItemAvatar>
           <Avatar
             alt={player.name}
