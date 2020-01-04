@@ -1,20 +1,14 @@
-import React, { useState, useEffect, Fragment } from "react";
+import React, { useState, Fragment } from "react";
 import { useSubscription, useMutation } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import {
   FixedWrapper,
-  Avatar,
   TitleBar,
   TextInput,
   MessageList,
   Message,
   MessageText,
-  AgentBar,
-  Title,
-  Subtitle,
   MessageGroup,
-  MessageButtons,
-  MessageButton,
   MessageTitle,
   MessageMedia,
   TextComposer,
@@ -23,16 +17,11 @@ import {
   Fit,
   IconButton,
   SendButton,
-  EmojiIcon,
   CloseIcon,
-  Column,
-  RateGoodIcon,
-  RateBadIcon,
   Bubble,
   ThemeProvider,
   purpleTheme,
-  darkTheme,
-  elegantTheme
+  ChatIcon
 } from "@livechat/ui-kit";
 
 const theme = {
@@ -51,29 +40,25 @@ const theme = {
 };
 
 function ChatInput({ channel, name }) {
-  let input;
-  const [postChat, { data }] = useMutation(Mutation);
+  const [postChat, _] = useMutation(Mutation);
 
   return (
-    <TextComposer>
+    <TextComposer
+      onSend={text => postChat({ variables: { text, channel, name } })}
+    >
       <Row align="center">
         <Fill>
-          <input ref={node => (input = node)} />
+          <TextInput />
         </Fill>
         <Fit>
-          <SendButton
-            onClick={() => {
-              postChat({ variables: { text: input.value, channel, name } });
-              input.value = "";
-            }}
-          />
+          <SendButton />
         </Fit>
       </Row>
     </TextComposer>
   );
 }
 
-function ChatHistory({ channel, messages, setMessages, name }) {
+function ChatHistory({ channel, messages, setMessages, name, minimize }) {
   const { data, loading } = useSubscription(Subscription, {
     variables: { channel },
     onSubscriptionData: ({ client, subscriptionData }) => {
@@ -82,6 +67,7 @@ function ChatHistory({ channel, messages, setMessages, name }) {
       const msg = subscriptionData.data.messageAdded;
       let last = newMessages.pop();
 
+      // group messages by created by
       if (last) {
         if (last[0].createdBy == msg.createdBy) {
           last.push(msg);
@@ -109,7 +95,7 @@ function ChatHistory({ channel, messages, setMessages, name }) {
     >
       <TitleBar
         rightIcons={[
-          <IconButton key="close">
+          <IconButton key="close" onClick={minimize}>
             <CloseIcon />
           </IconButton>
         ]}
@@ -168,25 +154,51 @@ export function Chat() {
   const [messages, setMessages] = useState([]);
 
   return (
-    <ThemeProvider theme={theme}>
+    <Fragment>
       name: <br />
       <input onChange={e => setName(e.target.value)} /> <br />
       channel: <br />
       <input onChange={e => setChannel(e.target.value)} /> <br />
-      <FixedWrapper.Root maximizedOnInit>
-        <FixedWrapper.Maximized>
-          <ChatHistory
-            channel={channel}
-            messages={messages}
-            setMessages={setMessages}
-            name={name}
-          />
-          <ChatInput channel={channel} name={name} />
-        </FixedWrapper.Maximized>
-      </FixedWrapper.Root>
-    </ThemeProvider>
+      <ThemeProvider theme={theme}>
+        <FixedWrapper.Root maximizedOnInit>
+          <FixedWrapper.Maximized>
+            <ChatHistory
+              channel={channel}
+              messages={messages}
+              setMessages={setMessages}
+              name={name}
+            />
+            <ChatInput channel={channel} name={name} />
+          </FixedWrapper.Maximized>
+          <FixedWrapper.Minimized>
+            <Minimized />
+          </FixedWrapper.Minimized>
+        </FixedWrapper.Root>
+      </ThemeProvider>
+    </Fragment>
   );
 }
+
+const Minimized = ({ maximize }) => (
+  <div
+    onClick={maximize}
+    style={{
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      width: "60px",
+      height: "60px",
+      background: "#0093FF",
+      color: "#fff",
+      borderRadius: "50%",
+      cursor: "pointer"
+    }}
+  >
+    <IconButton color="#fff">
+      <ChatIcon />
+    </IconButton>
+  </div>
+);
 
 const Subscription = gql`
   subscription MoreMessages($channel: String!) {
