@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Fragment } from "react";
-import { useLazyQuery } from "@apollo/react-hooks";
+import { useLazyQuery, useSubscription } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 // import "typeface-roboto";
 import { makeStyles } from "@material-ui/core/styles";
@@ -13,6 +13,7 @@ import Typography from "@material-ui/core/Typography";
 import Grow from "@material-ui/core/Grow";
 
 import { useThrottle } from "../utils";
+import { RotoAlerts } from "./rotoAlerts";
 
 export const SEARCH_PLAYER = gql`
   query searchPlayers($name: String!) {
@@ -101,6 +102,7 @@ export function PlayerSearch() {
 
   return (
     <Fragment>
+      <RotoAlerts />
       <input type="text" onChange={onChange} />
       <p>{msg}</p>
       <List className={classes.root}>

@@ -39,6 +39,24 @@ const theme = {
   }
 };
 
+const Subscription = gql`
+  subscription MoreMessages($channel: String!) {
+    messageAdded(roomName: $channel) {
+      id
+      text
+      createdBy
+    }
+  }
+`;
+
+const Mutation = gql`
+  mutation sendMessage($text: String!, $channel: String!, $name: String!) {
+    post(text: $text, roomName: $channel, username: $name) {
+      id
+    }
+  }
+`;
+
 function ChatInput({ channel, name }) {
   const [postChat, _] = useMutation(Mutation);
 
@@ -84,6 +102,7 @@ function ChatHistory({ channel, messages, setMessages, name, minimize }) {
   });
 
   console.log("messages", messages);
+  console.log("data", data);
 
   return (
     <div
@@ -199,21 +218,3 @@ const Minimized = ({ maximize }) => (
     </IconButton>
   </div>
 );
-
-const Subscription = gql`
-  subscription MoreMessages($channel: String!) {
-    messageAdded(roomName: $channel) {
-      id
-      text
-      createdBy
-    }
-  }
-`;
-
-const Mutation = gql`
-  mutation sendMessage($text: String!, $channel: String!, $name: String!) {
-    post(text: $text, roomName: $channel, username: $name) {
-      id
-    }
-  }
-`;
