@@ -17,7 +17,7 @@ import { RotoAlerts } from "./rotoAlerts";
 
 export const SEARCH_PLAYER = gql`
   query searchPlayers($name: String!) {
-    findPlayers(name: $name) {
+    findPlayers(name: $name, withGame: true) {
       __typename
       id
       name
@@ -27,6 +27,13 @@ export const SEARCH_PLAYER = gql`
       teamShort
       position
       url
+      game {
+        name
+        awayTeamFk
+        awayTeamName
+        homeTeamFk
+        homeTeamName
+      }
     }
   }
 `;
@@ -52,6 +59,13 @@ const useStyles = makeStyles(theme => ({
 
 export const PlayerItem = props => {
   const { player, classes, style } = props;
+  const { game } = player;
+
+  let vs;
+  if (game) {
+    vs =
+      game.awayTeamFk == player.teamFk ? game.homeTeamName : game.awayTeamName;
+  }
 
   return (
     <Fragment>
@@ -74,7 +88,7 @@ export const PlayerItem = props => {
               >
                 {player.teamName}
               </Typography>
-              &nbsp; - {player.position}
+              &nbsp; - {player.position} {vs ? `vs ${vs}` : "No game this week"}
             </React.Fragment>
           }
         />
