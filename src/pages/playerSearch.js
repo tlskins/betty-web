@@ -58,7 +58,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export const PlayerItem = props => {
-  const { player, classes, style } = props;
+  const { player, classes, style, onSelect } = props;
   const { game } = player;
 
   let vs;
@@ -69,7 +69,12 @@ export const PlayerItem = props => {
 
   return (
     <Fragment>
-      <ListItem alignItems="flex-start" className={classes.item} style={style}>
+      <ListItem
+        alignItems="flex-start"
+        className={classes.item}
+        style={style}
+        onClick={() => onSelect(player)}
+      >
         <ListItemAvatar>
           <Avatar
             alt={player.name}
@@ -98,7 +103,7 @@ export const PlayerItem = props => {
   );
 };
 
-export function PlayerSearch() {
+export function PlayerSearch({ onSelect }) {
   const [execute, { loading, data, error }] = useLazyQuery(SEARCH_PLAYER);
   const search = useThrottle(execute, 300);
   const classes = useStyles();
@@ -124,7 +129,11 @@ export function PlayerSearch() {
           data.findPlayers &&
           data.findPlayers.map(player => (
             <Grow key={player.id} in={true} timeout={400}>
-              <PlayerItem player={player} classes={classes} />
+              <PlayerItem
+                player={player}
+                classes={classes}
+                onSelect={onSelect}
+              />
             </Grow>
           ))}
       </List>
