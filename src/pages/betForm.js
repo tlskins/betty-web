@@ -10,6 +10,7 @@ import Chip from "@material-ui/core/Chip";
 import FaceIcon from "@material-ui/icons/Face";
 
 import { PlayerSearch } from "./playerSearch";
+import { NavBar } from "./navBar";
 
 export const GET_SETTINGS = gql`
   query getSettings($id: String!) {
@@ -67,6 +68,42 @@ export function Equation({ equation, id }) {
   return <div id={id}>{equation.map((e, i) => renderExpr(e, i))}</div>;
 }
 
+const useStyles = makeStyles(theme => ({
+  formControl: {
+    margin: theme.spacing(1),
+    minWidth: 120
+  },
+  selectEmpty: {
+    marginTop: theme.spacing(2)
+  }
+}));
+
+function BetSelector({ title, list, onSelect }) {
+  const classes = useStyles();
+  //   const [value, setValue] = useState(list.length == 0 ? null : list[0]);
+
+  return (
+    <FormControl className={classes.formControl}>
+      <NativeSelect
+        // value={value}
+        onChange={e => onSelect(e.target.value)}
+        inputProps={{
+          name: "age",
+          id: "age-native-label-placeholder"
+        }}
+        autoFocus={true}
+      >
+        {list.map((v, i) => (
+          <option key={i} value={v}>
+            {v}
+          </option>
+        ))}
+      </NativeSelect>
+      {/* <FormHelperText>Label + placeholder</FormHelperText> */}
+    </FormControl>
+  );
+}
+
 export function BetForm() {
   const { loading, error, data } = useQuery(GET_SETTINGS, {
     variables: { id: "nfl" }
@@ -113,6 +150,7 @@ export function BetForm() {
 
   return (
     <div>
+      <NavBar />
       <h3>Title: {step.name}</h3>
       <div>
         {equations.map((eq, i) => (
@@ -134,41 +172,5 @@ export function BetForm() {
         <PlayerSearch onSelect={expr => addToEq(expr)} />
       )}
     </div>
-  );
-}
-
-const useStyles = makeStyles(theme => ({
-  formControl: {
-    margin: theme.spacing(1),
-    minWidth: 120
-  },
-  selectEmpty: {
-    marginTop: theme.spacing(2)
-  }
-}));
-
-function BetSelector({ title, list, onSelect }) {
-  const classes = useStyles();
-  //   const [value, setValue] = useState(list.length == 0 ? null : list[0]);
-
-  return (
-    <FormControl className={classes.formControl}>
-      <NativeSelect
-        // value={value}
-        onChange={e => onSelect(e.target.value)}
-        inputProps={{
-          name: "age",
-          id: "age-native-label-placeholder"
-        }}
-        autoFocus={true}
-      >
-        {list.map((v, i) => (
-          <option key={i} value={v}>
-            {v}
-          </option>
-        ))}
-      </NativeSelect>
-      {/* <FormHelperText>Label + placeholder</FormHelperText> */}
-    </FormControl>
   );
 }

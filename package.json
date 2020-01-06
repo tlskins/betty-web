@@ -72,6 +72,7 @@
     "terser-webpack-plugin": "2.2.1",
     "ts-pnp": "1.1.5",
     "typeface-roboto": "^0.0.75",
+    "typeface-roboto-condensed": "^0.0.75",
     "url-loader": "2.3.0",
     "webpack": "4.41.2",
     "webpack-dev-server": "3.9.0",

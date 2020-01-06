@@ -11,9 +11,12 @@ import { getMainDefinition } from "apollo-utilities";
 import { createMuiTheme } from "@material-ui/core/styles";
 import { ThemeProvider } from "@material-ui/styles";
 import indigo from "@material-ui/core/colors/indigo";
-import "./css/tailwind.css";
 
+import "./css/tailwind.css";
 import Pages from "./pages";
+
+import "typeface-roboto-condensed";
+// require("typeface-roboto-condensed");
 // import { resolvers, typeDefs } from "./resolvers";
 // import injectStyles from "./styles";
 

@@ -9,9 +9,8 @@ export default function Pages() {
   return (
     <Fragment>
       <Router primary={false} component={Fragment}>
-        <PlayerSearch path="/" />
+        <BetForm path="/" />
         <Chat path="/chat" />
-        <BetForm path="/new_bet" />
       </Router>
     </Fragment>
   );
