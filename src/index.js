@@ -11,11 +11,10 @@ import { getMainDefinition } from "apollo-utilities";
 import { createMuiTheme } from "@material-ui/core/styles";
 import { ThemeProvider } from "@material-ui/styles";
 import indigo from "@material-ui/core/colors/indigo";
-
-// import "typeface-roboto";
+import "./css/tailwind.css";
 
 import Pages from "./pages";
-import { resolvers, typeDefs } from "./resolvers";
+// import { resolvers, typeDefs } from "./resolvers";
 // import injectStyles from "./styles";
 
 const wsLink = new WebSocketLink({
