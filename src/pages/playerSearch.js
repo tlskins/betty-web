@@ -1,16 +1,22 @@
 import React, { useState, useEffect, Fragment } from "react";
 import { useLazyQuery, useSubscription } from "@apollo/react-hooks";
 import gql from "graphql-tag";
-// import "typeface-roboto";
-import { makeStyles } from "@material-ui/core/styles";
+import "typeface-roboto";
+import { makeStyles, createMuiTheme } from "@material-ui/core/styles";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
-import Divider from "@material-ui/core/Divider";
 import ListItemText from "@material-ui/core/ListItemText";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import Avatar from "@material-ui/core/Avatar";
 import Typography from "@material-ui/core/Typography";
 import Grow from "@material-ui/core/Grow";
+import Paper from "@material-ui/core/Paper";
+import InputBase from "@material-ui/core/InputBase";
+import Divider from "@material-ui/core/Divider";
+import IconButton from "@material-ui/core/IconButton";
+import MenuIcon from "@material-ui/icons/Menu";
+import SearchIcon from "@material-ui/icons/Search";
+import DirectionsIcon from "@material-ui/icons/Directions";
 
 import { useThrottle } from "../utils";
 import { RotoAlerts } from "./rotoAlerts";
@@ -39,10 +45,17 @@ export const SEARCH_PLAYER = gql`
 `;
 
 const useStyles = makeStyles(theme => ({
-  root: {
+  searchRoot: {
     width: "100%",
     maxWidth: 360,
-    backgroundColor: theme.palette.background.paper
+    backgroundColor: theme.palette.primary,
+    borderRadius: "17px"
+  },
+  listRoot: {
+    padding: "2px 4px",
+    display: "flex",
+    alignItems: "center",
+    width: 400
   },
   inline: {
     display: "inline"
@@ -54,7 +67,18 @@ const useStyles = makeStyles(theme => ({
     // borderColor: "Silver",
     // borderRadius: "7px",
     marginTop: "2px"
+  },
+  input: {
+    marginLeft: theme.spacing(6),
+    flex: 1
+  },
+  iconButton: {
+    padding: 10
   }
+  // divider: {
+  //   height: 28,
+  //   margin: 4
+  // }
 }));
 
 export const PlayerItem = props => {
@@ -122,9 +146,38 @@ export function PlayerSearch({ onSelect }) {
   return (
     <Fragment>
       <RotoAlerts />
-      <input type="text" onChange={onChange} />
       <p>{msg}</p>
-      <List className={classes.root}>
+
+      <div class="max-w-sm mx-auto flex p-6 bg-white rounded-lg shadow-xl">
+        <div class="ml-6 pt-1">
+          <h4 class="text-xl text-gray-900 leading-tight">ChitChat</h4>
+          <p class="text-base text-gray-600 leading-normal">
+            You have a new message!
+          </p>
+        </div>
+      </div>
+
+      <Paper component="form" className={classes.searchRoot}>
+        <IconButton className={classes.iconButton} aria-label="menu">
+          <MenuIcon />
+        </IconButton>
+        <InputBase
+          className={classes.input}
+          placeholder="Search player or team"
+          inputProps={{ "aria-label": "search player team" }}
+          autoFocus={true}
+          onChange={onChange}
+        />
+        {/* <IconButton
+          type="submit"
+          className={classes.iconButton}
+          aria-label="search"
+        >
+          <SearchIcon />
+        </IconButton> */}
+      </Paper>
+
+      <List className={classes.listRoot}>
         {data &&
           data.findPlayers &&
           data.findPlayers.map(player => (

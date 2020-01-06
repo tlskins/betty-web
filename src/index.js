@@ -8,6 +8,9 @@ import { ApolloProvider, useQuery } from "@apollo/react-hooks";
 import { split } from "apollo-link";
 import { WebSocketLink } from "apollo-link-ws";
 import { getMainDefinition } from "apollo-utilities";
+import { createMuiTheme } from "@material-ui/core/styles";
+import { ThemeProvider } from "@material-ui/styles";
+import indigo from "@material-ui/core/colors/indigo";
 
 // import "typeface-roboto";
 
@@ -47,32 +50,41 @@ if (module.hot) {
   });
 }
 
+// const THEME = createMuiTheme({
+//   typography: {
+//     fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+//     fontSize: 14,
+//     fontWeightLight: 300,
+//     fontWeightRegular: 400,
+//     fontWeightMedium: 500
+//   }
+// });
+
+const theme = createMuiTheme({
+  palette: {
+    primary: {
+      main: "#ffb74d"
+    },
+    secondary: indigo
+  },
+  typography: {
+    fontFamily: [
+      "Nunito",
+      "Roboto",
+      '"Helvetica Neue"',
+      "Arial",
+      "sans-serif"
+    ].join(",")
+  }
+});
+
 function render(component) {
   ReactDOM.render(
-    <ApolloProvider client={apolloClient}>{component}</ApolloProvider>,
+    <ApolloProvider client={apolloClient}>
+      <ThemeProvider theme={theme}>{component}</ThemeProvider>
+    </ApolloProvider>,
     document.getElementById("root")
   );
 }
 
 render(<Pages />);
-
-// const cache = new InMemoryCache();
-// const client = new ApolloClient({
-//   cache,
-//   link: new HttpLink({
-//     uri: "http://localhost:8080/query",
-//     headers: {
-//       "client-name": "Betty",
-//       "client-version": "1.0.0"
-//     }
-//   }),
-//   resolvers,
-//   typeDefs
-// });
-
-// ReactDOM.render(
-//   <ApolloProvider client={client}>
-//     <Pages />
-//   </ApolloProvider>,
-//   document.getElementById("root")
-// );

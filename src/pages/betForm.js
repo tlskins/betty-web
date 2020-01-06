@@ -1,11 +1,13 @@
 import React, { useState, useEffect, Fragment } from "react";
 import { useQuery, useSubscription } from "@apollo/react-hooks";
 import gql from "graphql-tag";
-// import "typeface-roboto";
+import "typeface-roboto";
 import { makeStyles } from "@material-ui/core/styles";
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import NativeSelect from "@material-ui/core/NativeSelect";
+import Chip from "@material-ui/core/Chip";
+import FaceIcon from "@material-ui/icons/Face";
 
 import { PlayerSearch } from "./playerSearch";
 
@@ -37,6 +39,34 @@ const steps = [
   { num: 4, name: "Choose Stat / Result" }
 ];
 
+export function Equation({ equation, id }) {
+  const renderExpr = (expr, key) => {
+    if (typeof expr == "string") {
+      return (
+        <Chip
+          key={key}
+          color="secondary"
+          onDelete={() => {}}
+          icon={<FaceIcon />}
+          label={expr}
+        />
+      );
+    } else {
+      return (
+        <Chip
+          key={key}
+          color="primary"
+          onDelete={() => {}}
+          icon={<FaceIcon />}
+          label={expr.name}
+        />
+      );
+    }
+  };
+
+  return <div id={id}>{equation.map((e, i) => renderExpr(e, i))}</div>;
+}
+
 export function BetForm() {
   const { loading, error, data } = useQuery(GET_SETTINGS, {
     variables: { id: "nfl" }
@@ -53,15 +83,14 @@ export function BetForm() {
   };
 
   const addToEq = expr => {
-    setEquation([...equation, expr]);
     const next = nextStep(step);
+    if (next.num == 0) {
+      setEquations([...equations, [...equation, expr]]);
+      setEquation([]);
+    } else {
+      setEquation([...equation, expr]);
+    }
     setStep(next);
-    if (next.num == 0) addToEqs();
-  };
-
-  const addToEqs = () => {
-    setEquations([...equations, equation]);
-    setEquation([]);
   };
 
   if (loading) return <p>Loading ...</p>;
@@ -82,21 +111,19 @@ export function BetForm() {
     list = betEquations.map(b => b.name);
   }
 
-  if (list) {
-    return (
-      <BetSelector
-        title={step.name}
-        list={list}
-        onSelect={expr => addToEq(expr)}
-      />
-    );
-  } else if (step.name == "Choose Player / Team") {
-    return <PlayerSearch onSelect={expr => addToEq(expr)} />;
-  }
-
   return (
     <div>
-      <h3>{step.name}</h3>
+      <h3>Title: {step.name}</h3>
+      <div>
+        {equations.map((eq, i) => (
+          <div key={i}>
+            <Equation equation={eq} />
+          </div>
+        ))}
+      </div>
+      <div>
+        <Equation equation={equation} />
+      </div>
       {list ? (
         <BetSelector
           title={step.name}
@@ -133,6 +160,7 @@ function BetSelector({ title, list, onSelect }) {
           name: "age",
           id: "age-native-label-placeholder"
         }}
+        autoFocus={true}
       >
         {list.map((v, i) => (
           <option key={i} value={v}>

@@ -1,7 +1,7 @@
 {
   "name": "betty-web",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "dependencies": {
     "@livechat/ui-kit": "^0.4.0-10",
     "@material-ui/core": "^4.8.2",
@@ -14,13 +14,18 @@
     "apollo-client": "^2.6.8",
     "apollo-link-http": "^1.5.16",
     "apollo-link-ws": "^1.0.19",
+    "autoprefixer": "^9.7.3",
     "graphql": "^14.5.8",
     "graphql-tag": "^2.10.1",
+    "mini-css-extract-plugin": "^0.9.0",
+    "postcss-cli": "^6.1.3",
+    "postcss-loader": "^3.0.0",
     "react": "^16.12.0",
     "react-apollo": "^3.1.3",
     "react-dom": "^16.12.0",
     "react-scripts": "3.3.0",
     "subscriptions-transport-ws": "^0.9.16",
+    "tailwindcss": "^1.1.4",
     "typeface-roboto": "^0.0.75"
   },
   "scripts": {
@@ -43,5 +48,14 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "devDependencies": {
+    "css-loader": "^3.4.1",
+    "style-loader": "^1.1.2"
+  },
+  "description": "Web App for Betty",
+  "main": "index.js",
+  "repository": "https://github.com/tlskins/betty-web",
+  "author": "Tim Lee <tlee87@gmail.com>",
+  "license": "MIT"
 }
