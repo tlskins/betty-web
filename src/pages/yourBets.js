@@ -4,14 +4,14 @@ import gql from "graphql-tag";
 import "typeface-roboto";
 import { makeStyles } from "@material-ui/core/styles";
 import FormControl from "@material-ui/core/FormControl";
-import InputLabel from "@material-ui/core/InputLabel";
 import NativeSelect from "@material-ui/core/NativeSelect";
 import Chip from "@material-ui/core/Chip";
 import FaceIcon from "@material-ui/icons/Face";
 
-import { PlayerSearch } from "./playerSearch";
 import { NavBar } from "./navBar";
+import { NavSideBar } from "./navSideBar";
 import { Bet } from "./bet";
+import { RotoAlerts } from "./rotoAlerts";
 
 export const GET_BETS = gql`
   query {
@@ -183,36 +183,9 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-function BetSelector({ title, list, onSelect }) {
-  const classes = useStyles();
-
-  return (
-    <FormControl className={classes.formControl}>
-      <NativeSelect
-        // value={value}
-        onChange={e => onSelect(e.target.value)}
-        inputProps={{
-          name: "age",
-          id: "age-native-label-placeholder"
-        }}
-        autoFocus={true}
-      >
-        {list.map((v, i) => (
-          <option key={i} value={v}>
-            {v}
-          </option>
-        ))}
-      </NativeSelect>
-    </FormControl>
-  );
-}
-
 export function YourBets() {
-  const {
-    loading: settingsLoading,
-    error: settingsErr,
-    data: settingsData
-  } = useQuery(GET_SETTINGS, {
+  const [showSideBar, setShowSideBar] = useState(false);
+  useQuery(GET_SETTINGS, {
     variables: { id: "nfl" }
   });
   const { loading: betsLoading, error: betsErr, data: betsData } = useQuery(
@@ -221,7 +194,9 @@ export function YourBets() {
 
   return (
     <div className="page-layout-wrapper">
-      <NavBar />
+      <NavBar clickMenu={() => setShowSideBar(!showSideBar)} />
+      <NavSideBar show={showSideBar} hide={() => setShowSideBar(false)} />
+      <RotoAlerts />
       <div className="page-layout">
         <div className="page-inner-layout">
           <div className="page-hdr-box">

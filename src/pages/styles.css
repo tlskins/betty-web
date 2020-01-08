@@ -1,6 +1,6 @@
 /** Navbar **/
 
-.nav_bar {
+.nav-bar {
   font-family: GT-Sectra-Book, GT-Sectra-Regular, serif;
   color: rgb(11, 11, 11);
   -webkit-font-smoothing: antialiased !important;
@@ -13,6 +13,21 @@
   display: flex;
   height: 60px;
   border-bottom: 1px solid rgb(11, 11, 11);
+}
+
+.nav-bar-hidden {
+  font-family: GT-Sectra-Book, GT-Sectra-Regular, serif;
+  color: rgb(11, 11, 11);
+  -webkit-font-smoothing: antialiased !important;
+  box-sizing: inherit;
+  position: sticky;
+  top: 0px;
+  z-index: 900;
+  background: white;
+  transition: all 600ms ease 0s;
+  display: flex;
+  height: 80px;
+  border-bottom: none;
 }
 
 .nav-hdr-content {
@@ -552,4 +567,159 @@
   font-family: Plain;
   margin-left: 18px;
   padding: 10px 10px;
+}
+
+/** Nav Sidebar **/
+
+.nav-sidebar-wrapper {
+  font-family: GT-Sectra-Book, GT-Sectra-Regular, serif;
+  color: rgb(11, 11, 11);
+  -webkit-font-smoothing: antialiased !important;
+  box-sizing: inherit;
+  order: 4;
+  z-index: 902;
+  margin: 0px 0px 0px 24px;
+}
+
+.nav-overlay {
+  font-family: GT-Sectra-Book, GT-Sectra-Regular, serif;
+  color: rgb(11, 11, 11);
+  -webkit-font-smoothing: antialiased !important;
+  box-sizing: inherit;
+  position: fixed;
+  top: 0px;
+  right: 0px;
+  left: 0px;
+  bottom: 0px;
+  transform: none;
+  opacity: 1;
+  z-index: 901;
+  transition: opacity 0.3s ease 0s;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.nav-overlay-hidden {
+  font-family: GT-Sectra-Book, GT-Sectra-Regular, serif;
+  color: rgb(11, 11, 11);
+  -webkit-font-smoothing: antialiased !important;
+  box-sizing: inherit;
+  position: fixed;
+  top: 0px;
+  right: 0px;
+  left: 0px;
+  bottom: 0px;
+  transform: translate(-100%, 0px);
+  opacity: 0;
+  transition: opacity 0.3s ease 0s;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.nav-overlay-cover {
+  font-family: GT-Sectra-Book, GT-Sectra-Regular, serif;
+  color: rgb(11, 11, 11);
+  -webkit-font-smoothing: antialiased !important;
+  box-sizing: inherit;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+}
+
+.nav-sidebar-hidden {
+  font-family: GT-Sectra-Book, GT-Sectra-Regular, serif;
+  color: rgb(11, 11, 11);
+  -webkit-font-smoothing: antialiased !important;
+  box-sizing: inherit;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0px;
+  bottom: 0px;
+  width: 375px;
+  max-width: 70%;
+  z-index: 0;
+  opacity: 0;
+  overflow-x: hidden;
+  background: rgb(255, 255, 255);
+  transition: opacity 0s linear 0.4s, transform 0.3s ease-in-out 0s;
+  right: 0px;
+  left: initial;
+  transform: translate(100vw, 0px);
+}
+
+.nav-sidebar {
+  font-family: GT-Sectra-Book, GT-Sectra-Regular, serif;
+  color: rgb(11, 11, 11);
+  -webkit-font-smoothing: antialiased !important;
+  box-sizing: inherit;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0px;
+  bottom: 0px;
+  width: 375px;
+  max-width: 70%;
+  z-index: 902;
+  opacity: 1;
+  overflow-x: hidden;
+  background: rgb(255, 255, 255);
+  transition: transform 0.3s ease-in-out 0s;
+  right: 0px;
+  left: initial;
+  transform: none;
+}
+
+.nav-sidebar-list {
+  font-family: GT-Sectra-Book, GT-Sectra-Regular, serif;
+  color: rgb(11, 11, 11);
+  -webkit-font-smoothing: antialiased !important;
+  box-sizing: inherit;
+  list-style-type: none;
+  margin: 0px;
+  padding: 0px;
+}
+
+.nav-sidebar-list-item {
+  font-family: GT-Sectra-Book, GT-Sectra-Regular, serif;
+  color: rgb(11, 11, 11);
+  -webkit-font-smoothing: antialiased !important;
+  list-style-type: none;
+  box-sizing: inherit;
+}
+
+.nav-sidebar-list-label {
+  -webkit-font-smoothing: antialiased !important;
+  list-style-type: none;
+  color: #0b0b0b;
+  font-weight: normal;
+  box-sizing: inherit;
+  display: flex;
+  -webkit-box-pack: justify;
+  justify-content: space-between;
+  -webkit-box-align: center;
+  align-items: center;
+  font-size: 10px;
+  font-family: Plain-Medium;
+  line-height: 100%;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  border-bottom: 1px solid rgb(182, 182, 182);
+  height: 45px;
+  padding: 8px 20px;
+}
+
+.nav-sidebar-list-txt {
+  -webkit-font-smoothing: antialiased !important;
+  list-style-type: none;
+  color: #0b0b0b;
+  font-weight: normal;
+  font-size: 10px;
+  font-family: Plain-Medium;
+  line-height: 100%;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  box-sizing: inherit;
+  display: inline-block;
+  position: relative;
 }

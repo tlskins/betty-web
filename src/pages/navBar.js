@@ -1,13 +1,13 @@
 import React from "react";
 import "./styles.css";
 
-export function NavBar() {
+export function NavBar({ clickMenu }) {
   return (
-    <nav className="nav_bar">
+    <nav className="nav-bar">
       <div className="nav-hdr-content">
         <div className="nav-menu-container">
           <div>
-            <label className="nav_hamburger">
+            <label className="nav_hamburger" onClick={clickMenu}>
               <span className="hamburger_slice" />
               <span className="hamburger_slice" />
               <span className="hamburger_slice" />
