@@ -40,7 +40,7 @@ const link = split(
   httpLink
 );
 
-const apolloClient = new ApolloClient({
+export const apolloClient = new ApolloClient({
   link,
   cache: new InMemoryCache()
 });
@@ -51,16 +51,6 @@ if (module.hot) {
     render(<NextApp />);
   });
 }
-
-// const THEME = createMuiTheme({
-//   typography: {
-//     fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-//     fontSize: 14,
-//     fontWeightLight: 300,
-//     fontWeightRegular: 400,
-//     fontWeightMedium: 500
-//   }
-// });
 
 const theme = createMuiTheme({
   palette: {

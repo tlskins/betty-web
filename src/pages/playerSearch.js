@@ -15,8 +15,6 @@ import InputBase from "@material-ui/core/InputBase";
 import Divider from "@material-ui/core/Divider";
 import IconButton from "@material-ui/core/IconButton";
 import MenuIcon from "@material-ui/icons/Menu";
-import SearchIcon from "@material-ui/icons/Search";
-import DirectionsIcon from "@material-ui/icons/Directions";
 
 import { useThrottle } from "../utils";
 import { RotoAlerts } from "./rotoAlerts";
@@ -148,15 +146,6 @@ export function PlayerSearch({ onSelect }) {
       <RotoAlerts />
       <p>{msg}</p>
 
-      <div className="max-w-sm mx-auto flex p-6 bg-white rounded-lg shadow-xl">
-        <div className="ml-6 pt-1">
-          <h4 className="text-xl text-gray-900 leading-tight">ChitChat</h4>
-          <p className="text-base text-gray-600 leading-normal">
-            You have a new message!
-          </p>
-        </div>
-      </div>
-
       <Paper component="form" className={classes.searchRoot}>
         <IconButton className={classes.iconButton} aria-label="menu">
           <MenuIcon />
@@ -168,13 +157,6 @@ export function PlayerSearch({ onSelect }) {
           autoFocus={true}
           onChange={onChange}
         />
-        {/* <IconButton
-          type="submit"
-          className={classes.iconButton}
-          aria-label="search"
-        >
-          <SearchIcon />
-        </IconButton> */}
       </Paper>
 
       <List className={classes.listRoot}>
