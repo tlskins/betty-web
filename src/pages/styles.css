@@ -548,7 +548,8 @@
   -webkit-box-direction: normal;
   list-style-type: none;
   box-sizing: inherit;
-  height: 55px;
+  min-height: 55px;
+  /* height: 55px; */
   border-bottom: 1px solid black;
 }
 
@@ -705,7 +706,8 @@
   letter-spacing: 1.5px;
   text-transform: uppercase;
   border-bottom: 1px solid rgb(182, 182, 182);
-  height: 45px;
+  /* height: 45px; */
+  min-height: 45px;
   padding: 8px 20px;
 }
 
@@ -722,4 +724,153 @@
   box-sizing: inherit;
   display: inline-block;
   position: relative;
+}
+
+/** Roto **/
+
+.article-container {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+  font: 15px/20px "Calibre-Regular";
+  letter-spacing: 0.013em;
+  cursor: pointer;
+  color: #101820;
+  -webkit-box-pack: center;
+  justify-content: center;
+  -webkit-box-align: stretch;
+  align-items: stretch;
+  align-content: stretch;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  flex-direction: column;
+  padding-bottom: 32px;
+  padding-top: 32px;
+  position: relative;
+  text-decoration: none;
+  -webkit-box-flex: 1;
+  flex: 1 1 100%;
+  /* max-width: 50%; */
+  box-sizing: border-box;
+  padding-right: 40px;
+  max-height: initial;
+}
+
+.article-title {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+  cursor: pointer;
+  -webkit-box-direction: normal;
+  color: #101820;
+  font: 12px/14px "Calibre-Medium";
+  letter-spacing: 0.086em;
+  text-transform: uppercase;
+}
+
+.article-title-span {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+  cursor: pointer;
+  -webkit-box-direction: normal;
+  color: #101820;
+  font: 12px/14px "Calibre-Medium";
+  letter-spacing: 0.086em;
+  text-transform: none;
+  border-bottom: 1px solid transparent;
+  margin-bottom: 1em;
+  transition: border-bottom 0.2s ease-in-out;
+}
+
+.article-title-details {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+  cursor: pointer;
+  -webkit-box-direction: normal;
+  color: #656666;
+  font: 10px/12px "Calibre-Regular";
+  letter-spacing: 0.013em;
+  margin-bottom: 3px;
+  margin-top: 7px;
+}
+
+.article-title-lg-details {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+  cursor: pointer;
+  -webkit-box-direction: normal;
+  color: #101820;
+  font: 12px/14px "Calibre-Medium";
+  letter-spacing: 0.061em;
+  text-transform: uppercase;
+  margin-bottom: 3px;
+  margin-top: 7px;
+}
+
+.article-title-detail-span {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+  cursor: pointer;
+  -webkit-box-direction: normal;
+  color: #656666;
+  font: 10px/12px "Calibre-Regular";
+  letter-spacing: 0.08em;
+}
+
+.article-title-detail-sep {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+  cursor: pointer;
+  -webkit-box-direction: normal;
+  color: #656666;
+  font: 10px/12px "Calibre-Regular";
+  letter-spacing: 0.013em;
+}
+
+.article-title-detail-lg-span {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+  cursor: pointer;
+  -webkit-box-direction: normal;
+  color: #101820;
+  font: 12px/14px "Calibre-Medium";
+  letter-spacing: 0.061em;
+  text-transform: uppercase;
+}
+
+.article-title-detail-label {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+  cursor: pointer;
+  -webkit-box-direction: normal;
+  color: #101820;
+  font: 12px/14px "Calibre-Medium";
+  letter-spacing: 0.061em;
+  text-transform: uppercase;
+}
+
+.article-title-detail-value {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+  cursor: pointer;
+  -webkit-box-direction: normal;
+  font: 12px/14px "Calibre-Medium";
+  letter-spacing: 0.061em;
+  text-transform: uppercase;
+  color: #b70038;
+}
+
+.article-divider {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+  font: 15px/20px "Calibre-Regular";
+  letter-spacing: 0.013em;
+  cursor: pointer;
+  color: #101820;
+  -webkit-box-direction: normal;
+  border-color: #d0d2d3;
+  border-style: solid;
+  border-width: 0 0 1px;
+  width: 100%;
+  margin-bottom: 19px;
+  margin-top: 17px;
 }

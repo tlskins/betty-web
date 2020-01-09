@@ -1,15 +1,11 @@
-import React, { useState, useEffect, Fragment } from "react";
-import { useQuery, useSubscription } from "@apollo/react-hooks";
+import React, { useState } from "react";
+import { useQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import "typeface-roboto";
-import { makeStyles } from "@material-ui/core/styles";
-import FormControl from "@material-ui/core/FormControl";
-import NativeSelect from "@material-ui/core/NativeSelect";
-import Chip from "@material-ui/core/Chip";
-import FaceIcon from "@material-ui/icons/Face";
 
 import { NavBar } from "./navBar";
-import { NavSideBar } from "./navSideBar";
+// import { NavSideBar } from "./navSideBar";
+import { RotoSideBar } from "./rotoSideBar";
 import { Bet } from "./bet";
 import { RotoAlerts } from "./rotoAlerts";
 
@@ -137,54 +133,8 @@ export const GET_SETTINGS = gql`
   }
 `;
 
-const steps = [
-  { num: 0, name: "Choose Player / Team" },
-  { num: 1, name: "Choose Stat / Result" },
-  { num: 2, name: "Choose Comparison Type" },
-  { num: 3, name: "Choose Player / Team" },
-  { num: 4, name: "Choose Stat / Result" }
-];
-
-export function Equation({ equation, id }) {
-  const renderExpr = (expr, key) => {
-    if (typeof expr == "string") {
-      return (
-        <Chip
-          key={key}
-          color="secondary"
-          onDelete={() => {}}
-          icon={<FaceIcon />}
-          label={expr}
-        />
-      );
-    } else {
-      return (
-        <Chip
-          key={key}
-          color="primary"
-          onDelete={() => {}}
-          icon={<FaceIcon />}
-          label={expr.name}
-        />
-      );
-    }
-  };
-
-  return <div id={id}>{equation.map((e, i) => renderExpr(e, i))}</div>;
-}
-
-const useStyles = makeStyles(theme => ({
-  formControl: {
-    margin: theme.spacing(1),
-    minWidth: 120
-  },
-  selectEmpty: {
-    marginTop: theme.spacing(2)
-  }
-}));
-
 export function YourBets() {
-  const [showSideBar, setShowSideBar] = useState(false);
+  const [showSideBar, setShowSideBar] = useState(undefined);
   useQuery(GET_SETTINGS, {
     variables: { id: "nfl" }
   });
@@ -194,8 +144,11 @@ export function YourBets() {
 
   return (
     <div className="page-layout-wrapper">
-      <NavBar clickMenu={() => setShowSideBar(!showSideBar)} />
-      <NavSideBar show={showSideBar} hide={() => setShowSideBar(false)} />
+      <NavBar clickRotoNfl={() => setShowSideBar("RotoNfl")} />
+      <RotoSideBar
+        show={showSideBar == "RotoNfl"}
+        hide={() => setShowSideBar(undefined)}
+      />
       <RotoAlerts />
       <div className="page-layout">
         <div className="page-inner-layout">
