@@ -8,17 +8,11 @@ import { ApolloProvider, useQuery } from "@apollo/react-hooks";
 import { split } from "apollo-link";
 import { WebSocketLink } from "apollo-link-ws";
 import { getMainDefinition } from "apollo-utilities";
-import { createMuiTheme } from "@material-ui/core/styles";
-import { ThemeProvider } from "@material-ui/styles";
-import indigo from "@material-ui/core/colors/indigo";
 
 import "./css/tailwind.css";
 import Pages from "./pages";
 
 import "typeface-roboto-condensed";
-// require("typeface-roboto-condensed");
-// import { resolvers, typeDefs } from "./resolvers";
-// import injectStyles from "./styles";
 
 const wsLink = new WebSocketLink({
   uri: `ws://localhost:8080/query`,
@@ -52,29 +46,9 @@ if (module.hot) {
   });
 }
 
-const theme = createMuiTheme({
-  palette: {
-    primary: {
-      main: "#ffb74d"
-    },
-    secondary: indigo
-  },
-  typography: {
-    fontFamily: [
-      "Nunito",
-      "Roboto",
-      '"Helvetica Neue"',
-      "Arial",
-      "sans-serif"
-    ].join(",")
-  }
-});
-
 function render(component) {
   ReactDOM.render(
-    <ApolloProvider client={apolloClient}>
-      <ThemeProvider theme={theme}>{component}</ThemeProvider>
-    </ApolloProvider>,
+    <ApolloProvider client={apolloClient}>{component}</ApolloProvider>,
     document.getElementById("root")
   );
 }

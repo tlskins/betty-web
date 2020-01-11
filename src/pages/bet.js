@@ -4,6 +4,7 @@ import gql from "graphql-tag";
 import moment from "moment-timezone";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import Avatar from "@material-ui/core/Avatar";
+// import { useApolloClient } from "@apollo/client";
 
 import { useThrottle } from "../utils";
 import { apolloClient } from "../index";
@@ -23,6 +24,7 @@ export const SEARCH_PLAYER = gql`
       position
       url
       game {
+        fk
         name
         awayTeamFk
         awayTeamName
@@ -33,171 +35,144 @@ export const SEARCH_PLAYER = gql`
   }
 `;
 
-export function Bet({ bet }) {
-  const {
-    id,
-    finalizedAt,
-    equations,
-    recipient: { name: rName, screenName: rSN }
-  } = bet;
-  console.log("bet", bet);
+// const Mutation = gql`
+//   mutation updateBet($id: String!, $changes: BetChanges!) {
+//     updateBet(text: $text, roomName: $channel, username: $name) {
+//       id
+//     }
+//   }
+// `;
 
-  const finalAt = moment(finalizedAt);
+export function Bet({ bet = {} }) {
+  const { id, finalizedAt, equations = [], recipient = {} } = bet;
+  const { name = "?", screenName = "?" } = recipient;
+  const [editEquations, setEditEquations] = useState(
+    equations.map(e => {
+      return { id: e.id, edited: false };
+    })
+  );
+  const editedEquations = equations.map((e, i) => {
+    return { ...e, ...editEquations[i] };
+  });
+  console.log(equations, editEquations, editedEquations);
+
+  const changeEquation = eqChg => {
+    console.log("eqchg", eqChg);
+    const idx = editEquations.findIndex(eq => eq == eqChg.id);
+    setEditEquations([
+      ...editEquations.slice(0, idx),
+      { ...editEquations[idx], ...eqChg },
+      ...editEquations.slice(idx + 1)
+    ]);
+  };
+
+  const finalAt = moment(finalizedAt, "YYYY-MM-DD HH:mm:ss Z");
 
   return (
-    <div className="fact-section" key={id}>
+    <div className="fact-section">
       <div className="section-title-wrapper">
-        <h1 className="section-title">{`Bet with ${rName}`}</h1>
+        <h1 className="section-title">{`Bet with ${name}`}</h1>
         <p className="section-subtitle">
-          {finalAt.format("MMMM Do YYYY, h:mm:ss a")} | @{rSN}
+          {finalAt.format("MMMM Do YYYY, h:mm:ss a")} | @{screenName}
         </p>
       </div>
-
-      {equations && equations.map(eq => <Equation equation={eq} />)}
+      {editedEquations &&
+        editedEquations.map((eq, i) => (
+          <div key={i}>
+            <Equation equation={eq} onChange={changeEquation} />
+          </div>
+        ))}
     </div>
   );
 }
 
-function Equation({ equation, key }) {
-  const [edit, setEdit] = useState(null);
-
-  const { leftExpressions, rightExpressions, operator } = equation;
-  const op = (operator && operator.name) || "?";
+function Equation({ key, equation = {}, onChange }) {
+  const {
+    leftExpressions = [],
+    rightExpressions = [],
+    operator = {}
+  } = equation;
 
   return (
     <div key={key} className="flex w-full">
       <div className="flex flex-col px-4 py-2 m-2 w-full">
-        {leftExpressions &&
-          leftExpressions.map((exp, i) => (
-            <Expression expression={exp} key={"left" + i} />
-          ))}
+        {leftExpressions.map((exp, i) => (
+          <div key={i}>
+            <Expression
+              expression={exp}
+              onChange={exprChg =>
+                onChange({ id: equation.id, expression: exprChg.id })
+              }
+            />
+          </div>
+        ))}
       </div>
-      {edit && edit == "op" && <OperatorSearch onExit={() => setEdit(null)} />}
-      {!edit && (
-        <div
-          className="underline hover:text-blue-500 cursor-pointer px-4 py-2 m-2"
-          onClick={() => setEdit("op")}
-        >
-          {op}
-        </div>
-      )}
+      <Operator
+        operator={operator}
+        onSelect={operator => onChange({ operator })}
+      />
       <div className="flex flex-col px-4 py-2 m-2 w-full">
-        {rightExpressions &&
-          rightExpressions.map((exp, i) => (
-            <Expression expression={exp} key={"right" + i} />
-          ))}
+        {rightExpressions.map((exp, i) => (
+          <div key={i}>
+            <Expression
+              expression={exp}
+              onChange={exprChg =>
+                onChange({ id: equation.id, expression: exprChg.id })
+              }
+            />
+          </div>
+        ))}
       </div>
     </div>
   );
 }
 
-function Expression({ expression, key }) {
-  const [edit, setEdit] = useState(null);
-
-  const {
-    player: { firstName, lastName, position, teamShort, teamFk },
-    game: { awayTeamName, homeTeamFk, homeTeamName },
-    metric
-  } = expression;
-
-  let vsTeam = homeTeamName;
-  if (teamFk == homeTeamFk) {
-    vsTeam = awayTeamName;
-  }
-
-  const metricName = (metric && metric.name) || "?";
+export function Expression({ eqIdx, exprIdx, expression, dispatch }) {
+  const { id, player, game, metric } = expression;
 
   return (
     <div>
-      <div className="fact-wrapper" key={key}>
-        <span className="fact-label">
-          {edit && edit == "metric" && (
-            <MetricSearch onExit={() => setEdit(null)} />
-          )}
-          {edit && edit == "source" && (
-            <PlayerSearch onExit={() => setEdit(null)} />
-          )}
-          {!edit && (
-            <div>
-              <div
-                className="underline hover:text-blue-500 cursor-pointer"
-                onClick={() => setEdit("source")}
-              >
-                {firstName[0]}.{lastName} ({teamShort}-{position})
-              </div>
-              vs {vsTeam}
-            </div>
-          )}
-        </span>
-        <span
-          className="fact-value underline hover:text-blue-500 cursor-pointer"
-          onClick={() => setEdit("metric")}
-        >
-          {metricName}
-        </span>
+      <div className="fact-wrapper">
+        <Source
+          player={player}
+          game={game}
+          onSelect={source =>
+            dispatch({ type: "addSource", source, eqIdx, exprIdx })
+          }
+        />
+        <Metric
+          metric={metric}
+          onSelect={metric =>
+            dispatch({ type: "addMetric", metric, eqIdx, exprIdx })
+          }
+        />
       </div>
     </div>
   );
 }
 
-function MetricSearch({ onExit }) {
-  const data = apolloClient.readQuery({
-    query: GET_SETTINGS,
-    variables: { id: "nfl" }
-  });
-  console.log("data", data);
-
-  const [search, setSearch] = useState("");
-
-  const onChange = e => {
-    const value = e.target.value;
-    setSearch(value);
-  };
-
-  const onKeyDown = e => {
-    if (e.keyCode === 27) {
-      onExit();
-    }
-  };
+export function Operator({ operator, onSelect }) {
+  const [edit, setEdit] = useState(false);
+  const { name = "?" } = operator || {};
 
   return (
-    <div className="dropdown-menu flex flex-row" onMouseLeave={onExit}>
-      <button className="dropdown-btn">
-        <ExitButton onClick={onExit} />
-        <div className="dropdown-title ml-2">Player / Team</div>
-        <div className="dropdown-selection">
-          <input
-            type="text"
-            autoFocus={true}
-            placeholder="search"
-            className="p-2"
-            onChange={onChange}
-            onKeyDown={onKeyDown}
-          />
+    <div>
+      {edit && (
+        <OperatorSearch onExit={() => setEdit(false)} onSelect={onSelect} />
+      )}
+      {!edit && (
+        <div
+          className="underline hover:text-blue-500 cursor-pointer px-4 py-2 m-2"
+          onClick={() => setEdit(true)}
+        >
+          {name}
         </div>
-        {data && data.leagueSettings && data.leagueSettings.playerBets && (
-          <ul className="dropdown-list">
-            {data.leagueSettings.playerBets
-              .filter(bet => RegExp(search, "i").test(bet.name))
-              .map(bet => {
-                const { name } = bet;
-
-                return (
-                  <div key={name} className="dropdown-list-item">
-                    <div className="dropdown-list-item-text flex flex-row">
-                      {name}
-                    </div>
-                  </div>
-                );
-              })}
-          </ul>
-        )}
-      </button>
+      )}
     </div>
   );
 }
 
-function OperatorSearch({ onExit }) {
+function OperatorSearch({ onExit, onSelect }) {
   const data = apolloClient.readQuery({
     query: GET_SETTINGS,
     variables: { id: "nfl" }
@@ -237,9 +212,15 @@ function OperatorSearch({ onExit }) {
               .filter(bet => RegExp(search, "i").test(bet.name))
               .map(bet => {
                 const { name } = bet;
-
                 return (
-                  <div key={name} className="dropdown-list-item">
+                  <div
+                    key={name}
+                    className="dropdown-list-item"
+                    onClick={() => {
+                      onSelect(bet);
+                      onExit();
+                    }}
+                  >
                     <div className="dropdown-list-item-text flex flex-row">
                       {name}
                     </div>
@@ -253,7 +234,132 @@ function OperatorSearch({ onExit }) {
   );
 }
 
-function PlayerSearch({ onExit }) {
+export function Metric({ metric, onSelect }) {
+  const [edit, setEdit] = useState(false);
+  const { name } = metric || { name: "?" };
+
+  return (
+    <span className="fact-value">
+      {edit && (
+        <MetricSelect onExit={() => setEdit(false)} onSelect={onSelect} />
+      )}
+      {!edit && (
+        <div
+          className="underline hover:text-blue-500 cursor-pointer"
+          onClick={() => setEdit(true)}
+        >
+          {name}
+        </div>
+      )}
+    </span>
+  );
+}
+
+function MetricSelect({ onExit, onSelect }) {
+  const data = apolloClient.readQuery({
+    query: GET_SETTINGS,
+    variables: { id: "nfl" }
+  });
+
+  const [search, setSearch] = useState("");
+
+  const onChange = e => {
+    const value = e.target.value;
+    setSearch(value);
+  };
+
+  const onKeyDown = e => {
+    if (e.keyCode === 27) {
+      onExit();
+    }
+  };
+
+  return (
+    <div className="dropdown-menu flex flex-row" onMouseLeave={onExit}>
+      <button className="dropdown-btn">
+        <ExitButton onClick={onExit} />
+        <div className="dropdown-title ml-2">Metric</div>
+        <div className="dropdown-selection">
+          <input
+            type="text"
+            autoFocus={true}
+            placeholder="search"
+            className="p-2"
+            onChange={onChange}
+            onKeyDown={onKeyDown}
+          />
+        </div>
+        {data && data.leagueSettings && data.leagueSettings.playerBets && (
+          <ul className="dropdown-list">
+            {data.leagueSettings.playerBets
+              .filter(bet => RegExp(search, "i").test(bet.name))
+              .map(bet => {
+                const { name } = bet;
+
+                return (
+                  <div
+                    key={name}
+                    className="dropdown-list-item"
+                    onClick={() => {
+                      onSelect(bet);
+                      onExit();
+                    }}
+                  >
+                    <div className="dropdown-list-item-text flex flex-row">
+                      {name}
+                    </div>
+                  </div>
+                );
+              })}
+          </ul>
+        )}
+      </button>
+    </div>
+  );
+}
+
+export function Source({ player, game, onSelect }) {
+  const [edit, setEdit] = useState(false);
+
+  let playerName = "Add Player";
+  if (player) {
+    const { firstName, lastName, teamShort, position } = player;
+    playerName = `${firstName[0]}.${lastName} (${teamShort}-${position})`;
+  }
+
+  let vsTeam = "";
+  if (game && player) {
+    const { awayTeamName, homeTeamFk, homeTeamName } = game;
+    vsTeam = `vs ${homeTeamName}`;
+    if (player.teamFk == homeTeamFk) {
+      vsTeam = `vs ${awayTeamName}`;
+    }
+  }
+
+  return (
+    <span className="fact-label">
+      {edit && (
+        <PlayerSearch
+          onExit={() => setEdit(false)}
+          onSelect={source => onSelect(source)}
+        />
+      )}
+      {!edit && (
+        <div>
+          <div
+            className="underline hover:text-blue-500 cursor-pointer"
+            onClick={() => setEdit(true)}
+          >
+            {playerName}
+          </div>
+          {vsTeam}
+        </div>
+      )}
+    </span>
+  );
+}
+
+function PlayerSearch({ onExit, onSelect }) {
   const [execute, { loading, data, error }] = useLazyQuery(SEARCH_PLAYER);
   const search = useThrottle(execute, 300);
 
@@ -287,14 +393,14 @@ function PlayerSearch({ onExit }) {
         {data && data.findPlayers && (
           <ul className="dropdown-list">
             {data.findPlayers.map(player => {
+              const { game, ...onlyPlayer } = player;
               const {
                 id,
                 firstName,
                 lastName,
                 teamShort,
                 position,
-                teamFk,
-                game
+                teamFk
               } = player;
 
               let vsTeam = "No Game";
@@ -308,7 +414,14 @@ function PlayerSearch({ onExit }) {
               }
 
               return (
-                <div key={id} className="dropdown-list-item">
+                <div
+                  key={id}
+                  className="dropdown-list-item"
+                  onClick={() => {
+                    onSelect({ game, player: onlyPlayer });
+                    onExit();
+                  }}
+                >
                   <div className="dropdown-list-item-text flex flex-row">
                     <div>
                       <ListItemAvatar>

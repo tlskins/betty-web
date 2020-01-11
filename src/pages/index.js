@@ -3,7 +3,6 @@ import { Router } from "@reach/router";
 
 import { YourBets } from "./yourBets";
 import { Chat } from "./chat";
-import { PlayerSearch } from "./playerSearch";
 
 export default function Pages() {
   return (

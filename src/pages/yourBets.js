@@ -7,106 +7,42 @@ import { NavBar } from "./navBar";
 // import { NavSideBar } from "./navSideBar";
 import { RotoSideBar } from "./rotoSideBar";
 import { Bet } from "./bet";
+import { NewBet } from "./newBet";
 import { RotoAlerts } from "./rotoAlerts";
 
 export const GET_BETS = gql`
   query {
     bets {
       id
-      sourceFk
+      createdAt
       proposer {
-        idStr
         name
         screenName
       }
       recipient {
-        idStr
         name
         screenName
       }
-      acceptFk
-      proposerReplyFk
-      recipientReplyFk
-      expiresAt
-      finalizedAt
       equations {
+        id
         operator {
+          id
           name
         }
-        result
-        leftExpressions {
-          value
+        expressions {
+          id
+          isLeft
+          player {
+            fk
+            name
+          }
+          game {
+            fk
+            name
+          }
           metric {
             name
           }
-          player {
-            name
-            firstName
-            lastName
-            position
-            fk
-            teamFk
-            teamName
-            teamShort
-            url
-          }
-          game {
-            name
-            fk
-            url
-            awayTeamFk
-            awayTeamName
-            homeTeamFk
-            homeTeamName
-            gameTime
-            gameResultsAt
-            final
-          }
-        }
-        rightExpressions {
-          value
-          metric {
-            name
-          }
-          player {
-            name
-            firstName
-            lastName
-            position
-            fk
-            teamFk
-            teamName
-            teamShort
-            url
-          }
-          game {
-            name
-            fk
-            url
-            awayTeamFk
-            awayTeamName
-            homeTeamFk
-            homeTeamName
-            gameTime
-            gameResultsAt
-            final
-          }
-        }
-      }
-      betStatus
-      betResult {
-        response
-        decidedAt
-        responseFk
-        winner {
-          idStr
-          name
-          screenName
-        }
-        loser {
-          idStr
-          name
-          screenName
         }
       }
     }
@@ -121,12 +57,15 @@ export const GET_SETTINGS = gql`
       currentYear
       currentWeek
       playerBets {
+        id
         name
       }
       teamBets {
+        id
         name
       }
       betEquations {
+        id
         name
       }
     }
@@ -152,6 +91,19 @@ export function YourBets() {
       <RotoAlerts />
       <div className="page-layout">
         <div className="page-inner-layout">
+          <div className="page-hdr-box">
+            <h3 className="page-hdr">New Bet</h3>
+          </div>
+          <div className="page-wrapper">
+            <div className="page-content">
+              <div className="page-content-area">
+                <div className="page-section">
+                  <NewBet />
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className="page-hdr-box">
             <h3 className="page-hdr">Your Bets</h3>
           </div>
@@ -187,7 +139,11 @@ export function YourBets() {
                 <div className="page-section">
                   {betsData &&
                     betsData.bets &&
-                    betsData.bets.map(bet => <Bet bet={bet} />)}
+                    betsData.bets.map((bet, idx) => (
+                      <div key={idx}>
+                        <Bet bet={bet} />
+                      </div>
+                    ))}
                 </div>
               </div>
             </div>

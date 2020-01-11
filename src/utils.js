@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 
 export function useThrottle(fun, timeout, changes = []) {
   // Create the mutable local ref to store timer.
@@ -25,3 +25,19 @@ export function useThrottle(fun, timeout, changes = []) {
     }, timeout);
   };
 }
+
+export const useInput = initialValue => {
+  const [value, setValue] = useState(initialValue);
+
+  return {
+    value,
+    setValue,
+    reset: () => setValue(""),
+    bind: {
+      value,
+      onChange: event => {
+        setValue(event.target.value);
+      }
+    }
+  };
+};
