@@ -3,7 +3,10 @@ import { useMutation } from "@apollo/react-hooks";
 import moment from "moment-timezone";
 import gql from "graphql-tag";
 
-import { Operator, Source, Metric } from "./bet";
+import { GET_BETS } from "../yourBets";
+import { Operator } from "./operator";
+import { Source } from "./source";
+import { Metric } from "./metric";
 
 const CREATE_BET = gql`
   mutation createBet($changes: BetChanges!) {
@@ -67,12 +70,11 @@ const reducer = (state, action) => {
     case "addOperator": {
       const { operator, eqIdx } = action;
       const { equations } = state;
-      const equation = { ...equations[eqIdx], operator };
 
       return {
         equations: [
           ...equations.slice(0, eqIdx),
-          equation,
+          { ...equations[eqIdx], operator },
           ...equations.slice(eqIdx + 1)
         ]
       };
@@ -86,7 +88,6 @@ const reducer = (state, action) => {
       const { equations } = state;
       const equation = equations[eqIdx];
       const { expressions } = equation;
-      const expression = expressions[exprIdx];
 
       return addExprIfComplete({
         equations: [
@@ -95,7 +96,7 @@ const reducer = (state, action) => {
             ...equation,
             expressions: [
               ...expressions.slice(0, exprIdx),
-              { ...expression, player, game },
+              { ...expressions[exprIdx], player, game },
               ...expressions.slice(exprIdx + 1)
             ]
           },
@@ -108,7 +109,6 @@ const reducer = (state, action) => {
       const { equations } = state;
       const equation = equations[eqIdx];
       const { expressions } = equation;
-      const expression = expressions[exprIdx];
 
       return addExprIfComplete({
         equations: [
@@ -117,7 +117,7 @@ const reducer = (state, action) => {
             ...equation,
             expressions: [
               ...expressions.slice(0, exprIdx),
-              { ...expression, metric },
+              { ...expressions[exprIdx], metric },
               ...expressions.slice(exprIdx + 1)
             ]
           },
@@ -125,6 +125,8 @@ const reducer = (state, action) => {
         ]
       });
     }
+    case "clearBet":
+      return { ...initialState };
     default:
       throw new Error("what's going on?");
   }
@@ -179,11 +181,14 @@ const equationComplete = equation => {
   return lComplete && rComplete && equation.operator;
 };
 
-export function NewBet() {
+// components
+
+export function NewBet({ getBets }) {
   const [{ equations }, dispatch] = useReducer(reducer, initialState);
-  const [createBet, _] = useMutation(CREATE_BET);
+  const [createBet, { data }] = useMutation(CREATE_BET);
   const complete = equationComplete(equations[0]);
 
+  console.log("create bet data", data);
   const saveBet = () => {
     const changes = { equationsChanges: [] };
     equations.forEach(eq => {
@@ -203,7 +208,11 @@ export function NewBet() {
       });
       changes.equationsChanges.push(eqChg);
     });
-    createBet({ variables: { changes } });
+    createBet({
+      variables: { changes },
+      refetchQueries: [{ query: GET_BETS }]
+    });
+    dispatch({ type: "clearBet" });
   };
 
   console.log("bet equations", equations);
@@ -226,23 +235,52 @@ export function NewBet() {
       {equations &&
         Object.values(equations).map((eq, i) => (
           <div key={i}>
-            <NewEquation eqIdx={i} equation={eq} dispatch={dispatch} />
+            <Equation eqIdx={i} equation={eq} dispatch={dispatch} />
           </div>
         ))}
     </div>
   );
 }
 
-function NewEquation({ eqIdx, equation, dispatch }) {
-  const { operator, expressions } = equation;
+export function Bet({ bet }) {
+  const { createdAt, equations, recipient } = bet;
+  const { name = "?", screenName = "?" } = recipient;
+
+  const created = moment(createdAt, "YYYY-MM-DD HH:mm:ss Z");
+
+  console.log("bet equations", equations);
+  return (
+    <div className="fact-section">
+      <div className="section-title-wrapper">
+        <h1 className="section-title">{`Bet with ${name}`}</h1>
+        <p className="section-subtitle">
+          {created.format("MMMM Do YYYY, h:mm:ss a")} | @{screenName}
+        </p>
+      </div>
+      {equations.map((eq, i) => (
+        <div key={i}>
+          <Equation equation={eq} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function Equation({ eqIdx, equation, dispatch }) {
+  const { operator = {}, expressions = [] } = equation;
   const [leftExpressions, rightExpressions] = [[], []];
-  expressions.forEach((expr, i) => {
-    if (expr.isLeft) {
-      leftExpressions.push([expr, i]);
-    } else {
-      rightExpressions.push([expr, i]);
-    }
-  });
+  expressions &&
+    expressions.forEach((expr, i) => {
+      if (expr.isLeft) {
+        leftExpressions.push([expr, i]);
+      } else {
+        rightExpressions.push([expr, i]);
+      }
+    });
+
+  const onSelect =
+    dispatch &&
+    (operator => dispatch({ type: "addOperator", operator, eqIdx }));
 
   return (
     <div className="flex w-full">
@@ -258,12 +296,7 @@ function NewEquation({ eqIdx, equation, dispatch }) {
           </div>
         ))}
       </div>
-      <Operator
-        operator={operator}
-        onSelect={operator =>
-          dispatch({ type: "addOperator", operator, eqIdx })
-        }
-      />
+      <Operator operator={operator} onSelect={onSelect} />
       <div className="flex flex-col px-4 py-2 m-2 w-full">
         {rightExpressions.map(([expr, i]) => (
           <div key={i}>
@@ -284,24 +317,20 @@ export function Expression({ eqIdx, exprIdx, expression, dispatch }) {
   const complete = expressionComplete(expression);
   const { player, game, metric } = expression;
 
-  const className = complete ? "fact-wrapper" : "fact-wrapper bg-gray-200";
+  const onSelectSource =
+    dispatch &&
+    (source => dispatch({ type: "addSource", source, eqIdx, exprIdx }));
+  const onSelectMetric =
+    dispatch &&
+    (metric => dispatch({ type: "addMetric", metric, eqIdx, exprIdx }));
+  const className =
+    complete || !dispatch ? "fact-wrapper" : "fact-wrapper bg-gray-200";
 
   return (
     <div>
       <div className={className}>
-        <Source
-          player={player}
-          game={game}
-          onSelect={source =>
-            dispatch({ type: "addSource", source, eqIdx, exprIdx })
-          }
-        />
-        <Metric
-          metric={metric}
-          onSelect={metric =>
-            dispatch({ type: "addMetric", metric, eqIdx, exprIdx })
-          }
-        />
+        <Source player={player} game={game} onSelect={onSelectSource} />
+        <Metric metric={metric} onSelect={onSelectMetric} />
       </div>
     </div>
   );

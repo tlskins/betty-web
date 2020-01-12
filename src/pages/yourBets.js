@@ -4,11 +4,10 @@ import gql from "graphql-tag";
 import "typeface-roboto";
 
 import { NavBar } from "./navBar";
-// import { NavSideBar } from "./navSideBar";
 import { RotoSideBar } from "./rotoSideBar";
-import { Bet } from "./bet";
-import { NewBet } from "./newBet";
+import { NewBet, Bet } from "./bets/bet";
 import { RotoAlerts } from "./rotoAlerts";
+import { FilterButton } from "./components/filterButton";
 
 export const GET_BETS = gql`
   query {
@@ -33,12 +32,16 @@ export const GET_BETS = gql`
           id
           isLeft
           player {
-            fk
-            name
+            teamFk
+            firstName
+            lastName
+            teamShort
+            position
           }
           game {
-            fk
-            name
+            homeTeamFk
+            homeTeamName
+            awayTeamName
           }
           metric {
             name
@@ -77,9 +80,8 @@ export function YourBets() {
   useQuery(GET_SETTINGS, {
     variables: { id: "nfl" }
   });
-  const { loading: betsLoading, error: betsErr, data: betsData } = useQuery(
-    GET_BETS
-  );
+  const { loading, error, data } = useQuery(GET_BETS);
+  console.log("your bets data", data);
 
   return (
     <div className="page-layout-wrapper">
@@ -111,35 +113,16 @@ export function YourBets() {
             <div className="page-summary">
               <div className="page-summary-item">
                 <div className="flex-row">
-                  <label className="collapse-toggle">
-                    <span className="toggle-name">SHOW FILTERS</span>
-                    <svg
-                      data-name="Layer 1"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 8.33 5"
-                      width="10px"
-                      height="10px"
-                      className="arrow pointer "
-                      style={{ transform: `rotate(-270deg)` }}
-                    >
-                      <polyline
-                        points="1.17 4.25 4.17 1.25 7.17 4.25"
-                        fill="none"
-                        stroke="#0b0b0b"
-                        strokeMiterlimit="10"
-                        strokeWidth="1.5"
-                      ></polyline>
-                    </svg>
-                  </label>
+                  <FilterButton />
                 </div>
               </div>
             </div>
             <div className="page-content">
               <div className="page-content-area">
                 <div className="page-section">
-                  {betsData &&
-                    betsData.bets &&
-                    betsData.bets.map((bet, idx) => (
+                  {data &&
+                    data.bets &&
+                    data.bets.map((bet, idx) => (
                       <div key={idx}>
                         <Bet bet={bet} />
                       </div>
