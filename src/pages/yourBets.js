@@ -16,11 +16,11 @@ export const GET_BETS = gql`
       createdAt
       proposer {
         name
-        screenName
+        userName
       }
       recipient {
         name
-        screenName
+        userName
       }
       equations {
         id

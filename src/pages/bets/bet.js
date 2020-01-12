@@ -15,11 +15,11 @@ const CREATE_BET = gql`
       createdAt
       proposer {
         name
-        screenName
+        userName
       }
       recipient {
         name
-        screenName
+        userName
       }
       equations {
         id
