@@ -3,6 +3,7 @@ import { Redirect } from "@reach/router";
 import { useMutation } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
+import { apolloClient } from "../index";
 import "./styles.css";
 
 const LOG_OUT = gql`
@@ -16,6 +17,7 @@ export function NavBar({ clickRotoNfl }) {
     onCompleted(data) {
       console.log("data", data);
       if (data && data.signOut) {
+        apolloClient.resetStore();
         setRedirectLogin(true);
       }
     }

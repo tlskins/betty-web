@@ -30,8 +30,8 @@ function OperatorSearch({ onExit, onSelect }) {
     query: GET_SETTINGS,
     variables: { id: "nfl" }
   });
-
   const [search, setSearch] = useState("");
+  const [searchIdx, setSearchIdx] = useState(0);
 
   const onChange = e => {
     const value = e.target.value;
@@ -39,8 +39,22 @@ function OperatorSearch({ onExit, onSelect }) {
   };
 
   const onKeyDown = e => {
-    if (e.keyCode === 27) {
+    const lastIdx = data.leagueSettings.betEquations.length || 0;
+    if (e.keyCode == 27) {
+      // esc
       onExit();
+    } else if (e.keyCode == 13 && data.leagueSettings.betEquations.length > 0) {
+      // enter
+      onSelect(data.leagueSettings.betEquations[searchIdx]);
+      onExit();
+    } else if (e.keyCode == 40) {
+      // down
+      const idx = searchIdx == lastIdx - 1 ? 0 : searchIdx + 1;
+      setSearchIdx(idx);
+    } else if (e.keyCode == 38) {
+      // up
+      const idx = searchIdx == 0 ? lastIdx - 1 : searchIdx - 1;
+      setSearchIdx(idx);
     }
   };
 
@@ -63,16 +77,21 @@ function OperatorSearch({ onExit, onSelect }) {
           <ul className="dropdown-list">
             {data.leagueSettings.betEquations
               .filter(bet => RegExp(search, "i").test(bet.name))
-              .map(bet => {
+              .map((bet, i) => {
                 const { name } = bet;
+                const className =
+                  searchIdx == i
+                    ? "dropdown-list-item bg-gray-200"
+                    : "dropdown-list-item";
                 return (
                   <div
                     key={name}
-                    className="dropdown-list-item"
+                    className={className}
                     onClick={() => {
                       onSelect(bet);
                       onExit();
                     }}
+                    onMouseEnter={() => setSearchIdx(i)}
                   >
                     <div className="dropdown-list-item-text flex flex-row">
                       {name}

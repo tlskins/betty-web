@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { Redirect } from "@reach/router";
-import { useMutation } from "@apollo/react-hooks";
+import { useMutation, useLazyQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
+import { apolloClient } from "../index";
 
-const SIGN_IN = gql`
-  mutation signIn($userName: String!, $password: String!) {
+export const SIGN_IN = gql`
+  query signIn($userName: String!, $password: String!) {
     signIn(userName: $userName, password: $password) {
       id
       userName
@@ -14,9 +15,10 @@ const SIGN_IN = gql`
 `;
 
 export function SignIn() {
-  const [signIn, _] = useMutation(SIGN_IN, {
+  const [signIn, _] = useLazyQuery(SIGN_IN, {
     onCompleted(data) {
       if (data && data.signIn) {
+        apolloClient.writeData({ data: { profile: data.signIn } });
         setRedirect(true);
       }
     }

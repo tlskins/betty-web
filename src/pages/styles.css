@@ -440,9 +440,9 @@
   -webkit-font-smoothing: antialiased !important;
   -webkit-box-direction: normal;
   box-sizing: inherit;
-  position: relative;
+  position: absolute;
   height: 40px;
-  width: 100%;
+  /* width: 100%; */
   background-color: white;
   z-index: 60;
   border-width: 1px;

@@ -75,6 +75,7 @@ export function Source({ player, game, onSelect }) {
 
 function PlayerSearch({ onExit, onSelect }) {
   const [execute, { loading, data, error }] = useLazyQuery(SEARCH_PLAYER);
+  const [searchIdx, setSearchIdx] = useState(0);
   const search = useThrottle(execute, 300);
 
   const onChange = e => {
@@ -84,8 +85,26 @@ function PlayerSearch({ onExit, onSelect }) {
   };
 
   const onKeyDown = e => {
-    if (e.keyCode === 27) {
+    if (e.keyCode == 27) {
+      // esc
       onExit();
+    } else if (
+      e.keyCode == 13 &&
+      data &&
+      data.findPlayers &&
+      data.findPlayers.length > 0
+    ) {
+      // enter
+      onSelect({ user: data.findPlayers[searchIdx] });
+      onExit();
+    } else if (e.keyCode == 40) {
+      // down
+      const idx = searchIdx == data.findPlayers.length - 1 ? 0 : searchIdx + 1;
+      setSearchIdx(idx);
+    } else if (e.keyCode == 38) {
+      // up
+      const idx = searchIdx == 0 ? data.findPlayers.length - 1 : searchIdx - 1;
+      setSearchIdx(idx);
     }
   };
 
@@ -106,57 +125,68 @@ function PlayerSearch({ onExit, onSelect }) {
         </div>
         {data && data.findPlayers && (
           <ul className="dropdown-list">
-            {data.findPlayers.map(player => {
-              const { game, ...onlyPlayer } = player;
-              const {
-                id,
-                firstName,
-                lastName,
-                teamShort,
-                position,
-                teamFk
-              } = player;
-
-              let vsTeam = "No Game";
-              if (game) {
-                const { homeTeamFk, homeTeamName, awayTeamName } = game;
-                let team = homeTeamName;
-                if (homeTeamFk == teamFk) {
-                  team = awayTeamName;
-                }
-                vsTeam = `vs ${team}`;
-              }
-
-              return (
-                <div
-                  key={id}
-                  className="dropdown-list-item"
-                  onClick={() => {
-                    onSelect({ game, player: onlyPlayer });
-                    onExit();
-                  }}
-                >
-                  <div className="dropdown-list-item-text flex flex-row">
-                    <div>
-                      <ListItemAvatar>
-                        <Avatar
-                          alt={firstName + lastName}
-                          src={`https://d395i9ljze9h3x.cloudfront.net/req/20180910/images/headshots/${id}_2018.jpg`}
-                        />
-                      </ListItemAvatar>
-                    </div>
-                    <div className="flex flex-col">
-                      {firstName[0]}.{lastName} ({teamShort}-{position})
-                      <br />
-                      {vsTeam}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+            {data.findPlayers.map((player, i) => (
+              <div key={i}>
+                <Player
+                  player={player}
+                  searchIdx={searchIdx}
+                  setSearchIdx={setSearchIdx}
+                  index={i}
+                  onSelect={onSelect}
+                  onExit={onExit}
+                />
+              </div>
+            ))}
           </ul>
         )}
       </button>
+    </div>
+  );
+}
+
+function Player({ player, searchIdx, setSearchIdx, index, onSelect, onExit }) {
+  const { game, ...onlyPlayer } = player;
+  const { id, firstName, lastName, teamShort, position, teamFk } = player;
+
+  let vsTeam = "No Game";
+  if (game) {
+    const { homeTeamFk, homeTeamName, awayTeamName } = game;
+    let team = homeTeamName;
+    if (homeTeamFk == teamFk) {
+      team = awayTeamName;
+    }
+    vsTeam = `vs ${team}`;
+  }
+  const className =
+    searchIdx == index
+      ? "dropdown-list-item bg-gray-200"
+      : "dropdown-list-item";
+
+  return (
+    <div
+      key={id}
+      className={className}
+      onClick={() => {
+        onSelect({ game, player: onlyPlayer });
+        onExit();
+      }}
+      onMouseEnter={() => setSearchIdx(index)}
+    >
+      <div className="dropdown-list-item-text flex flex-row">
+        <div>
+          <ListItemAvatar>
+            <Avatar
+              alt={firstName + lastName}
+              src={`https://d395i9ljze9h3x.cloudfront.net/req/20180910/images/headshots/${id}_2018.jpg`}
+            />
+          </ListItemAvatar>
+        </div>
+        <div className="flex flex-col">
+          {firstName[0]}.{lastName} ({teamShort}-{position})
+          <br />
+          {vsTeam}
+        </div>
+      </div>
     </div>
   );
 }

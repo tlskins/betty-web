@@ -14,6 +14,7 @@ export const GET_BETS = gql`
     bets {
       id
       createdAt
+      betStatus
       proposer {
         name
         userName
@@ -81,7 +82,7 @@ export function YourBets() {
     variables: { id: "nfl" }
   });
   const { loading, error, data } = useQuery(GET_BETS);
-  console.log("your bets data", data);
+  console.log("your bets data", loading, error, data);
 
   return (
     <div className="page-layout-wrapper">

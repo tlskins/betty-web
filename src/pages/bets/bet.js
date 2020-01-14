@@ -1,12 +1,14 @@
-import React, { useReducer } from "react";
-import { useMutation } from "@apollo/react-hooks";
+import React, { useReducer, useState } from "react";
+import { useMutation, useQuery } from "@apollo/react-hooks";
 import moment from "moment-timezone";
 import gql from "graphql-tag";
 
 import { GET_BETS } from "../yourBets";
+import { UserSearch } from "../userSearch";
 import { Operator } from "./operator";
 import { Source } from "./source";
 import { Metric } from "./metric";
+import { apolloClient } from "../../index";
 
 const CREATE_BET = gql`
   mutation createBet($changes: BetChanges!) {
@@ -47,6 +49,16 @@ const CREATE_BET = gql`
   }
 `;
 
+const GET_PROFILE = gql`
+  {
+    profile @client {
+      id
+      userName
+      name
+    }
+  }
+`;
+
 const initialExpression = {
   isLeft: true,
   player: undefined,
@@ -62,7 +74,10 @@ const initialEquation = {
   ]
 };
 
-const initialState = { equations: [{ ...initialEquation }] };
+const initialState = {
+  recipient: undefined,
+  equations: [{ ...initialEquation }]
+};
 
 const reducer = (state, action) => {
   console.log("reducer", state, action);
@@ -125,6 +140,10 @@ const reducer = (state, action) => {
         ]
       });
     }
+    case "addRecipient": {
+      const { recipient } = action;
+      return { ...state, recipient };
+    }
     case "clearBet":
       return { ...initialState };
     default:
@@ -181,16 +200,30 @@ const equationComplete = equation => {
   return lComplete && rComplete && equation.operator;
 };
 
+const betComplete = bet => {
+  const { recipient, equations = [] } = bet;
+  equations.forEach(eq => {
+    if (!equationComplete(eq)) {
+      return false;
+    }
+  });
+  return equations.length > 0 && recipient;
+};
+
 // components
 
-export function NewBet({ getBets }) {
-  const [{ equations }, dispatch] = useReducer(reducer, initialState);
+export function NewBet() {
+  const [{ recipient, equations }, dispatch] = useReducer(
+    reducer,
+    initialState
+  );
   const [createBet, { data }] = useMutation(CREATE_BET);
-  const complete = equationComplete(equations[0]);
+  const [findingUser, setFindingUser] = useState(false);
+  const complete = betComplete({ recipient, equations });
 
   console.log("create bet data", data);
   const saveBet = () => {
-    const changes = { equationsChanges: [] };
+    const changes = { equationsChanges: [], recipientId: recipient.id };
     equations.forEach(eq => {
       const eqChg = {
         operatorId: eq.operator.id,
@@ -215,10 +248,35 @@ export function NewBet({ getBets }) {
     dispatch({ type: "clearBet" });
   };
 
+  const recipientName = (recipient && recipient.userName) || "?";
+  const titleWrapperClass = findingUser
+    ? "section-title-wrapper"
+    : "section-title-wrapper inline-flex";
+
   return (
     <div className="fact-section">
-      <div className="section-title-wrapper">
-        <h1 className="section-title">Bet with ?</h1>
+      <div className={titleWrapperClass}>
+        <h1 className="section-title">
+          Bet with
+          {!findingUser && (
+            <span
+              className="underline hover:text-blue-500 cursor-pointer ml-2"
+              onClick={() => setFindingUser(true)}
+            >
+              {recipientName}
+            </span>
+          )}
+          {findingUser && (
+            <div className="section-subtitle">
+              <UserSearch
+                onExit={() => setFindingUser(false)}
+                onSelect={({ user: recipient }) =>
+                  dispatch({ type: "addRecipient", recipient })
+                }
+              />
+            </div>
+          )}
+        </h1>
         <p className="section-subtitle">
           {moment().format("MMMM Do YYYY, h:mm:ss a")} | @?
         </p>
@@ -242,15 +300,17 @@ export function NewBet({ getBets }) {
 }
 
 export function Bet({ bet }) {
-  const { createdAt, equations, recipient } = bet;
+  const { createdAt, betStatus, equations, recipient } = bet;
   const { name = "?", screenName = "?" } = recipient;
-
   const created = moment(createdAt, "YYYY-MM-DD HH:mm:ss Z");
+  const { profile } = apolloClient.readQuery({ query: GET_PROFILE });
+  console.log("profile", profile);
 
   return (
     <div className="fact-section">
       <div className="section-title-wrapper">
         <h1 className="section-title">{`Bet with ${name}`}</h1>
+        <p className="section-subtitle">Status: {betStatus}</p>
         <p className="section-subtitle">
           {created.format("MMMM Do YYYY, h:mm:ss a")} | @{screenName}
         </p>
