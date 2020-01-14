@@ -3,8 +3,9 @@ import ReactDOM from "react-dom";
 
 import { ApolloClient } from "apollo-client";
 import { InMemoryCache } from "apollo-cache-inmemory";
-import { HttpLink } from "apollo-link-http";
-import { ApolloProvider, useQuery } from "@apollo/react-hooks";
+// import { HttpLink } from "apollo-link-http";
+import { createHttpLink } from "apollo-link-http";
+import { ApolloProvider } from "@apollo/react-hooks";
 import { split } from "apollo-link";
 import { WebSocketLink } from "apollo-link-ws";
 import { getMainDefinition } from "apollo-utilities";
@@ -21,7 +22,10 @@ const wsLink = new WebSocketLink({
   }
 });
 
-const httpLink = new HttpLink({ uri: "http://localhost:8080/query" });
+const httpLink = createHttpLink({
+  uri: "http://localhost:8080/query",
+  credentials: "include"
+});
 
 // depending on what kind of operation is being sent
 const link = split(

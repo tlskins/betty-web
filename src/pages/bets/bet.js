@@ -215,7 +215,6 @@ export function NewBet({ getBets }) {
     dispatch({ type: "clearBet" });
   };
 
-  console.log("bet equations", equations);
   return (
     <div className="fact-section">
       <div className="section-title-wrapper">
@@ -248,7 +247,6 @@ export function Bet({ bet }) {
 
   const created = moment(createdAt, "YYYY-MM-DD HH:mm:ss Z");
 
-  console.log("bet equations", equations);
   return (
     <div className="fact-section">
       <div className="section-title-wrapper">

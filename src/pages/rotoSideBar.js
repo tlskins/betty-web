@@ -93,7 +93,9 @@ export function RotoSideBar({ show, hide }) {
                               {position}
                             </span>
                           </div>
-                          <p className="lowercase">{article}</p>
+                          <p className="lowercase bg-gray-200 rounded-lg p-2">
+                            {article}
+                          </p>
                         </div>
                       </div>
                     </div>
