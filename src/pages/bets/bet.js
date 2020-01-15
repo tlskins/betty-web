@@ -92,13 +92,14 @@ const reducer = (state, action) => {
       const { operator, eqIdx } = action;
       const { equations } = state;
 
-      return {
+      return addExprIfComplete({
+        ...state,
         equations: [
           ...equations.slice(0, eqIdx),
           { ...equations[eqIdx], operator },
           ...equations.slice(eqIdx + 1)
         ]
-      };
+      });
     }
     case "addSource": {
       const {
@@ -111,6 +112,7 @@ const reducer = (state, action) => {
       const { expressions } = equation;
 
       return addExprIfComplete({
+        ...state,
         equations: [
           ...equations.slice(0, eqIdx),
           {
@@ -132,6 +134,7 @@ const reducer = (state, action) => {
       const { expressions } = equation;
 
       return addExprIfComplete({
+        ...state,
         equations: [
           ...equations.slice(0, eqIdx),
           {
@@ -284,7 +287,7 @@ export function NewBet() {
           )}
         </h1>
         <p className="section-subtitle">
-          {moment().format("MMMM Do YYYY, h:mm:ss a")} | @?
+          {moment().format("MMMM Do YYYY, h:mm:ss a")}
         </p>
         {complete && (
           <p
@@ -310,8 +313,16 @@ export function Bet({ bet, onClick }) {
   const { profile } = apolloClient.readQuery({ query: GET_PROFILE });
   console.log("profile", profile);
 
-  const { id, createdAt, betStatus, equations, proposer, recipient } = bet;
-  const created = moment(createdAt, "YYYY-MM-DD HH:mm:ss Z");
+  const {
+    id,
+    createdAt,
+    finalizedAt,
+    expiresAt,
+    betStatus,
+    equations,
+    proposer,
+    recipient
+  } = bet;
 
   const title = `${proposer.name} (${proposer.userName})'s Bet with ${recipient.name} (${recipient.userName})`;
   const acceptable =
@@ -341,6 +352,25 @@ export function Bet({ bet, onClick }) {
     });
   };
 
+  const created =
+    (createdAt &&
+      moment(createdAt, "YYYY-MM-DD HH:mm:ss Z").format(
+        "MMM Do YYYY, h:mm a"
+      )) ||
+    "?";
+  const expires =
+    (expiresAt &&
+      moment(expiresAt, "YYYY-MM-DD HH:mm:ss Z").format(
+        "MMM Do YYYY, h:mm a"
+      )) ||
+    "?";
+  const finalized =
+    (finalizedAt &&
+      moment(finalizedAt, "YYYY-MM-DD HH:mm:ss Z").format(
+        "MMM Do YYYY, h:mm a"
+      )) ||
+    "?";
+
   return (
     <div className={betClass} onClick={onClick}>
       <div className="section-title-wrapper">
@@ -362,8 +392,16 @@ export function Bet({ bet, onClick }) {
             </button>
           </div>
         )}
-        <p className="section-subtitle">
-          {created.format("MMMM Do YYYY, h:mm:ss a")}
+        <p className="section-subtitle flex-col text-center">
+          <div>
+            <b>CREATED:</b> {created}
+          </div>
+          <div>
+            <b>EXPIRES:</b> {expires}
+          </div>
+          <div>
+            <b>FINAL:</b> {finalized}
+          </div>
         </p>
       </div>
       {equations.map((eq, i) => (

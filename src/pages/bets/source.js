@@ -118,7 +118,7 @@ function PlayerSearch({ onExit, onSelect }) {
             type="text"
             autoFocus={true}
             placeholder="search"
-            className="p-2"
+            className="p-2 mx-5"
             onChange={onChange}
             onKeyDown={onKeyDown}
           />

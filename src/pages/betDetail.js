@@ -14,6 +14,8 @@ export const GET_BET = gql`
     bet(id: $id) {
       id
       createdAt
+      finalizedAt
+      expiresAt
       betStatus
       proposer {
         name

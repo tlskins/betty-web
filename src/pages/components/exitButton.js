@@ -11,11 +11,11 @@ export function ExitButton({ onClick }) {
       className="pointer"
       data-dismiss-on-click="true"
       style={{
-        position: `absolute`,
         marginTop: `-1px`,
         marginRight: `-1px`,
         stroke: `transparent`,
-        verticalAlign: `middle`
+        verticalAlign: `middle`,
+        overflow: `visible`
       }}
       onClick={onClick}
     >

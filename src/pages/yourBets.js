@@ -15,6 +15,8 @@ export const GET_BETS = gql`
     bets {
       id
       createdAt
+      finalizedAt
+      expiresAt
       betStatus
       proposer {
         name
