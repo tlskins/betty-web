@@ -263,7 +263,7 @@ export function NewBet() {
     <div className="fact-section">
       <div className={titleWrapperClass}>
         <h1 className="section-title">
-          Bet with
+          New Bet with
           {!findingUser && (
             <span
               className="underline hover:text-blue-500 cursor-pointer ml-2"
@@ -305,7 +305,7 @@ export function NewBet() {
   );
 }
 
-export function Bet({ bet }) {
+export function Bet({ bet, onClick }) {
   const [acceptBet, _] = useMutation(ACCEPT_BET);
   const { profile } = apolloClient.readQuery({ query: GET_PROFILE });
   console.log("profile", profile);
@@ -322,6 +322,10 @@ export function Bet({ bet }) {
   } else if (betStatus == "Cancelled") {
     statusColor = "bg-red-200";
   }
+
+  const betClass = onClick
+    ? "fact-section rounded-lg hover:bg-gray-100 cursor-pointer"
+    : "fact-section rounded-lg";
   const statusClass = `section-subtitle ${statusColor} rounded border border-black p-1`;
 
   const onAccept = () => {
@@ -338,7 +342,7 @@ export function Bet({ bet }) {
   };
 
   return (
-    <div className="fact-section rounded">
+    <div className={betClass} onClick={onClick}>
       <div className="section-title-wrapper">
         <h1 className="section-title">{title}</h1>
         <div className={statusClass}>Status: {betStatus}</div>

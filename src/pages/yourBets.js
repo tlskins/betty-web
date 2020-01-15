@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useQuery } from "@apollo/react-hooks";
+import { Redirect } from "@reach/router";
 import gql from "graphql-tag";
 import "typeface-roboto";
 
@@ -79,11 +80,16 @@ export const GET_SETTINGS = gql`
 
 export function YourBets() {
   const [showSideBar, setShowSideBar] = useState(undefined);
+  const [redirectToBet, setRedirectToBet] = useState(undefined);
   useQuery(GET_SETTINGS, {
     variables: { id: "nfl" }
   });
   const { loading, error, data } = useQuery(GET_BETS);
   console.log("your bets data", loading, error, data);
+
+  const onRedirectBet = id => () => {
+    setRedirectToBet(id);
+  };
 
   return (
     <div className="page-layout-wrapper">
@@ -95,10 +101,7 @@ export function YourBets() {
       <RotoAlerts />
       <div className="page-layout">
         <div className="page-inner-layout">
-          <div className="page-hdr-box">
-            <h3 className="page-hdr">New Bet</h3>
-          </div>
-          <div className="page-wrapper">
+          <div className="page-wrapper my-10">
             <div className="page-content">
               <div className="page-content-area">
                 <div className="page-section">
@@ -126,7 +129,10 @@ export function YourBets() {
                     data.bets &&
                     data.bets.map((bet, idx) => (
                       <div key={idx}>
-                        <Bet bet={bet} />
+                        <Bet bet={bet} onClick={onRedirectBet(bet.id)} />
+                        {redirectToBet == bet.id && (
+                          <Redirect to={`/bet/${bet.id}`} noThrow />
+                        )}
                       </div>
                     ))}
                 </div>

@@ -236,7 +236,7 @@
   -webkit-box-direction: normal;
   box-sizing: inherit;
   width: 100%;
-  margin-top: 0px;
+  /* margin-top: 0px; */
 }
 
 .page-summary {
