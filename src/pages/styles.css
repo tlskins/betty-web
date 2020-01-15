@@ -376,7 +376,7 @@
   text-transform: uppercase;
   color: rgb(119, 119, 119);
   margin-top: 23px;
-  padding: 0px;
+  /* padding: 4px; */
 }
 
 .fact-section {
@@ -459,6 +459,7 @@
   font-weight: normal;
   background-color: white;
   display: flex;
+  /* position: relative; */
   text-align: left;
   -webkit-box-align: center;
   align-items: center;

@@ -20,6 +20,7 @@ export const GET_BETS = gql`
         userName
       }
       recipient {
+        id
         name
         userName
       }

@@ -49,6 +49,12 @@ const CREATE_BET = gql`
   }
 `;
 
+const ACCEPT_BET = gql`
+  mutation acceptBet($id: ID!, $accept: Boolean!) {
+    acceptBet(id: $id, accept: $accept)
+  }
+`;
+
 const GET_PROFILE = gql`
   {
     profile @client {
@@ -300,19 +306,60 @@ export function NewBet() {
 }
 
 export function Bet({ bet }) {
-  const { createdAt, betStatus, equations, recipient } = bet;
-  const { name = "?", screenName = "?" } = recipient;
-  const created = moment(createdAt, "YYYY-MM-DD HH:mm:ss Z");
+  const [acceptBet, _] = useMutation(ACCEPT_BET);
   const { profile } = apolloClient.readQuery({ query: GET_PROFILE });
   console.log("profile", profile);
 
+  const { id, createdAt, betStatus, equations, proposer, recipient } = bet;
+  const created = moment(createdAt, "YYYY-MM-DD HH:mm:ss Z");
+
+  const title = `${proposer.name} (${proposer.userName})'s Bet with ${recipient.name} (${recipient.userName})`;
+  const acceptable =
+    betStatus == "Pending Approval" && profile.id == recipient.id;
+  let statusColor = "bg-yellow-200";
+  if (betStatus == "Accepted") {
+    statusColor = "bg-green-200";
+  } else if (betStatus == "Cancelled") {
+    statusColor = "bg-red-200";
+  }
+  const statusClass = `section-subtitle ${statusColor} rounded border border-black p-1`;
+
+  const onAccept = () => {
+    acceptBet({
+      variables: { id, accept: true },
+      refetchQueries: [{ query: GET_BETS }]
+    });
+  };
+  const onDecline = () => {
+    acceptBet({
+      variables: { id, accept: false },
+      refetchQueries: [{ query: GET_BETS }]
+    });
+  };
+
   return (
-    <div className="fact-section">
+    <div className="fact-section rounded">
       <div className="section-title-wrapper">
-        <h1 className="section-title">{`Bet with ${name}`}</h1>
-        <p className="section-subtitle">Status: {betStatus}</p>
+        <h1 className="section-title">{title}</h1>
+        <div className={statusClass}>Status: {betStatus}</div>
+        {acceptable && (
+          <div>
+            <button
+              className="section-subtitle hover:text-blue-500 bg-red-200 rounded border border-black p-1 mx-3"
+              onClick={onDecline}
+            >
+              Decline
+            </button>
+            <button
+              className="section-subtitle hover:text-blue-500 bg-green-200 rounded border border-black p-1 mx-3"
+              onClick={onAccept}
+            >
+              Accept
+            </button>
+          </div>
+        )}
         <p className="section-subtitle">
-          {created.format("MMMM Do YYYY, h:mm:ss a")} | @{screenName}
+          {created.format("MMMM Do YYYY, h:mm:ss a")}
         </p>
       </div>
       {equations.map((eq, i) => (
@@ -320,6 +367,7 @@ export function Bet({ bet }) {
           <Equation equation={eq} />
         </div>
       ))}
+      <hr className="article-divider" />
     </div>
   );
 }

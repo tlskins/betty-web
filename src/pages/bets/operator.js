@@ -60,7 +60,7 @@ function OperatorSearch({ onExit, onSelect }) {
 
   return (
     <div className="dropdown-menu flex flex-row">
-      <button className="dropdown-btn">
+      <div className="dropdown-btn flex-row">
         <ExitButton onClick={onExit} />
         <div className="dropdown-title ml-2">Equivalency</div>
         <div className="dropdown-selection">
@@ -101,7 +101,7 @@ function OperatorSearch({ onExit, onSelect }) {
               })}
           </ul>
         )}
-      </button>
+      </div>
     </div>
   );
 }
