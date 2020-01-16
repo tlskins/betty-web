@@ -330,8 +330,8 @@ export function Bet({ bet, onClick }) {
   let statusColor = "bg-yellow-200";
   if (betStatus == "Accepted") {
     statusColor = "bg-green-200";
-  } else if (betStatus == "Cancelled") {
-    statusColor = "bg-red-200";
+  } else if (betStatus == "Declined" || betStatus == "Withdrawn") {
+    statusColor = "bg-red-300";
   }
 
   const betClass = onClick
