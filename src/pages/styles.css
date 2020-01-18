@@ -346,7 +346,7 @@
   -webkit-box-align: center;
   align-items: center;
   flex: 1 1 0%;
-  overflow: auto;
+  /* overflow: auto; */
   padding: 24px;
 }
 
@@ -356,7 +356,7 @@
   box-sizing: border-box;
   font-weight: normal;
   text-align: center;
-  margin: 0px;
+  /* margin: 0px; */
   font-size: 26px;
   font-family: GT-Sectra-Book;
   line-height: 1.42;
@@ -874,4 +874,16 @@
   width: 100%;
   margin-bottom: 19px;
   margin-top: 17px;
+}
+
+/* Carousel */
+
+.carousel-ul {
+  /* margin-block-start: 1em;
+  margin-block-end: 1em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  padding-inline-start: 40px; */
+  width: 55%;
+  margin: auto;
 }

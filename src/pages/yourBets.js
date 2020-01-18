@@ -4,6 +4,7 @@ import { Redirect } from "@reach/router";
 import gql from "graphql-tag";
 import "typeface-roboto";
 
+import { CurrentGames } from "./currentGames";
 import { NavBar } from "./navBar";
 import { RotoSideBar } from "./rotoSideBar";
 import { NewBet, Bet } from "./bets/bet";
@@ -104,6 +105,15 @@ export function YourBets() {
       <RotoAlerts />
       <div className="page-layout">
         <div className="page-inner-layout">
+        <div className="page-wrapper my-10">
+            <div className="page-content">
+              <div className="page-content-area">
+                <div className="page-section">
+                  <CurrentGames />
+                </div>
+              </div>
+            </div>
+          </div>
           <div className="page-wrapper my-10">
             <div className="page-content">
               <div className="page-content-area">
@@ -113,7 +123,6 @@ export function YourBets() {
               </div>
             </div>
           </div>
-
           <div className="page-hdr-box">
             <h3 className="page-hdr">Your Bets</h3>
           </div>
