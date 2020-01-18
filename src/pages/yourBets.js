@@ -11,7 +11,7 @@ import { RotoAlerts } from "./rotoAlerts";
 import { FilterButton } from "./components/filterButton";
 
 export const GET_BETS = gql`
-  query {
+  query bets {
     bets {
       id
       createdAt
@@ -19,6 +19,7 @@ export const GET_BETS = gql`
       expiresAt
       betStatus
       proposer {
+        id
         name
         userName
       }

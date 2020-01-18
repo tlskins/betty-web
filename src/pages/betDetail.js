@@ -18,6 +18,7 @@ export const GET_BET = gql`
       expiresAt
       betStatus
       proposer {
+        id
         name
         userName
       }

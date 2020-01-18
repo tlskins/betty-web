@@ -16,10 +16,12 @@ const CREATE_BET = gql`
       id
       createdAt
       proposer {
+        id
         name
         userName
       }
       recipient {
+        id
         name
         userName
       }
@@ -55,7 +57,7 @@ const ACCEPT_BET = gql`
   }
 `;
 
-const GET_PROFILE = gql`
+export const GET_PROFILE = gql`
   {
     profile @client {
       id
@@ -326,7 +328,7 @@ export function Bet({ bet, onClick }) {
 
   const title = `${proposer.name} (${proposer.userName})'s Bet with ${recipient.name} (${recipient.userName})`;
   const acceptable =
-    betStatus == "Pending Approval" && profile.id == recipient.id;
+    betStatus == "Pending Approval" && (profile.id == recipient.id || profile.id == proposer.id);
   let statusColor = "bg-yellow-200";
   if (betStatus == "Accepted") {
     statusColor = "bg-green-200";
@@ -392,7 +394,7 @@ export function Bet({ bet, onClick }) {
             </button>
           </div>
         )}
-        <p className="section-subtitle flex-col text-center">
+        <div className="section-subtitle flex-col text-center">
           <div>
             <b>CREATED:</b> {created}
           </div>
@@ -402,7 +404,7 @@ export function Bet({ bet, onClick }) {
           <div>
             <b>FINAL:</b> {finalized}
           </div>
-        </p>
+        </div>
       </div>
       {equations.map((eq, i) => (
         <div key={i}>
