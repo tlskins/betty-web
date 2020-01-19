@@ -80,7 +80,6 @@ function ChatHistory({ channel, messages, setMessages, name, minimize }) {
   const { data, loading } = useSubscription(Subscription, {
     variables: { channel },
     onSubscriptionData: ({ client, subscriptionData }) => {
-      console.log("onSubscriptionData", subscriptionData);
       const newMessages = [...messages];
       const msg = subscriptionData.data.messageAdded;
       let last = newMessages.pop();
@@ -100,9 +99,6 @@ function ChatHistory({ channel, messages, setMessages, name, minimize }) {
       setMessages(newMessages);
     }
   });
-
-  console.log("messages", messages);
-  console.log("data", data);
 
   return (
     <div

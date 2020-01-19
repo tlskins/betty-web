@@ -1,14 +1,15 @@
 import React, { useReducer, useState } from "react";
-import { useMutation, useQuery } from "@apollo/react-hooks";
+import { useMutation, useApolloClient } from "@apollo/react-hooks";
 import moment from "moment-timezone";
 import gql from "graphql-tag";
 
 import { GET_BETS } from "../yourBets";
+import { GET_PROFILE } from "../navBar";
 import { UserSearch } from "../userSearch";
 import { Operator } from "./operator";
 import { Source } from "./source";
 import { Metric } from "./metric";
-import { apolloClient } from "../../index";
+
 
 const CREATE_BET = gql`
   mutation createBet($changes: BetChanges!) {
@@ -57,16 +58,6 @@ const ACCEPT_BET = gql`
   }
 `;
 
-export const GET_PROFILE = gql`
-  {
-    profile @client {
-      id
-      userName
-      name
-    }
-  }
-`;
-
 const initialExpression = {
   isLeft: true,
   player: undefined,
@@ -88,7 +79,6 @@ const initialState = {
 };
 
 const reducer = (state, action) => {
-  console.log("reducer", state, action);
   switch (action.type) {
     case "addOperator": {
       const { operator, eqIdx } = action;
@@ -232,7 +222,6 @@ export function NewBet() {
   const [findingUser, setFindingUser] = useState(false);
   const complete = betComplete({ recipient, equations });
 
-  console.log("create bet data", data);
   const saveBet = () => {
     const changes = { equationsChanges: [], recipientId: recipient.id };
     equations.forEach(eq => {
@@ -312,8 +301,13 @@ export function NewBet() {
 
 export function Bet({ bet, onClick }) {
   const [acceptBet, _] = useMutation(ACCEPT_BET);
-  const { profile } = apolloClient.readQuery({ query: GET_PROFILE });
-  console.log("profile", profile);
+  
+  let profile
+  try {
+    const apolloClient = useApolloClient();
+    const queryProfile = apolloClient.readQuery({ query: GET_PROFILE, default: {} });
+    profile = queryProfile.profile
+  } catch(e) {}
 
   const {
     id,

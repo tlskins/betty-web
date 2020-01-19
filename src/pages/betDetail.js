@@ -62,10 +62,9 @@ export function BetDetail(props) {
   useQuery(GET_SETTINGS, {
     variables: { id: "nfl" }
   });
-  const { loading, error, data } = useQuery(GET_BET, {
+  const { data } = useQuery(GET_BET, {
     variables: { id: props.betId }
   });
-  console.log("bet data", props, data);
 
   return (
     <div className="page-layout-wrapper">

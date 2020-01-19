@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import { Carousel } from "./components/carousel";
@@ -22,8 +22,7 @@ export const CURRENT_GAMES = gql`
 `;
 
 export function CurrentGames() {
-    const { loading, error, data } = useQuery(CURRENT_GAMES);
-    console.log("current games", loading, error, data);
+    const { data } = useQuery(CURRENT_GAMES);
   
     return (
         <div className="fact-section">

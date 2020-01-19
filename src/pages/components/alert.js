@@ -1,26 +1,10 @@
-import React, { useState, Fragment } from "react";
-import { useSubscription } from "@apollo/react-hooks";
-import gql from "graphql-tag";
+import React, { useState } from "react";
 import Snackbar from "@material-ui/core/Snackbar";
 import SnackbarContent from "@material-ui/core/SnackbarContent";
 import InfoIcon from "@material-ui/icons/Info";
 import IconButton from "@material-ui/core/IconButton";
 import { makeStyles } from "@material-ui/core/styles";
 import CloseIcon from "@material-ui/icons/Close";
-
-export const Subscription = gql`
-  subscription MoreArticles {
-    rotoArticleAdded {
-      id
-      playerName
-      position
-      team
-      title
-      article
-      scrapedAt
-    }
-  }
-`;
 
 const useStyles = makeStyles(theme => ({
   info: {
@@ -40,18 +24,8 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export function RotoAlerts() {
-  const [open, setOpen] = useState(false);
-  const { data } = useSubscription(Subscription, {
-    onSubscriptionData: () => setOpen(true)
-  });
+export function Alert({ title, open, onClose }) {
   const classes = useStyles();
-
-  if (!data || !data.rotoArticleAdded) {
-    return null;
-  }
-
-  const { id, title, playerName, article } = data.rotoArticleAdded;
 
   return (
     <Snackbar
@@ -61,7 +35,7 @@ export function RotoAlerts() {
       }}
       open={open}
       autoHideDuration={12000}
-      onClose={() => setOpen(false)}
+      onClose={onClose}
     >
       <SnackbarContent
         className={classes.info}
@@ -77,7 +51,7 @@ export function RotoAlerts() {
             key="close"
             aria-label="close"
             color="inherit"
-            onClick={() => setOpen(false)}
+            onClick={onClose}
           >
             <CloseIcon className={classes.icon} />
           </IconButton>

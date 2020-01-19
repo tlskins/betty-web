@@ -53,8 +53,8 @@ function ListItem({ item, nextTab, prevTab }) {
             </div>
             <div className="w-full md:w-3/5 h-full flex items-center bg-gray-100 rounded-lg">
                 <div className="p-12 md:pr-24 md:pl-16 md:py-12">
+                    <div className="mb-4"><span className="text-gray-900"><b>{ item && item.name }</b></span><br /></div>
                     <p className="text-gray-600" style={{transition: `duration 350ms`}}>
-                        <div className="mb-4"><span className="text-gray-900"><b>{ item && item.name }</b></span><br /></div>
                         <span className="text-gray-900">Game Time:&nbsp;</span>{ item && moment(item.gameTime, "YYYY-MM-DD HH:mm:ss Z").format("MMM Do YYYY, h:mm a") }<br />
                         <span className="text-gray-900">Game Reults At:&nbsp;</span>{ item && moment(item.gameResultsAt, "YYYY-MM-DD HH:mm:ss Z").format("MMM Do YYYY, h:mm a") }<br />
                     </p>

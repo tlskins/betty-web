@@ -1,10 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, Fragment } from "react";
 import { Redirect } from "@reach/router";
 import { useMutation } from "@apollo/react-hooks";
+import { useApolloClient } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
-import { apolloClient } from "../index";
 import "./styles.css";
+
+export const GET_PROFILE = gql`
+  {
+    profile @client {
+      id
+      userName
+      name
+    }
+  }
+`;
 
 const LOG_OUT = gql`
   mutation signOut {
@@ -15,14 +25,20 @@ const LOG_OUT = gql`
 export function NavBar({ clickRotoNfl }) {
   const [logout, _] = useMutation(LOG_OUT, {
     onCompleted(data) {
-      console.log("data", data);
       if (data && data.signOut) {
         apolloClient.resetStore();
-        setRedirectLogin(true);
+        setRedirectTo("/login");
       }
     }
   });
-  const [redirectLogin, setRedirectLogin] = useState(false);
+  const [redirectTo, setRedirectTo] = useState(undefined);
+
+  let profile
+  const apolloClient = useApolloClient()
+  try {
+    const queryProfile = apolloClient.readQuery({ query: GET_PROFILE });
+    profile = queryProfile.profile
+  } catch(e) {}
 
   return (
     <nav className="nav-bar">
@@ -37,22 +53,28 @@ export function NavBar({ clickRotoNfl }) {
           </div>
         </div>
         <div className="nav_logo">
-          <span className="logo">BETTY</span>
+          <a className="logo" href="/">BETTY</a>
         </div>
 
         <a className="nav-link hover:text-blue-500 cursor-pointer">
           <button onClick={clickRotoNfl}>ROTO</button>
         </a>
-        <a className="nav-link-m-left hover:text-blue-500 cursor-pointer">
-          CHAT
-        </a>
-        <a className="nav-link-m-left hover:text-blue-500 cursor-pointer">
-          FRIENDS
-        </a>
-        <a className="nav-link-m-left hover:text-blue-500 cursor-pointer">
-          <button onClick={logout}>LOGOUT</button>
-          {redirectLogin && <Redirect to="/login" noThrow />}
-        </a>
+        { profile && 
+          <Fragment>
+            <a className="nav-link-m-left hover:text-blue-500 cursor-pointer" href="/bets">
+              <button>YOUR BETS</button>
+            </a>
+            <a className="nav-link-m-left hover:text-blue-500 cursor-pointer" onClick={logout}>
+              <button>LOGOUT</button>
+            </a>
+          </Fragment>
+        }
+        { !profile &&
+          <a className="nav-link-m-left hover:text-blue-500 cursor-pointer" href="/login">
+            <button>LOGIN</button>
+          </a>
+        }
+        {redirectTo && <Redirect to={redirectTo} noThrow />}
       </div>
     </nav>
   );

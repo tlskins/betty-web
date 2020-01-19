@@ -21,7 +21,7 @@ export const FIND_USERS = gql`
 `;
 
 export function UserSearch({ onExit, onSelect }) {
-  const [execute, { loading, data, error }] = useLazyQuery(FIND_USERS);
+  const [execute, { data }] = useLazyQuery(FIND_USERS);
   const [searchIdx, setSearchIdx] = useState(0);
   const onSearch = useThrottle(execute, 300);
 
@@ -73,7 +73,6 @@ export function UserSearch({ onExit, onSelect }) {
         {data && data.findUsers && (
           <ul className="dropdown-list">
             {data.findUsers.map((user, i) => {
-              console.log("finduser", searchIdx, i, user);
               const { id, userName, name, twitterUser = {} } = user;
               const { screenName } = twitterUser;
               const className =

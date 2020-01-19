@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { apolloClient } from "../../index";
+import { useApolloClient } from "@apollo/react-hooks";
+
 import { GET_SETTINGS } from "../yourBets";
 import { ExitButton } from "../components/exitButton";
 
@@ -26,6 +27,7 @@ export function Operator({ operator, onSelect }) {
 }
 
 function OperatorSearch({ onExit, onSelect }) {
+  const apolloClient = useApolloClient()
   const data = apolloClient.readQuery({
     query: GET_SETTINGS,
     variables: { id: "nfl" }
