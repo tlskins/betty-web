@@ -27,14 +27,14 @@ const cache = new InMemoryCache();
 })();
 
 const wsLink = new WebSocketLink({
-  uri: `ws://ec2-18-207-208-175.compute-1.amazonaws.com:8080/query`,
+  uri: `ws://localhost:8080/query`,
   options: {
     reconnect: true
   }
 });
 
 const httpLink = createHttpLink({
-  uri: "http://ec2-18-207-208-175.compute-1.amazonaws.com:8080/query",
+  uri: "http://localhost:8080/query",
   credentials: "include"
 });
 
