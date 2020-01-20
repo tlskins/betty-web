@@ -3,55 +3,46 @@ import ReactDOM from "react-dom";
 
 import { ApolloClient } from "apollo-client";
 import { InMemoryCache } from "apollo-cache-inmemory";
-// import { HttpLink } from "apollo-link-http";
-import { createHttpLink } from "apollo-link-http";
+import { HttpLink } from "apollo-link-http";
 import { ApolloProvider } from "@apollo/react-hooks";
-import { persistCache } from "apollo-cache-persist";
-import { split } from "apollo-link";
 import { WebSocketLink } from "apollo-link-ws";
-import { getMainDefinition } from "apollo-utilities";
 
-import "./css/tailwind.css";
 import Pages from "./pages";
 
-import "typeface-roboto-condensed";
-
-const cache = new InMemoryCache();
-
-// await before instantiating ApolloClient, else queries might run before the cache is persisted
-(async () => {
-  await persistCache({
-    cache,
-    storage: window.localStorage
-  });
-})();
-
 const wsLink = new WebSocketLink({
-  uri: `ws://localhost:8080/query`,
+  uri: `ws://ec2-18-207-208-175.compute-1.amazonaws.com:8080/query`,
   options: {
     reconnect: true
   }
 });
 
-const httpLink = createHttpLink({
-  uri: "http://localhost:8080/query",
-  credentials: "include"
+const httpLink = new HttpLink({
+  uri: "http://ec2-18-207-208-175.compute-1.amazonaws.com:8080/query"
 });
 
-// depending on what kind of operation is being sent
-const link = split(
-  // split based on operation type
-  ({ query }) => {
-    const { kind, operation } = getMainDefinition(query);
-    return kind === "OperationDefinition" && operation === "subscription";
-  },
-  wsLink,
-  httpLink
-);
+// const wsLink = new WebSocketLink({
+//   uri: `ws://localhost:8080/query`,
+//   options: {
+//     reconnect: true
+//   }
+// });
 
-export const apolloClient = new ApolloClient({
+// const httpLink = new HttpLink({ uri: "http://localhost:8080/query" });
+
+// // depending on what kind of operation is being sent
+// const link = split(
+//   // split based on operation type
+//   ({ query }) => {
+//     const { kind, operation } = getMainDefinition(query);
+//     return kind === "OperationDefinition" && operation === "subscription";
+//   },
+//   wsLink,
+//   httpLink
+// );
+
+const apolloClient = new ApolloClient({
   link,
-  cache
+  cache: new InMemoryCache()
 });
 
 if (module.hot) {
