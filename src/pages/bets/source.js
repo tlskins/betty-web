@@ -74,7 +74,7 @@ export function Source({ player, game, onSelect }) {
 }
 
 function PlayerSearch({ onExit, onSelect }) {
-  const [execute, { loading, data, error }] = useLazyQuery(SEARCH_PLAYER);
+  const [execute, { data }] = useLazyQuery(SEARCH_PLAYER);
   const [searchIdx, setSearchIdx] = useState(0);
   const search = useThrottle(execute, 300);
 
