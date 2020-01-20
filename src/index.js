@@ -29,16 +29,16 @@ const httpLink = new HttpLink({
 
 // const httpLink = new HttpLink({ uri: "http://localhost:8080/query" });
 
-// // depending on what kind of operation is being sent
-// const link = split(
-//   // split based on operation type
-//   ({ query }) => {
-//     const { kind, operation } = getMainDefinition(query);
-//     return kind === "OperationDefinition" && operation === "subscription";
-//   },
-//   wsLink,
-//   httpLink
-// );
+// depending on what kind of operation is being sent
+const link = split(
+  // split based on operation type
+  ({ query }) => {
+    const { kind, operation } = getMainDefinition(query);
+    return kind === "OperationDefinition" && operation === "subscription";
+  },
+  wsLink,
+  httpLink
+);
 
 const apolloClient = new ApolloClient({
   link,
