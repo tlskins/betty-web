@@ -88,14 +88,14 @@ export function YourBets() {
   useQuery(GET_SETTINGS, {
     variables: { id: "nfl" }
   });
-  const { loading, error, data } = useQuery(GET_BETS);
+  const { error, data } = useQuery(GET_BETS);
 
-  if ( error ) {
-    return(<Redirect to="/" noThrow />)
+  if (error) {
+    return <Redirect to="/" noThrow />;
   }
 
   const onRedirectBet = id => () => {
-    setRedirectTo("/bet/"+id);
+    setRedirectTo("/bet/" + id);
   };
 
   return (
@@ -108,7 +108,7 @@ export function YourBets() {
       <RotoAlerts />
       <div className="page-layout">
         <div className="page-inner-layout">
-        <div className="page-wrapper my-10">
+          <div className="page-wrapper my-10">
             <div className="page-content">
               <div className="page-content-area">
                 <div className="page-section">
@@ -147,7 +147,7 @@ export function YourBets() {
                         <Bet bet={bet} onClick={onRedirectBet(bet.id)} />
                       </div>
                     ))}
-                    {redirectTo && <Redirect to={redirectTo} noThrow />}
+                  {redirectTo && <Redirect to={redirectTo} noThrow />}
                 </div>
               </div>
             </div>
