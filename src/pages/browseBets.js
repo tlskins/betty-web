@@ -12,49 +12,49 @@ import { RotoAlerts } from "./rotoAlerts";
 import { FilterButton } from "./components/filterButton";
 
 export const BROWSE_BETS = gql`
-    query {
-        currentBets {
-            id
-            createdAt
-            betStatus
-            proposer {
-            id
-            name
-            userName
-            }
-            recipient {
-            id
-            name
-            userName
-            }
-            equations {
-            id
-            operator {
-                id
-                name
-            }
-            expressions {
-                id
-                isLeft
-                player {
-                teamFk
-                firstName
-                lastName
-                teamShort
-                position
-                }
-                game {
-                homeTeamFk
-                homeTeamName
-                awayTeamName
-                }
-                metric {
-                name
-                }
-            }
-            }
+  query {
+    currentBets {
+      id
+      createdAt
+      betStatus
+      proposer {
+        id
+        name
+        userName
+      }
+      recipient {
+        id
+        name
+        userName
+      }
+      equations {
+        id
+        operator {
+          id
+          name
         }
+        expressions {
+          id
+          isLeft
+          player {
+            teamFk
+            firstName
+            lastName
+            teamShort
+            position
+          }
+          game {
+            homeTeamFk
+            homeTeamName
+            awayTeamName
+          }
+          metric {
+            name
+          }
+        }
+      }
     }
+  }
 `;
 
 export function BrowseBets() {
@@ -76,7 +76,7 @@ export function BrowseBets() {
       <RotoAlerts />
       <div className="page-layout">
         <div className="page-inner-layout">
-        <div className="page-wrapper my-10">
+          <div className="page-wrapper my-10">
             <div className="page-content">
               <div className="page-content-area">
                 <div className="page-section">
@@ -86,7 +86,7 @@ export function BrowseBets() {
             </div>
           </div>
           <div className="page-hdr-box">
-            <h3 className="page-hdr">Current Bets</h3>
+            <h3 className="page-hdr">Current Bets 0.01</h3>
           </div>
           <div className="page-wrapper">
             <div className="page-summary">
@@ -106,7 +106,7 @@ export function BrowseBets() {
                         <Bet bet={bet} onClick={onRedirectBet(bet.id)} />
                       </div>
                     ))}
-                    {redirectTo && <Redirect to={redirectTo} noThrow />}
+                  {redirectTo && <Redirect to={redirectTo} noThrow />}
                 </div>
               </div>
             </div>
