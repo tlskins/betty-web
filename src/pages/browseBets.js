@@ -86,7 +86,7 @@ export function BrowseBets() {
             </div>
           </div>
           <div className="page-hdr-box">
-            <h3 className="page-hdr">Current Bets 0.05</h3>
+            <h3 className="page-hdr">Current Bets 0.06</h3>
           </div>
           <div className="page-wrapper">
             <div className="page-summary">
