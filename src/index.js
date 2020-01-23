@@ -13,14 +13,14 @@ import Pages from "./pages";
 import "./css/tailwind.css";
 
 const wsLink = new WebSocketLink({
-  uri: `wss://ec2-18-207-208-175.compute-1.amazonaws.com:8080/query`,
+  uri: `wss://api.bettybets.com:8080/query`,
   options: {
     reconnect: true
   }
 });
 
 const httpLink = new HttpLink({
-  uri: "https://ec2-18-207-208-175.compute-1.amazonaws.com:8080/query"
+  uri: "https://api.bettybets.com:8080/query"
 });
 
 // const wsLink = new WebSocketLink({
