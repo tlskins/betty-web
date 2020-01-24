@@ -5,7 +5,7 @@ import { YourBets } from "./yourBets";
 import { BrowseBets } from "./browseBets";
 import { BetDetail } from "./betDetail";
 import { SignIn } from "./signIn";
-import { Chat } from "./chat";
+import { Chat } from "../components/chat";
 
 export default function Pages() {
   return (

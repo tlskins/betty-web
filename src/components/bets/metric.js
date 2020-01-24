@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useApolloClient } from "@apollo/react-hooks";
 
-import { GET_SETTINGS } from "../yourBets";
-import { ExitButton } from "../components/exitButton";
+import { GET_SETTINGS } from "../../pages/yourBets";
+import { ExitButton } from "../exitButton";
 
 export function Metric({ metric, onSelect }) {
   const [edit, setEdit] = useState(false);
@@ -27,7 +27,7 @@ export function Metric({ metric, onSelect }) {
 }
 
 function MetricSelect({ onExit, onSelect }) {
-  const apolloClient = useApolloClient()
+  const apolloClient = useApolloClient();
   const data = apolloClient.readQuery({
     query: GET_SETTINGS,
     variables: { id: "nfl" }

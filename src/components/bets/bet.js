@@ -3,13 +3,12 @@ import { useMutation, useApolloClient } from "@apollo/react-hooks";
 import moment from "moment-timezone";
 import gql from "graphql-tag";
 
-import { GET_BETS } from "../yourBets";
+import { GET_BETS } from "../../pages/yourBets";
 import { GET_PROFILE } from "../navBar";
 import { UserSearch } from "../userSearch";
 import { Operator } from "./operator";
 import { Source } from "./source";
 import { Metric } from "./metric";
-
 
 const CREATE_BET = gql`
   mutation createBet($changes: BetChanges!) {
@@ -301,13 +300,16 @@ export function NewBet() {
 
 export function Bet({ bet, onClick }) {
   const [acceptBet, _] = useMutation(ACCEPT_BET);
-  
-  let profile
+
+  let profile;
   try {
     const apolloClient = useApolloClient();
-    const queryProfile = apolloClient.readQuery({ query: GET_PROFILE, default: {} });
-    profile = queryProfile.profile
-  } catch(e) {}
+    const queryProfile = apolloClient.readQuery({
+      query: GET_PROFILE,
+      default: {}
+    });
+    profile = queryProfile.profile;
+  } catch (e) {}
 
   const {
     id,
@@ -322,7 +324,8 @@ export function Bet({ bet, onClick }) {
 
   const title = `${proposer.name} (${proposer.userName})'s Bet with ${recipient.name} (${recipient.userName})`;
   const acceptable =
-    betStatus == "Pending Approval" && (profile.id == recipient.id || profile.id == proposer.id);
+    betStatus == "Pending Approval" &&
+    (profile.id == recipient.id || profile.id == proposer.id);
   let statusColor = "bg-yellow-200";
   if (betStatus == "Accepted") {
     statusColor = "bg-green-200";

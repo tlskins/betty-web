@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useLazyQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import { useThrottle } from "../utils";
-import { ExitButton } from "./components/exitButton";
+import { ExitButton } from "./exitButton";
 
 export const FIND_USERS = gql`
   query findUsers($search: String!) {

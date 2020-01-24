@@ -3,10 +3,10 @@ import { Redirect } from "@reach/router";
 import { useLazyQuery, useApolloClient } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
-import { NavBar } from "./navBar";
-import { RotoSideBar } from "./rotoSideBar";
-import { RotoAlerts } from "./rotoAlerts";
-import { Alert } from "./components/alert"
+import { NavBar } from "../components/navBar";
+import { RotoSideBar } from "../components/rotoSideBar";
+import { RotoAlerts } from "../components/rotoAlerts";
+import { Alert } from "../components/alert";
 
 export const SIGN_IN = gql`
   query signIn($userName: String!, $password: String!) {
@@ -19,7 +19,7 @@ export const SIGN_IN = gql`
 `;
 
 export function SignIn() {
-  const apolloClient = useApolloClient()
+  const apolloClient = useApolloClient();
   const [signIn, signInResponse] = useLazyQuery(SIGN_IN, {
     onCompleted(data) {
       if (data && data.signIn) {
@@ -35,26 +35,30 @@ export function SignIn() {
   const [showSideBar, setShowSideBar] = useState(undefined);
 
   useEffect(() => {
-    if ( signInResponse && signInResponse.error ) {
-      setAlertMsg(signInResponse.error.message)
+    if (signInResponse && signInResponse.error) {
+      setAlertMsg(signInResponse.error.message);
     }
     return function cleanup() {
-      setAlertMsg(undefined)
-    }
+      setAlertMsg(undefined);
+    };
   }, [signInResponse]);
 
   return (
     <div className="page-layout-wrapper">
-    <NavBar clickRotoNfl={() => setShowSideBar("RotoNfl")} />
-    <RotoSideBar
-      show={showSideBar == "RotoNfl"}
-      hide={() => setShowSideBar(undefined)}
-    />
-    <RotoAlerts />
-    <Alert title={alertMsg} open={alertMsg != undefined} onClose={() => setAlertMsg(undefined)} />
-    <div className="page-layout">
-      <div className="page-inner-layout">
-        <div className="page-wrapper my-10">
+      <NavBar clickRotoNfl={() => setShowSideBar("RotoNfl")} />
+      <RotoSideBar
+        show={showSideBar == "RotoNfl"}
+        hide={() => setShowSideBar(undefined)}
+      />
+      <RotoAlerts />
+      <Alert
+        title={alertMsg}
+        open={alertMsg != undefined}
+        onClose={() => setAlertMsg(undefined)}
+      />
+      <div className="page-layout">
+        <div className="page-inner-layout">
+          <div className="page-wrapper my-10">
             <div className="page-content">
               <div className="page-content-area">
                 <div className="p-8">
@@ -72,7 +76,9 @@ export function SignIn() {
                   />
                   <button
                     className="block"
-                    onClick={() => signIn({ variables: { userName, password } })}
+                    onClick={() =>
+                      signIn({ variables: { userName, password } })
+                    }
                   >
                     Log In
                   </button>

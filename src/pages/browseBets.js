@@ -4,12 +4,12 @@ import { Redirect } from "@reach/router";
 import "typeface-roboto";
 import gql from "graphql-tag";
 
-import { CurrentGames } from "./currentGames";
-import { NavBar } from "./navBar";
-import { RotoSideBar } from "./rotoSideBar";
-import { Bet } from "./bets/bet";
-import { RotoAlerts } from "./rotoAlerts";
-import { FilterButton } from "./components/filterButton";
+import { CurrentGames } from "../components/currentGames";
+import { NavBar } from "../components/navBar";
+import { RotoSideBar } from "../components/rotoSideBar";
+import { Bet } from "../components/bets/bet";
+import { RotoAlerts } from "../components/rotoAlerts";
+import { FilterButton } from "../components/filterButton";
 
 export const BROWSE_BETS = gql`
   query {

@@ -4,8 +4,6 @@ import { useMutation } from "@apollo/react-hooks";
 import { useApolloClient } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
-import "./styles.css";
-
 export const GET_PROFILE = gql`
   {
     profile @client {
@@ -33,12 +31,12 @@ export function NavBar({ clickRotoNfl }) {
   });
   const [redirectTo, setRedirectTo] = useState(undefined);
 
-  let profile
-  const apolloClient = useApolloClient()
+  let profile;
+  const apolloClient = useApolloClient();
   try {
     const queryProfile = apolloClient.readQuery({ query: GET_PROFILE });
-    profile = queryProfile.profile
-  } catch(e) {}
+    profile = queryProfile.profile;
+  } catch (e) {}
 
   return (
     <nav className="nav-bar">
@@ -53,27 +51,38 @@ export function NavBar({ clickRotoNfl }) {
           </div>
         </div>
         <div className="nav_logo">
-          <a className="logo" href="/">BETTY</a>
+          <a className="logo" href="/">
+            BETTY
+          </a>
         </div>
 
         <a className="nav-link hover:text-blue-500 cursor-pointer">
           <button onClick={clickRotoNfl}>ROTO</button>
         </a>
-        { profile && 
+        {profile && (
           <Fragment>
-            <a className="nav-link-m-left hover:text-blue-500 cursor-pointer" href="/bets">
+            <a
+              className="nav-link-m-left hover:text-blue-500 cursor-pointer"
+              href="/bets"
+            >
               <button>YOUR BETS</button>
             </a>
-            <a className="nav-link-m-left hover:text-blue-500 cursor-pointer" onClick={logout}>
+            <a
+              className="nav-link-m-left hover:text-blue-500 cursor-pointer"
+              onClick={logout}
+            >
               <button>LOGOUT</button>
             </a>
           </Fragment>
-        }
-        { !profile &&
-          <a className="nav-link-m-left hover:text-blue-500 cursor-pointer" href="/login">
+        )}
+        {!profile && (
+          <a
+            className="nav-link-m-left hover:text-blue-500 cursor-pointer"
+            href="/login"
+          >
             <button>LOGIN</button>
           </a>
-        }
+        )}
         {redirectTo && <Redirect to={redirectTo} noThrow />}
       </div>
     </nav>

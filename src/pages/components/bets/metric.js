@@ -1,33 +1,33 @@
 import React, { useState } from "react";
 import { useApolloClient } from "@apollo/react-hooks";
 
-import { GET_SETTINGS } from "../yourBets";
-import { ExitButton } from "../components/exitButton";
+import { GET_SETTINGS } from "../../pages/yourBets";
+import { ExitButton } from "../exitButton";
 
-export function Operator({ operator, onSelect }) {
+export function Metric({ metric, onSelect }) {
   const [edit, setEdit] = useState(false);
-  const { name = "?" } = operator || {};
+  const { name } = metric || { name: "?" };
 
   const onExit = onSelect && (() => setEdit(false));
   const onClick = onSelect && (() => setEdit(true));
 
   return (
-    <div>
-      {edit && <OperatorSearch onExit={onExit} onSelect={onSelect} />}
+    <span className="fact-value">
+      {edit && <MetricSelect onExit={onExit} onSelect={onSelect} />}
       {!edit && (
         <div
-          className="underline hover:text-blue-500 cursor-pointer px-4 py-2 m-2"
+          className="underline hover:text-blue-500 cursor-pointer"
           onClick={onClick}
         >
           {name}
         </div>
       )}
-    </div>
+    </span>
   );
 }
 
-function OperatorSearch({ onExit, onSelect }) {
-  const apolloClient = useApolloClient()
+function MetricSelect({ onExit, onSelect }) {
+  const apolloClient = useApolloClient();
   const data = apolloClient.readQuery({
     query: GET_SETTINGS,
     variables: { id: "nfl" }
@@ -41,13 +41,13 @@ function OperatorSearch({ onExit, onSelect }) {
   };
 
   const onKeyDown = e => {
-    const lastIdx = data.leagueSettings.betEquations.length || 0;
+    const lastIdx = data.leagueSettings.playerBets.length || 0;
     if (e.keyCode == 27) {
       // esc
       onExit();
-    } else if (e.keyCode == 13 && data.leagueSettings.betEquations.length > 0) {
+    } else if (e.keyCode == 13 && data.leagueSettings.playerBets.length > 0) {
       // enter
-      onSelect(data.leagueSettings.betEquations[searchIdx]);
+      onSelect(data.leagueSettings.playerBets[searchIdx]);
       onExit();
     } else if (e.keyCode == 40) {
       // down
@@ -62,9 +62,9 @@ function OperatorSearch({ onExit, onSelect }) {
 
   return (
     <div className="dropdown-menu flex flex-row">
-      <div className="dropdown-btn flex-row">
+      <button className="dropdown-btn">
         <ExitButton onClick={onExit} />
-        <div className="dropdown-title ml-2">Equivalency</div>
+        <div className="dropdown-title ml-2">Metric</div>
         <div className="dropdown-selection">
           <input
             type="text"
@@ -75,9 +75,9 @@ function OperatorSearch({ onExit, onSelect }) {
             onKeyDown={onKeyDown}
           />
         </div>
-        {data && data.leagueSettings && data.leagueSettings.betEquations && (
+        {data && data.leagueSettings && data.leagueSettings.playerBets && (
           <ul className="dropdown-list">
-            {data.leagueSettings.betEquations
+            {data.leagueSettings.playerBets
               .filter(bet => RegExp(search, "i").test(bet.name))
               .map((bet, i) => {
                 const { name } = bet;
@@ -103,7 +103,7 @@ function OperatorSearch({ onExit, onSelect }) {
               })}
           </ul>
         )}
-      </div>
+      </button>
     </div>
   );
 }

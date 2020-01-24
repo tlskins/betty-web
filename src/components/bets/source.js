@@ -4,7 +4,7 @@ import gql from "graphql-tag";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import Avatar from "@material-ui/core/Avatar";
 import { useThrottle } from "../../utils";
-import { ExitButton } from "../components/exitButton";
+import { ExitButton } from "../exitButton";
 
 export const SEARCH_PLAYER = gql`
   query searchPlayers($name: String!) {

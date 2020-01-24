@@ -3,10 +3,10 @@ import { useQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import "typeface-roboto";
 
-import { NavBar } from "./navBar";
-import { RotoSideBar } from "./rotoSideBar";
-import { Bet } from "./bets/bet";
-import { RotoAlerts } from "./rotoAlerts";
+import { NavBar } from "../components/navBar";
+import { RotoSideBar } from "../components/rotoSideBar";
+import { Bet } from "../components/bets/bet";
+import { RotoAlerts } from "../components/rotoAlerts";
 import { GET_SETTINGS } from "./yourBets";
 
 export const GET_BET = gql`
