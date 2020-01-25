@@ -60,22 +60,22 @@ export function SignIn() {
         <div className="page-inner-layout">
           <div className="page-wrapper my-10">
             <div className="page-content">
-              <div className="page-content-area">
+              <div className="page-content-area flex-row">
                 <div className="p-8">
                   <input
-                    className="block"
+                    className="block border border-black rounded p-2 m-2"
                     type="text"
                     onChange={e => setUserName(e.target.value)}
                     placeholder="username"
                   />
                   <input
-                    className="block"
-                    type="text"
+                    className="block border border-black rounded p-2 m-2"
+                    type="password"
                     onChange={e => setPassword(e.target.value)}
                     placeholder="password"
                   />
                   <button
-                    className="block"
+                    className="block border border-black rounded p-2 m-2"
                     onClick={() =>
                       signIn({ variables: { userName, password } })
                     }
@@ -83,6 +83,41 @@ export function SignIn() {
                     Log In
                   </button>
                   {redirect && <Redirect to="/bets" noThrow />}
+                </div>
+                <div className="p-8">
+                  <p className="font-sans">
+                    <h4 className="m-2 text-lg">
+                      <b>New User? </b> Register through twitter!
+                    </h4>
+                    <ol type="1">
+                      <li className="m-2">
+                        <b>1.</b> Follow{" "}
+                        <span className="text-blue-600 font-bold">
+                          @bettybetbot
+                        </span>{" "}
+                        (so you can receive a confirmation dm (direct message)
+                        from her)
+                      </li>
+                      <li className="m-2">
+                        <b>2.</b> Send a tweet to{" "}
+                        <span className="text-blue-600 font-bold">
+                          @bettybetbot
+                        </span>{" "}
+                        to register your user name ie:{" "}
+                        <span className="font-medium font-mono">
+                          "@bettybetbot register DrJackBlack"
+                        </span>
+                      </li>
+                      <li className="m-2">
+                        You will receive a dm from{" "}
+                        <span className="text-blue-600 font-bold">
+                          @bettybetbot
+                        </span>
+                        with the username: <b>DrJackBlack</b> and your temporary
+                        password
+                      </li>
+                    </ol>
+                  </p>
                 </div>
               </div>
             </div>

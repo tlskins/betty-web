@@ -13,29 +13,29 @@ import Pages from "./pages";
 import "./css/tailwind.css";
 import "./css/styles.css";
 
-const wsLink = new WebSocketLink({
-  uri: `wss://api.bettybets.com/query`,
-  options: {
-    reconnect: true
-  }
-});
-
-const httpLink = new HttpLink({
-  uri: "https://api.bettybets.com/query",
-  credentials: "include"
-});
-
 // const wsLink = new WebSocketLink({
-//   uri: `ws://localhost:8080/query`,
+//   uri: `wss://api.bettybets.com/query`,
 //   options: {
 //     reconnect: true
 //   }
 // });
 
 // const httpLink = new HttpLink({
-//   uri: "http://localhost:8080/query",
+//   uri: "https://api.bettybets.com/query",
 //   credentials: "include"
 // });
+
+const wsLink = new WebSocketLink({
+  uri: `ws://localhost:8080/query`,
+  options: {
+    reconnect: true
+  }
+});
+
+const httpLink = new HttpLink({
+  uri: "http://localhost:8080/query",
+  credentials: "include"
+});
 
 // depending on what kind of operation is being sent
 const link = split(
