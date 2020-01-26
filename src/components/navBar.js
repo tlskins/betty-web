@@ -1,15 +1,20 @@
 import React, { useState, Fragment } from "react";
 import { Redirect } from "@reach/router";
-import { useMutation } from "@apollo/react-hooks";
-import { useApolloClient } from "@apollo/react-hooks";
+import { useMutation, useApolloClient } from "@apollo/react-hooks";
+
 import gql from "graphql-tag";
 
 export const GET_PROFILE = gql`
   {
     profile @client {
       id
-      userName
       name
+      userName
+      twitterUser {
+        idStr
+        screenName
+        name
+      }
     }
   }
 `;
@@ -20,35 +25,33 @@ const LOG_OUT = gql`
   }
 `;
 
-export function NavBar({ clickRotoNfl }) {
+export function NavBar({ clickRoto, clickProfile }) {
+  const client = useApolloClient();
   const [logout, _] = useMutation(LOG_OUT, {
     onCompleted(data) {
       if (data && data.signOut) {
-        apolloClient.resetStore();
+        client.resetStore();
+        localStorage.clear();
         setRedirectTo("/login");
       }
     }
   });
   const [redirectTo, setRedirectTo] = useState(undefined);
-
-  let profile;
-  const apolloClient = useApolloClient();
-  try {
-    const queryProfile = apolloClient.readQuery({ query: GET_PROFILE });
-    profile = queryProfile.profile;
-  } catch (e) {}
+  const profile = JSON.parse(localStorage.getItem("profile"));
 
   return (
     <nav className="nav-bar">
       <div className="nav-hdr-content">
         <div className="nav-menu-container">
-          <div>
-            <label className="nav_hamburger">
-              <span className="hamburger_slice" />
-              <span className="hamburger_slice" />
-              <span className="hamburger_slice" />
-            </label>
-          </div>
+          {profile && (
+            <div>
+              <label className="nav_hamburger" onClick={clickProfile}>
+                <span className="hamburger_slice" />
+                <span className="hamburger_slice" />
+                <span className="hamburger_slice" />
+              </label>
+            </div>
+          )}
         </div>
         <div className="nav_logo">
           <a className="logo" href="/">
@@ -57,7 +60,7 @@ export function NavBar({ clickRotoNfl }) {
         </div>
 
         <a className="nav-link hover:text-blue-500 cursor-pointer">
-          <button onClick={clickRotoNfl}>ROTO</button>
+          <button onClick={clickRoto}>ROTO</button>
         </a>
         {profile && (
           <Fragment>

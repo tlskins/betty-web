@@ -7,6 +7,7 @@ import "typeface-roboto";
 import { CurrentGames } from "../components/currentGames";
 import { NavBar } from "../components/navBar";
 import { RotoSideBar } from "../components/rotoSideBar";
+import { ProfileSideBar } from "../components/profileSideBar";
 import { NewBet, Bet } from "../components/bets/bet";
 import { RotoAlerts } from "../components/rotoAlerts";
 import { FilterButton } from "../components/filterButton";
@@ -100,9 +101,16 @@ export function YourBets() {
 
   return (
     <div className="page-layout-wrapper">
-      <NavBar clickRotoNfl={() => setShowSideBar("RotoNfl")} />
+      <NavBar
+        clickRoto={() => setShowSideBar("roto")}
+        clickProfile={() => setShowSideBar("profile")}
+      />
       <RotoSideBar
-        show={showSideBar == "RotoNfl"}
+        show={showSideBar == "roto"}
+        hide={() => setShowSideBar(undefined)}
+      />
+      <ProfileSideBar
+        show={showSideBar == "profile"}
         hide={() => setShowSideBar(undefined)}
       />
       <RotoAlerts />

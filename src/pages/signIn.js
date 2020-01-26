@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Redirect } from "@reach/router";
-import { useLazyQuery, useApolloClient } from "@apollo/react-hooks";
+import { useLazyQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
 import { NavBar } from "../components/navBar";
@@ -12,18 +12,23 @@ export const SIGN_IN = gql`
   query signIn($userName: String!, $password: String!) {
     signIn(userName: $userName, password: $password) {
       id
-      userName
       name
+      userName
+      twitterUser {
+        idStr
+        screenName
+        name
+      }
     }
   }
 `;
 
 export function SignIn() {
-  const apolloClient = useApolloClient();
   const [signIn, signInResponse] = useLazyQuery(SIGN_IN, {
     onCompleted(data) {
       if (data && data.signIn) {
-        apolloClient.writeData({ data: { profile: data.signIn } });
+        console.log("data:", data);
+        localStorage.setItem("profile", JSON.stringify(data.signIn));
         setRedirect(true);
       }
     }
@@ -84,40 +89,37 @@ export function SignIn() {
                   </button>
                   {redirect && <Redirect to="/bets" noThrow />}
                 </div>
-                <div className="p-8">
-                  <p className="font-sans">
-                    <h4 className="m-2 text-lg">
-                      <b>New User? </b> Register through twitter!
-                    </h4>
-                    <ol type="1">
-                      <li className="m-2">
-                        <b>1.</b> Follow{" "}
-                        <span className="text-blue-600 font-bold">
-                          @bettybetbot
-                        </span>{" "}
-                        (so you can receive a confirmation dm (direct message)
-                        from her)
-                      </li>
-                      <li className="m-2">
-                        <b>2.</b> Send a tweet to{" "}
-                        <span className="text-blue-600 font-bold">
-                          @bettybetbot
-                        </span>{" "}
-                        to register your user name ie:{" "}
-                        <span className="font-medium font-mono">
-                          "@bettybetbot register DrJackBlack"
-                        </span>
-                      </li>
-                      <li className="m-2">
-                        You will receive a dm from{" "}
-                        <span className="text-blue-600 font-bold">
-                          @bettybetbot
-                        </span>
-                        with the username: <b>DrJackBlack</b> and your temporary
-                        password
-                      </li>
-                    </ol>
-                  </p>
+                <div className="p-8 font-sans">
+                  <h4 className="m-2 text-lg">
+                    <b>New User? </b> Register through twitter!
+                  </h4>
+                  <ol type="1">
+                    <li className="m-2">
+                      <b>1.</b> Follow{" "}
+                      <span className="text-blue-600 font-bold">
+                        @bettybetbot
+                      </span>{" "}
+                      (so you can receive a confirmation dm from her)
+                    </li>
+                    <li className="m-2">
+                      <b>2.</b> Send a tweet to{" "}
+                      <span className="text-blue-600 font-bold">
+                        @bettybetbot
+                      </span>{" "}
+                      to register your user name ie:{" "}
+                      <span className="font-medium font-mono">
+                        "@bettybetbot register DrJackBlack"
+                      </span>
+                    </li>
+                    <li className="m-2">
+                      You will receive a dm from{" "}
+                      <span className="text-blue-600 font-bold">
+                        @bettybetbot
+                      </span>
+                      with the username: <b>DrJackBlack</b> and your temporary
+                      password
+                    </li>
+                  </ol>
                 </div>
               </div>
             </div>
