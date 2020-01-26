@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Redirect } from "@reach/router";
 import { useLazyQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
@@ -23,6 +23,36 @@ export const SIGN_IN = gql`
   }
 `;
 
+export function RegistrationDetails() {
+  return (
+    <div>
+      <h4 className="m-2 text-lg">
+        <b>New User? </b> Register through twitter!
+      </h4>
+      <ol type="1">
+        <li className="m-2">
+          <b>1.</b> Follow{" "}
+          <span className="text-blue-600 font-bold">@bettybetbot</span> (so you
+          can receive a confirmation dm from her)
+        </li>
+        <li className="m-2">
+          <b>2.</b> Send a tweet to{" "}
+          <span className="text-blue-600 font-bold">@bettybetbot</span> to
+          register your user name ie:{" "}
+          <span className="font-medium font-mono">
+            "@bettybetbot register DrJackBlack"
+          </span>
+        </li>
+        <li className="m-2">
+          You will receive a dm from{" "}
+          <span className="text-blue-600 font-bold">@bettybetbot</span>
+          with the username: <b>DrJackBlack</b> and your temporary password
+        </li>
+      </ol>
+    </div>
+  );
+}
+
 export function SignIn() {
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
@@ -44,15 +74,15 @@ export function SignIn() {
 
   return (
     <div className="page-layout-wrapper">
-      <NavBar clickRotoNfl={() => setShowSideBar("RotoNfl")} />
+      <NavBar clickRotoNfl={() => setShowSideBar("roto")} />
       <RotoSideBar
-        show={showSideBar == "RotoNfl"}
+        show={showSideBar === "roto"}
         hide={() => setShowSideBar(undefined)}
       />
       <RotoAlerts />
       <Alert
         title={alertMsg}
-        open={alertMsg != undefined}
+        open={alertMsg !== undefined}
         onClose={() => setAlertMsg(undefined)}
       />
       <div className="page-layout">
@@ -84,36 +114,7 @@ export function SignIn() {
                   {redirect && <Redirect to="/bets" noThrow />}
                 </div>
                 <div className="p-8 font-sans">
-                  <h4 className="m-2 text-lg">
-                    <b>New User? </b> Register through twitter!
-                  </h4>
-                  <ol type="1">
-                    <li className="m-2">
-                      <b>1.</b> Follow{" "}
-                      <span className="text-blue-600 font-bold">
-                        @bettybetbot
-                      </span>{" "}
-                      (so you can receive a confirmation dm from her)
-                    </li>
-                    <li className="m-2">
-                      <b>2.</b> Send a tweet to{" "}
-                      <span className="text-blue-600 font-bold">
-                        @bettybetbot
-                      </span>{" "}
-                      to register your user name ie:{" "}
-                      <span className="font-medium font-mono">
-                        "@bettybetbot register DrJackBlack"
-                      </span>
-                    </li>
-                    <li className="m-2">
-                      You will receive a dm from{" "}
-                      <span className="text-blue-600 font-bold">
-                        @bettybetbot
-                      </span>
-                      with the username: <b>DrJackBlack</b> and your temporary
-                      password
-                    </li>
-                  </ol>
+                  <RegistrationDetails />
                 </div>
               </div>
             </div>

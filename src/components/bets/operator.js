@@ -42,20 +42,23 @@ function OperatorSearch({ onExit, onSelect }) {
 
   const onKeyDown = e => {
     const lastIdx = data.leagueSettings.betEquations.length || 0;
-    if (e.keyCode == 27) {
+    if (e.keyCode === 27) {
       // esc
       onExit();
-    } else if (e.keyCode == 13 && data.leagueSettings.betEquations.length > 0) {
+    } else if (
+      e.keyCode === 13 &&
+      data.leagueSettings.betEquations.length > 0
+    ) {
       // enter
       onSelect(data.leagueSettings.betEquations[searchIdx]);
       onExit();
-    } else if (e.keyCode == 40) {
+    } else if (e.keyCode === 40) {
       // down
-      const idx = searchIdx == lastIdx - 1 ? 0 : searchIdx + 1;
+      const idx = searchIdx === lastIdx - 1 ? 0 : searchIdx + 1;
       setSearchIdx(idx);
-    } else if (e.keyCode == 38) {
+    } else if (e.keyCode === 38) {
       // up
-      const idx = searchIdx == 0 ? lastIdx - 1 : searchIdx - 1;
+      const idx = searchIdx === 0 ? lastIdx - 1 : searchIdx - 1;
       setSearchIdx(idx);
     }
   };
@@ -82,7 +85,7 @@ function OperatorSearch({ onExit, onSelect }) {
               .map((bet, i) => {
                 const { name } = bet;
                 const className =
-                  searchIdx == i
+                  searchIdx === i
                     ? "dropdown-list-item bg-gray-200"
                     : "dropdown-list-item";
                 return (

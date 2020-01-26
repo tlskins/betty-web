@@ -19,7 +19,7 @@ export function RotoSideBar({ show, hide }) {
   const [execute, queryResults] = useLazyQuery(GET_ROTO_ARTICLES, {
     variables: { id: "nfl" }
   });
-  const { loading, error, refetch } = queryResults;
+  const { loading, refetch } = queryResults;
   let { data } = queryResults;
   const [showing, setShowing] = useState(false);
   const [expanded, setExpanded] = useState(undefined);
@@ -60,7 +60,7 @@ export function RotoSideBar({ show, hide }) {
             data.currentRotoArticles &&
             data.currentRotoArticles.map((a, i) => {
               const { title, playerName, team, position, article } = a;
-              const contentClass = expanded == title ? "" : "hidden";
+              const contentClass = expanded === title ? "" : "hidden";
 
               return (
                 <li

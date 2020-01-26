@@ -1,4 +1,4 @@
-import React, { useState, Fragment } from "react";
+import React, { useState } from "react";
 import { useSubscription } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import Snackbar from "@material-ui/core/Snackbar";
@@ -51,7 +51,7 @@ export function RotoAlerts() {
     return null;
   }
 
-  const { id, title, playerName, article } = data.rotoArticleAdded;
+  const { title } = data.rotoArticleAdded;
 
   return (
     <Snackbar

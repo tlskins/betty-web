@@ -41,7 +41,7 @@ export function ProfileSideBar({ show, hide }) {
       </nav>
       <Alert
         title={alertMsg}
-        open={alertMsg != undefined}
+        open={alertMsg !== undefined}
         onClose={() => setAlertMsg(undefined)}
       />
     </div>

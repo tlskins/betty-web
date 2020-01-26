@@ -76,7 +76,7 @@ export function BrowseBets() {
     <div className="page-layout-wrapper">
       <NavBar clickRotoNfl={() => setShowSideBar("RotoNfl")} />
       <RotoSideBar
-        show={showSideBar == "RotoNfl"}
+        show={showSideBar === "RotoNfl"}
         hide={() => setShowSideBar(undefined)}
       />
       <RotoAlerts />

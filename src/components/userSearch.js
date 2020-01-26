@@ -34,23 +34,23 @@ export function UserSearch({ onExit, onSelect }) {
 
   const onChange = e => {
     let { value } = e.target;
-    if (value.length == 0) return;
+    if (value.length === 0) return;
     onSearch({ variables: { search: value.replace("@", "") } });
     setSearch(value);
   };
 
   const onKeyDown = e => {
-    if (e.keyCode == 27) {
+    if (e.keyCode === 27) {
       onExit(); // esc
     } else if (users.length > 0) {
       if (e.keyCode === 13) {
         onSelect({ user: users[searchIdx] });
         onExit(); // enter
       } else if (e.keyCode === 40) {
-        const idx = searchIdx == 0 ? users.length - 1 : searchIdx - 1;
+        const idx = searchIdx === 0 ? users.length - 1 : searchIdx - 1;
         setSearchIdx(idx); // down
       } else if (e.keyCode === 38) {
-        const idx = searchIdx == users.length - 1 ? 0 : searchIdx + 1;
+        const idx = searchIdx === users.length - 1 ? 0 : searchIdx + 1;
         setSearchIdx(idx); // up
       }
     }
@@ -76,7 +76,7 @@ export function UserSearch({ onExit, onSelect }) {
             const { id, userName, twitterUser = {} } = user;
             const { screenName } = twitterUser;
             const className =
-              searchIdx == i
+              searchIdx === i
                 ? "dropdown-list-item bg-gray-200"
                 : "dropdown-list-item";
             return (

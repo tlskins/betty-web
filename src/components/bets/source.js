@@ -46,7 +46,7 @@ export function Source({ player, game, onSelect }) {
   if (game && player) {
     const { homeTeamFk, homeTeamName = "N/A", awayTeamName = "N/A" } = game;
     vsTeam = `vs ${homeTeamName}`;
-    if (player.teamFk == homeTeamFk) {
+    if (player.teamFk === homeTeamFk) {
       vsTeam = `vs ${awayTeamName}`;
     }
   }
@@ -80,16 +80,16 @@ function PlayerSearch({ onExit, onSelect }) {
 
   const onChange = e => {
     const name = e.target.value;
-    if (name.length == 0) return;
+    if (name.length === 0) return;
     search({ variables: { name } });
   };
 
   const onKeyDown = e => {
-    if (e.keyCode == 27) {
+    if (e.keyCode === 27) {
       // esc
       onExit();
     } else if (
-      e.keyCode == 13 &&
+      e.keyCode === 13 &&
       data &&
       data.findPlayers &&
       data.findPlayers.length > 0
@@ -97,13 +97,13 @@ function PlayerSearch({ onExit, onSelect }) {
       // enter
       onSelect({ user: data.findPlayers[searchIdx] });
       onExit();
-    } else if (e.keyCode == 40) {
+    } else if (e.keyCode === 40) {
       // down
-      const idx = searchIdx == data.findPlayers.length - 1 ? 0 : searchIdx + 1;
+      const idx = searchIdx === data.findPlayers.length - 1 ? 0 : searchIdx + 1;
       setSearchIdx(idx);
-    } else if (e.keyCode == 38) {
+    } else if (e.keyCode === 38) {
       // up
-      const idx = searchIdx == 0 ? data.findPlayers.length - 1 : searchIdx - 1;
+      const idx = searchIdx === 0 ? data.findPlayers.length - 1 : searchIdx - 1;
       setSearchIdx(idx);
     }
   };
@@ -152,13 +152,13 @@ function Player({ player, searchIdx, setSearchIdx, index, onSelect, onExit }) {
   if (game) {
     const { homeTeamFk, homeTeamName, awayTeamName } = game;
     let team = homeTeamName;
-    if (homeTeamFk == teamFk) {
+    if (homeTeamFk === teamFk) {
       team = awayTeamName;
     }
     vsTeam = `vs ${team}`;
   }
   const className =
-    searchIdx == index
+    searchIdx === index
       ? "dropdown-list-item bg-gray-200"
       : "dropdown-list-item";
 

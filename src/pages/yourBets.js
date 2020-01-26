@@ -116,16 +116,16 @@ export function YourBets() {
         clickProfile={() => setShowSideBar("profile")}
       />
       <RotoSideBar
-        show={showSideBar == "roto"}
+        show={showSideBar === "roto"}
         hide={() => setShowSideBar(undefined)}
       />
       <ProfileSideBar
-        show={showSideBar == "profile"}
+        show={showSideBar === "profile"}
         hide={() => setShowSideBar(undefined)}
       />
       <Alert
         title={alertMsg}
-        open={alertMsg != undefined}
+        open={alertMsg !== undefined}
         onClose={() => setAlertMsg(undefined)}
       />
       <RotoAlerts />

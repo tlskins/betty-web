@@ -9,6 +9,7 @@ import { Bet } from "../components/bets/bet";
 import { RotoAlerts } from "../components/rotoAlerts";
 import { GET_SETTINGS } from "./yourBets";
 import { Alert } from "../components/alert";
+import { RegistrationDetails } from "./signIn";
 
 export const GET_BET = gql`
   query bet($id: ID!) {
@@ -73,17 +74,20 @@ export function BetDetail(props) {
     variables: { id: props.betId }
   });
   const [alertMsg, setAlertMsg] = useState(undefined);
+  const [registration, setRegistration] = useState(false);
+  const profile = JSON.parse(localStorage.getItem("profile"));
+  const signedIn = !!(profile && profile.id);
 
   return (
     <div className="page-layout-wrapper">
-      <NavBar clickRotoNfl={() => setShowSideBar("RotoNfl")} />
+      <NavBar clickRotoNfl={() => setShowSideBar("roto")} />
       <RotoSideBar
-        show={showSideBar == "RotoNfl"}
+        show={showSideBar === "roto"}
         hide={() => setShowSideBar(undefined)}
       />
       <Alert
         title={alertMsg}
-        open={alertMsg != undefined}
+        open={alertMsg !== undefined}
         onClose={() => setAlertMsg(undefined)}
       />
       <RotoAlerts />
@@ -95,7 +99,19 @@ export function BetDetail(props) {
           <div className="page-wrapper">
             <div className="page-content">
               <div className="page-content-area">
-                <div className="page-section">
+                <div className="page-section flex flex-col">
+                  {!signedIn && (
+                    <div className="text-center font-serif inline-block bg-indigo-200 rounded p-2 w-1/2 self-center mb-6">
+                      Is this your bet? Reply "Yes / No" to tweet!
+                      <div
+                        className="underline text-blue-500 hover:text-blue-800 cursor-pointer"
+                        onClick={() => setRegistration(!registration)}
+                      >
+                        New user?
+                      </div>
+                    </div>
+                  )}
+                  <div>{registration && <RegistrationDetails />}</div>
                   {data && data.bet && (
                     <Bet bet={data.bet} setAlertMsg={setAlertMsg} />
                   )}

@@ -27,7 +27,7 @@ const LOG_OUT = gql`
 
 export function NavBar({ clickRoto, clickProfile }) {
   const client = useApolloClient();
-  const [logout, _] = useMutation(LOG_OUT, {
+  const [logout] = useMutation(LOG_OUT, {
     onCompleted(data) {
       if (data && data.signOut) {
         client.resetStore();
@@ -42,25 +42,23 @@ export function NavBar({ clickRoto, clickProfile }) {
   return (
     <nav className="nav-bar">
       <div className="nav-hdr-content">
-        <div className="nav-menu-container">
-          {profile && (
-            <div>
-              <label className="nav_hamburger" onClick={clickProfile}>
-                <span className="hamburger_slice" />
-                <span className="hamburger_slice" />
-                <span className="hamburger_slice" />
-              </label>
-            </div>
-          )}
-        </div>
         <div className="nav_logo">
           <a className="logo" href="/">
             BETTY
           </a>
         </div>
 
-        <a className="nav-link hover:text-blue-500 cursor-pointer">
-          <button onClick={clickRoto}>ROTO</button>
+        <button
+          className="nav-link hover:text-blue-500 cursor-pointer"
+          onClick={clickRoto}
+        >
+          ROTO
+        </button>
+        <a
+          className="nav-link-m-left hover:text-blue-500 cursor-pointer"
+          href="/info"
+        >
+          <button>INFO</button>
         </a>
         {profile && (
           <Fragment>
@@ -68,14 +66,20 @@ export function NavBar({ clickRoto, clickProfile }) {
               className="nav-link-m-left hover:text-blue-500 cursor-pointer"
               href="/bets"
             >
-              <button>YOUR BETS</button>
+              <button>MY BETS</button>
             </a>
-            <a
+            <button
+              className="nav-link-m-left hover:text-blue-500 cursor-pointer"
+              onClick={clickProfile}
+            >
+              PROFILE
+            </button>
+            <button
               className="nav-link-m-left hover:text-blue-500 cursor-pointer"
               onClick={logout}
             >
-              <button>LOGOUT</button>
-            </a>
+              LOGOUT
+            </button>
           </Fragment>
         )}
         {!profile && (

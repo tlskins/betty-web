@@ -58,7 +58,7 @@ const Mutation = gql`
 `;
 
 function ChatInput({ channel, name }) {
-  const [postChat, _] = useMutation(Mutation);
+  const [postChat] = useMutation(Mutation);
 
   return (
     <TextComposer
@@ -77,7 +77,7 @@ function ChatInput({ channel, name }) {
 }
 
 function ChatHistory({ channel, messages, setMessages, name, minimize }) {
-  const { data, loading } = useSubscription(Subscription, {
+  useSubscription(Subscription, {
     variables: { channel },
     onSubscriptionData: ({ client, subscriptionData }) => {
       const newMessages = [...messages];
@@ -86,7 +86,7 @@ function ChatHistory({ channel, messages, setMessages, name, minimize }) {
 
       // group messages by created by
       if (last) {
-        if (last[0].createdBy == msg.createdBy) {
+        if (last[0].createdBy === msg.createdBy) {
           last.push(msg);
           newMessages.push(last);
         } else {
@@ -138,7 +138,7 @@ function ChatHistory({ channel, messages, setMessages, name, minimize }) {
                     {message.text && <MessageText>{message.text}</MessageText>}
                     {message.imageUrl && (
                       <MessageMedia>
-                        <img src={message.imageUrl} />
+                        <img src={message.imageUrl} alt="msg" />
                       </MessageMedia>
                     )}
                   </Bubble>

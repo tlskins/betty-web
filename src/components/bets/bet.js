@@ -190,8 +190,8 @@ const equationComplete = equation => {
   const right = equation.expressions.filter(e => !e.isLeft);
   if (
     !equation.operator ||
-    left.length == 0 ||
-    right.length == 0 ||
+    left.length === 0 ||
+    right.length === 0 ||
     !expressionComplete(left[0]) ||
     !expressionComplete(right[0])
   ) {
@@ -202,7 +202,7 @@ const equationComplete = equation => {
 
 const betComplete = bet => {
   const { recipient, equations = [] } = bet;
-  if (equations.length == 0) {
+  if (equations.length === 0) {
     return false;
   }
   if (!equationComplete(equations[0])) {
@@ -218,7 +218,7 @@ export function NewBet({ setAlertMsg }) {
     reducer,
     initialState
   );
-  const [createBet, { data }] = useMutation(CREATE_BET, {
+  const [createBet] = useMutation(CREATE_BET, {
     onCompleted(data) {
       setAlertMsg("Bet sent!");
     }
@@ -328,15 +328,15 @@ export function Bet({ bet, onClick, setAlertMsg }) {
     recipientReplyFk
   } = bet;
   const profile = JSON.parse(localStorage.getItem("profile"));
-  const isProposer = proposer.id == profile.id;
-  const isRecipient = recipient.id == profile.id;
+  const isProposer = profile && proposer.id === profile.id;
+  const isRecipient = profile && recipient.id === profile.id;
 
   const [acceptBet] = useMutation(ACCEPT_BET, {
     onCompleted(data) {
       setAlertMsg("Bet Accepted!");
     }
   });
-  const [rejectBet, _] = useMutation(ACCEPT_BET, {
+  const [rejectBet] = useMutation(ACCEPT_BET, {
     onCompleted(data) {
       setAlertMsg(`Bet ${isProposer ? "Withdrawn" : "Declined"}!`);
     }
@@ -373,15 +373,15 @@ export function Bet({ bet, onClick, setAlertMsg }) {
   }
   const title = `${proposer.name} (${proposer.userName})'s Bet with ${rcptName}`;
   const acceptable =
-    betStatus == "Pending Approval" &&
+    betStatus === "Pending Approval" &&
     ((!proposerReplyFk && isProposer) || (!recipientReplyFk && isRecipient));
   const rejectable =
-    betStatus == "Pending Approval" &&
+    betStatus === "Pending Approval" &&
     ((proposerReplyFk && isProposer) || (recipientReplyFk && isRecipient));
   let statusColor = "bg-yellow-200";
-  if (betStatus == "Accepted") {
+  if (betStatus === "Accepted") {
     statusColor = "bg-green-200";
-  } else if (betStatus == "Declined" || betStatus == "Withdrawn") {
+  } else if (betStatus === "Declined" || betStatus === "Withdrawn") {
     statusColor = "bg-red-300";
   }
   const betClass = onClick
