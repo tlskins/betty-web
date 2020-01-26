@@ -21,11 +21,17 @@ export const GET_BET = gql`
         id
         name
         userName
+        twitterUser {
+          screenName
+        }
       }
       recipient {
         id
         name
         userName
+        twitterUser {
+          screenName
+        }
       }
       equations {
         id

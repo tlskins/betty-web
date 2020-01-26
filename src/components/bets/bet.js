@@ -182,31 +182,33 @@ const addExprIfComplete = state => {
 
 const expressionComplete = expression => {
   const { player, game, metric } = expression;
-  return player && game && metric;
+  return player && game && metric ? true : false;
 };
 
 const equationComplete = equation => {
-  let [lComplete, rComplete] = [false, false];
-  equation.expressions
-    .filter(expr => expressionComplete(expr))
-    .forEach(expr => {
-      if (expr.isLeft) {
-        lComplete = true;
-      } else {
-        rComplete = true;
-      }
-    });
-  return lComplete && rComplete && equation.operator;
+  const left = equation.expressions.filter(e => e.isLeft);
+  const right = equation.expressions.filter(e => !e.isLeft);
+  if (
+    !equation.operator ||
+    left.length == 0 ||
+    right.length == 0 ||
+    !expressionComplete(left[0]) ||
+    !expressionComplete(right[0])
+  ) {
+    return false;
+  }
+  return true;
 };
 
 const betComplete = bet => {
   const { recipient, equations = [] } = bet;
-  equations.forEach(eq => {
-    if (!equationComplete(eq)) {
-      return false;
-    }
-  });
-  return equations.length > 0 && recipient;
+  if (equations.length == 0) {
+    return false;
+  }
+  if (!equationComplete(equations[0])) {
+    return false;
+  }
+  return equations.length > 0 && recipient ? true : false;
 };
 
 // components
@@ -221,7 +223,14 @@ export function NewBet() {
   const complete = betComplete({ recipient, equations });
 
   const saveBet = () => {
-    const changes = { equationsChanges: [], recipientId: recipient.id };
+    const changes = {
+      equationsChanges: [],
+      betRecipient: {
+        id: recipient.id,
+        twitterScreenName:
+          recipient.twitterUser && recipient.twitterUser.screenName
+      }
+    };
     equations.forEach(eq => {
       const eqChg = {
         operatorId: eq.operator.id,
@@ -246,7 +255,11 @@ export function NewBet() {
     dispatch({ type: "clearBet" });
   };
 
-  const recipientName = (recipient && recipient.userName) || "?";
+  const recipientName =
+    (recipient &&
+      (recipient.userName ||
+        (recipient.twitterUser && "@" + recipient.twitterUser.screenName))) ||
+    "?";
   const titleWrapperClass = findingUser
     ? "section-title-wrapper"
     : "section-title-wrapper inline-flex";
@@ -312,7 +325,12 @@ export function Bet({ bet, onClick }) {
     recipient
   } = bet;
 
-  const title = `${proposer.name} (${proposer.userName})'s Bet with ${recipient.name} (${recipient.userName})`;
+  let rcptName = `${recipient.name} (${recipient.userName})`;
+  if (!recipient.Name && recipient.twitterUser) {
+    rcptName = "@" + recipient.twitterUser.screenName;
+  }
+
+  const title = `${proposer.name} (${proposer.userName})'s Bet with ${rcptName}`;
   const acceptable =
     betStatus == "Pending Approval" &&
     ((profile && profile.id) == recipient.id ||
