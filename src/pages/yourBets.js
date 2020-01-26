@@ -11,6 +11,7 @@ import { ProfileSideBar } from "../components/profileSideBar";
 import { NewBet, Bet } from "../components/bets/bet";
 import { RotoAlerts } from "../components/rotoAlerts";
 import { FilterButton } from "../components/filterButton";
+import { Alert } from "../components/alert";
 
 export const GET_BETS = gql`
   query bets {
@@ -20,6 +21,8 @@ export const GET_BETS = gql`
       finalizedAt
       expiresAt
       betStatus
+      proposerReplyFk
+      recipientReplyFk
       proposer {
         id
         name
@@ -92,6 +95,7 @@ export const GET_SETTINGS = gql`
 export function YourBets() {
   const [showSideBar, setShowSideBar] = useState(undefined);
   const [redirectTo, setRedirectTo] = useState(undefined);
+  const [alertMsg, setAlertMsg] = useState(undefined);
   useQuery(GET_SETTINGS, {
     variables: { id: "nfl" }
   });
@@ -119,6 +123,11 @@ export function YourBets() {
         show={showSideBar == "profile"}
         hide={() => setShowSideBar(undefined)}
       />
+      <Alert
+        title={alertMsg}
+        open={alertMsg != undefined}
+        onClose={() => setAlertMsg(undefined)}
+      />
       <RotoAlerts />
       <div className="page-layout">
         <div className="page-inner-layout">
@@ -135,7 +144,7 @@ export function YourBets() {
             <div className="page-content">
               <div className="page-content-area">
                 <div className="page-section">
-                  <NewBet />
+                  <NewBet setAlertMsg={setAlertMsg} />
                 </div>
               </div>
             </div>
@@ -158,7 +167,11 @@ export function YourBets() {
                     data.bets &&
                     data.bets.map((bet, idx) => (
                       <div key={idx}>
-                        <Bet bet={bet} onClick={onRedirectBet(bet.id)} />
+                        <Bet
+                          bet={bet}
+                          onClick={onRedirectBet(bet.id)}
+                          setAlertMsg={setAlertMsg}
+                        />
                       </div>
                     ))}
                   {redirectTo && <Redirect to={redirectTo} noThrow />}

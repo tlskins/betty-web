@@ -8,6 +8,7 @@ import { RotoSideBar } from "../components/rotoSideBar";
 import { Bet } from "../components/bets/bet";
 import { RotoAlerts } from "../components/rotoAlerts";
 import { GET_SETTINGS } from "./yourBets";
+import { Alert } from "../components/alert";
 
 export const GET_BET = gql`
   query bet($id: ID!) {
@@ -71,6 +72,7 @@ export function BetDetail(props) {
   const { data } = useQuery(GET_BET, {
     variables: { id: props.betId }
   });
+  const [alertMsg, setAlertMsg] = useState(undefined);
 
   return (
     <div className="page-layout-wrapper">
@@ -78,6 +80,11 @@ export function BetDetail(props) {
       <RotoSideBar
         show={showSideBar == "RotoNfl"}
         hide={() => setShowSideBar(undefined)}
+      />
+      <Alert
+        title={alertMsg}
+        open={alertMsg != undefined}
+        onClose={() => setAlertMsg(undefined)}
       />
       <RotoAlerts />
       <div className="page-layout">
@@ -89,7 +96,9 @@ export function BetDetail(props) {
             <div className="page-content">
               <div className="page-content-area">
                 <div className="page-section">
-                  {data && data.bet && <Bet bet={data.bet} />}
+                  {data && data.bet && (
+                    <Bet bet={data.bet} setAlertMsg={setAlertMsg} />
+                  )}
                 </div>
               </div>
             </div>

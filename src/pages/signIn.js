@@ -24,29 +24,23 @@ export const SIGN_IN = gql`
 `;
 
 export function SignIn() {
-  const [signIn, signInResponse] = useLazyQuery(SIGN_IN, {
-    onCompleted(data) {
-      if (data && data.signIn) {
-        console.log("data:", data);
-        localStorage.setItem("profile", JSON.stringify(data.signIn));
-        setRedirect(true);
-      }
-    }
-  });
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [redirect, setRedirect] = useState(false);
   const [alertMsg, setAlertMsg] = useState(undefined);
   const [showSideBar, setShowSideBar] = useState(undefined);
 
-  useEffect(() => {
-    if (signInResponse && signInResponse.error) {
-      setAlertMsg(signInResponse.error.message);
+  const [signIn] = useLazyQuery(SIGN_IN, {
+    onError(error) {
+      setAlertMsg(error.message);
+    },
+    onCompleted(data) {
+      if (data && data.signIn) {
+        localStorage.setItem("profile", JSON.stringify(data.signIn));
+        setRedirect(true);
+      }
     }
-    return function cleanup() {
-      setAlertMsg(undefined);
-    };
-  }, [signInResponse]);
+  });
 
   return (
     <div className="page-layout-wrapper">

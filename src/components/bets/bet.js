@@ -213,12 +213,16 @@ const betComplete = bet => {
 
 // components
 
-export function NewBet() {
+export function NewBet({ setAlertMsg }) {
   const [{ recipient, equations }, dispatch] = useReducer(
     reducer,
     initialState
   );
-  const [createBet, { data }] = useMutation(CREATE_BET);
+  const [createBet, { data }] = useMutation(CREATE_BET, {
+    onCompleted(data) {
+      setAlertMsg("Bet sent!");
+    }
+  });
   const [findingUser, setFindingUser] = useState(false);
   const complete = betComplete({ recipient, equations });
 
@@ -310,10 +314,7 @@ export function NewBet() {
   );
 }
 
-export function Bet({ bet, onClick }) {
-  const [acceptBet, _] = useMutation(ACCEPT_BET);
-  const profile = JSON.parse(localStorage.getItem("profile"));
-
+export function Bet({ bet, onClick, setAlertMsg }) {
   const {
     id,
     createdAt,
@@ -322,84 +323,100 @@ export function Bet({ bet, onClick }) {
     betStatus,
     equations,
     proposer,
-    recipient
+    recipient,
+    proposerReplyFk,
+    recipientReplyFk
   } = bet;
+  const profile = JSON.parse(localStorage.getItem("profile"));
+  const isProposer = proposer.id == profile.id;
+  const isRecipient = recipient.id == profile.id;
+
+  const [acceptBet] = useMutation(ACCEPT_BET, {
+    onCompleted(data) {
+      setAlertMsg("Bet Accepted!");
+    }
+  });
+  const [rejectBet, _] = useMutation(ACCEPT_BET, {
+    onCompleted(data) {
+      setAlertMsg(`Bet ${isProposer ? "Withdrawn" : "Declined"}!`);
+    }
+  });
+
+  const onAccept = e => {
+    e.stopPropagation();
+    acceptBet({
+      variables: { id, accept: true },
+      refetchQueries: [{ query: GET_BETS }]
+    });
+  };
+  const onDecline = e => {
+    console.log(e);
+    e.stopPropagation();
+    rejectBet({
+      variables: { id, accept: false },
+      refetchQueries: [{ query: GET_BETS }]
+    });
+  };
+  const dateToString = time => {
+    if (time) {
+      return moment(time, "YYYY-MM-DD HH:mm:ss Z").format(
+        "MMM Do YYYY, h:mm a"
+      );
+    } else {
+      return "?";
+    }
+  };
 
   let rcptName = `${recipient.name} (${recipient.userName})`;
   if (!recipient.Name && recipient.twitterUser) {
     rcptName = "@" + recipient.twitterUser.screenName;
   }
-
   const title = `${proposer.name} (${proposer.userName})'s Bet with ${rcptName}`;
   const acceptable =
     betStatus == "Pending Approval" &&
-    ((profile && profile.id) == recipient.id ||
-      (profile && profile.id) == proposer.id);
+    ((!proposerReplyFk && isProposer) || (!recipientReplyFk && isRecipient));
+  const rejectable =
+    betStatus == "Pending Approval" &&
+    ((proposerReplyFk && isProposer) || (recipientReplyFk && isRecipient));
   let statusColor = "bg-yellow-200";
   if (betStatus == "Accepted") {
     statusColor = "bg-green-200";
   } else if (betStatus == "Declined" || betStatus == "Withdrawn") {
     statusColor = "bg-red-300";
   }
-
   const betClass = onClick
     ? "fact-section rounded-lg hover:bg-gray-100 cursor-pointer"
     : "fact-section rounded-lg";
   const statusClass = `section-subtitle ${statusColor} rounded border border-black p-1`;
-
-  const onAccept = () => {
-    acceptBet({
-      variables: { id, accept: true },
-      refetchQueries: [{ query: GET_BETS }]
-    });
-  };
-  const onDecline = () => {
-    acceptBet({
-      variables: { id, accept: false },
-      refetchQueries: [{ query: GET_BETS }]
-    });
-  };
-
-  const created =
-    (createdAt &&
-      moment(createdAt, "YYYY-MM-DD HH:mm:ss Z").format(
-        "MMM Do YYYY, h:mm a"
-      )) ||
-    "?";
-  const expires =
-    (expiresAt &&
-      moment(expiresAt, "YYYY-MM-DD HH:mm:ss Z").format(
-        "MMM Do YYYY, h:mm a"
-      )) ||
-    "?";
-  const finalized =
-    (finalizedAt &&
-      moment(finalizedAt, "YYYY-MM-DD HH:mm:ss Z").format(
-        "MMM Do YYYY, h:mm a"
-      )) ||
-    "?";
+  const created = dateToString(createdAt);
+  const expires = dateToString(expiresAt);
+  const finalized = dateToString(finalizedAt);
 
   return (
-    <div className={betClass} onClick={onClick}>
+    <div id="bet" className={betClass} onClick={onClick}>
       <div className="section-title-wrapper">
         <h1 className="section-title">{title}</h1>
         <div className={statusClass}>Status: {betStatus}</div>
-        {acceptable && (
-          <div>
+        <div>
+          {acceptable && (
             <button
-              className="section-subtitle hover:text-blue-500 bg-red-200 rounded border border-black p-1 mx-3"
-              onClick={onDecline}
-            >
-              Decline
-            </button>
-            <button
+              id="accept-btn"
               className="section-subtitle hover:text-blue-500 bg-green-200 rounded border border-black p-1 mx-3"
               onClick={onAccept}
             >
               Accept
             </button>
-          </div>
-        )}
+          )}
+          {rejectable && (
+            <button
+              id="reject-btn"
+              className="section-subtitle hover:text-blue-500 bg-red-200 rounded border border-black p-1 mx-3"
+              onClick={onDecline}
+            >
+              {isProposer ? "Withdraw" : "Decline"}
+            </button>
+          )}
+        </div>
         <div className="section-subtitle flex-col text-center">
           <div>
             <b>CREATED:</b> {created}
