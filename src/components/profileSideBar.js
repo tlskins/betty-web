@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useMutation } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
 import { Alert } from "../components/alert";
 
 export const UPDATE_USER = gql`
-  mutation updateUser($name: String, $userName: String, $password: String) {
-    updateUser(name: $name, userName: $userName, password: $password) {
+  mutation updateUser($changes: ProfileChanges!) {
+    updateUser(changes: $changes) {
       id
       name
       userName
@@ -20,24 +20,12 @@ export const UPDATE_USER = gql`
 `;
 
 export function ProfileSideBar({ show, hide }) {
-  const [showing, setShowing] = useState(false);
-  const [updateUser, { data }] = useMutation(UPDATE_USER);
   const [alertMsg, setAlertMsg] = useState(undefined);
+  const [showing, setShowing] = useState(false);
   const navClass = show ? "nav-sidebar" : "nav-sidebar-hidden";
   const overlayClass = show ? "nav-overlay" : "nav-overlay-hidden";
 
-  console.log("data", data);
-
-  useEffect(() => {
-    if (data && data.error) {
-      setAlertMsg(data.error.message);
-    } else if (data) {
-      setAlertMsg("Updates saved!");
-    }
-    return function cleanup() {
-      setAlertMsg(undefined);
-    };
-  }, [data]);
+  const profile = JSON.parse(localStorage.getItem("profile"));
 
   if (showing && !show) {
     setShowing(false);
@@ -49,7 +37,7 @@ export function ProfileSideBar({ show, hide }) {
         <div className="nav-overlay-cover" />
       </label>
       <nav className={navClass}>
-        {show && <Profile updateUser={updateUser} setAlertMsg={setAlertMsg} />}
+        {show && <ProfileForm profile={profile} setAlertMsg={setAlertMsg} />}
       </nav>
       <Alert
         title={alertMsg}
@@ -60,23 +48,22 @@ export function ProfileSideBar({ show, hide }) {
   );
 }
 
-function Profile({ setAlertMsg, updateUser }) {
-  const profile = JSON.parse(localStorage.getItem("profile"));
-
-  return (
-    <ProfileForm
-      profile={profile}
-      setAlertMsg={setAlertMsg}
-      updateUser={updateUser}
-    />
-  );
-}
-
-function ProfileForm({ profile, setAlertMsg, updateUser }) {
+function ProfileForm({ profile, setAlertMsg }) {
   const [name, setName] = useState(profile.name);
-  const [password, setPassword] = useState("");
-  const [confirmation, setConfirmation] = useState("");
+  const [password, setPassword] = useState(undefined);
+  const [confirmation, setConfirmation] = useState(undefined);
   const [userName, setUserName] = useState(profile.userName);
+  const [updateUser] = useMutation(UPDATE_USER, {
+    onCompleted(data) {
+      if (data && data.error) {
+        setAlertMsg(data.error.message);
+      } else if (data) {
+        setAlertMsg("Updates saved!");
+        setPassword(undefined);
+        setConfirmation(undefined);
+      }
+    }
+  });
 
   const twtName = (profile.twitterUser && profile.twitterUser.name) || "";
   const twtScreenName =
@@ -84,11 +71,11 @@ function ProfileForm({ profile, setAlertMsg, updateUser }) {
 
   const onUpdate = e => {
     e.preventDefault();
-    if (password.length > 0 && confirmation !== password) {
+    if (password && confirmation !== password) {
       setAlertMsg("Password and confirmation don't match!");
       return;
     }
-    if (password.length > 0 && password.length < 6) {
+    if (password && password.length < 6) {
       setAlertMsg("Password must be at least 6 characters long");
       return;
     }
@@ -96,17 +83,8 @@ function ProfileForm({ profile, setAlertMsg, updateUser }) {
       setAlertMsg("User name must be at least 5 characters long");
       return;
     }
-    const variables = { name, userName };
-    if (password.length > 5) {
-      variables.password = password;
-    }
-    updateUser({
-      variables,
-      onCompleted(data) {
-        setPassword("");
-        setConfirmation("");
-      }
-    });
+    const changes = { name, userName, password };
+    updateUser({ variables: { changes } });
   };
 
   return (
@@ -155,7 +133,13 @@ function ProfileForm({ profile, setAlertMsg, updateUser }) {
             placeholder="new password"
             aria-label="password"
             value={password}
-            onChange={e => setPassword(e.target.value)}
+            onChange={e => {
+              if (e.target.value === "") {
+                setPassword(undefined);
+              } else {
+                setPassword(e.target.value);
+              }
+            }}
           />
           <input
             className="w-full mt-2 px-5 py-2 text-gray-700 bg-gray-200 rounded"
