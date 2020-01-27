@@ -50,7 +50,7 @@ export function playerTitle(player, game) {
   return [playerName, vsTeam]
 }
 
-export function Source({ player, game }) {
+export function Player({ player, game }) {
   const [playerName, vsTeam] = playerTitle(player, game)
   return (
     <span className="fact-label">
@@ -115,7 +115,7 @@ export function PlayerSearch({ playerAndGame, onSelect, onClear }) {
             onClear()
           }} />
         <div className="dropdown-selection">
-          { player && <Source player={player} game={game} /> }
+          { player && <Player player={player} game={game} /> }
           { !player &&
             <input
               value={search}

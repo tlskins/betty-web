@@ -6,7 +6,7 @@ import gql from "graphql-tag";
 import { GET_BETS } from "../../pages/yourBets";
 import { UserSearch } from "../userSearch";
 import { OperatorSearch } from "./operator";
-import { PlayerSearch } from "./source";
+import { PlayerSearch } from "./player";
 import { MetricSelect } from "./metric";
 
 

@@ -5,7 +5,7 @@ import gql from "graphql-tag";
 
 import { GET_BETS } from "../../pages/yourBets";
 import { Operator } from "./operator";
-import { Source } from "./source";
+import { Player } from "./player";
 import { Metric } from "./metric";
 
 const ACCEPT_BET = gql`
@@ -139,48 +139,22 @@ export function Bet({ bet, onClick, setAlertMsg }) {
   );
 }
 
-export function Equation({ eqIdx, equation, dispatch, focus }) {
+export function Equation({ equation }) {
   const { operator = {}, expressions = [] } = equation;
-  const [leftExpressions, rightExpressions] = [[], []];
-  expressions &&
-    expressions.forEach((expr, i) => {
-      if (expr.isLeft) {
-        leftExpressions.push([expr, i]);
-      } else {
-        rightExpressions.push([expr, i]);
-      }
-    });
-
-  const onSelect =
-    dispatch &&
-    (operator => dispatch({ type: "addOperator", operator, eqIdx }));
-
   return (
     <div className="flex w-full">
       <div className="flex flex-col px-4 py-2 m-2 w-full">
-        {leftExpressions.map(([expr, i]) => (
-          <div key={i}>
-            <Expression
-              eqIdx={eqIdx}
-              exprIdx={i}
-              expression={expr}
-              dispatch={dispatch}
-              focus={focus && focus["l"+i]}
-            />
+        {expressions.filter( expr => expr.isLeft ).map((expr,i) => (
+          <div key={"leftExpr" + i}>
+            <Expression expression={expr} />
           </div>
         ))}
       </div>
-      <Operator operator={operator} onSelect={onSelect} />
+      <Operator operator={operator} />
       <div className="flex flex-col px-4 py-2 m-2 w-full">
-        {rightExpressions.map(([expr, i]) => (
-          <div key={i}>
-            <Expression
-              eqIdx={eqIdx}
-              exprIdx={i}
-              expression={expr}
-              dispatch={dispatch}
-              focus={focus && focus["r"+i]}
-            />
+        {expressions.filter( expr => !expr.isLeft ).map((expr, i) => (
+          <div key={"leftExpr" + i}>
+            <Expression expression={expr} />
           </div>
         ))}
       </div>
@@ -188,29 +162,13 @@ export function Equation({ eqIdx, equation, dispatch, focus }) {
   );
 }
 
-const expressionComplete = expression => {
+export function Expression({ expression }) {
   const { player, game, metric } = expression;
-  return player && game && metric ? true : false;
-};
-
-export function Expression({ eqIdx, exprIdx, expression, dispatch, focus }) {
-  const complete = expressionComplete(expression);
-  const { player, game, metric } = expression;
-
-  const onSelectSource =
-    dispatch &&
-    (source => dispatch({ type: "addSource", source, eqIdx, exprIdx }));
-  const onSelectMetric =
-    dispatch &&
-    (metric => dispatch({ type: "addMetric", metric, eqIdx, exprIdx }));
-  const className =
-    complete || !dispatch ? "fact-wrapper" : "fact-wrapper bg-gray-200";
-
   return (
     <div>
-      <div className={className}>
-        <Source player={player} game={game} onSelect={onSelectSource} focus={focus} />
-        <Metric metric={metric} onSelect={onSelectMetric} />
+      <div className="fact-wrapper">
+        <Player player={player} game={game}/>
+        <Metric metric={metric} />
       </div>
     </div>
   );
