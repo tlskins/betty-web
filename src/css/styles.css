@@ -440,7 +440,7 @@
   -webkit-font-smoothing: antialiased !important;
   -webkit-box-direction: normal;
   box-sizing: inherit;
-  position: absolute;
+  /* position: absolute; */
   height: 40px;
   /* width: 100%; */
   background-color: white;
@@ -524,10 +524,10 @@
   -webkit-font-smoothing: antialiased !important;
   -webkit-box-direction: normal;
   box-sizing: inherit;
-  overflow-x: hidden;
+  /* overflow-x: hidden; */
   background-color: white;
-  max-height: 200px;
-  overflow-y: scroll;
+  /* max-height: 200px; */
+  /* overflow-y: scroll; */
   width: calc(100% + 2px);
   z-index: 2;
   position: absolute;

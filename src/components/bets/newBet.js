@@ -1,11 +1,13 @@
-import React, { useReducer, useState } from "react";
+import React, { useReducer } from "react";
 import { useMutation } from "@apollo/react-hooks";
 import moment from "moment-timezone";
 import gql from "graphql-tag";
 
 import { GET_BETS } from "../../pages/yourBets";
 import { UserSearch } from "../userSearch";
-import { Equation } from "./bet";
+import { OperatorSearch } from "./operator";
+import { PlayerSearch } from "./source";
+import { MetricSelect } from "./metric";
 
 
 const CREATE_BET = gql`
@@ -71,18 +73,37 @@ const initialState = {
 
 const reducer = (state, action) => {
   switch (action.type) {
+    case "addExpression": {
+      console.log('addexpr', state, action)
+      const { isLeft, eqIdx } = action
+      const { equations } = state
+    
+      return {
+        ...state,
+        equations: [
+          ...equations.slice(0, eqIdx),
+          { ...equations[eqIdx],
+            expressions: [
+              ...equations[eqIdx].expressions,
+              { ...initialExpression, isLeft }
+            ]
+          },
+          ...equations.slice(eqIdx + 1)
+        ]
+      };
+    }
     case "addOperator": {
       const { operator, eqIdx } = action;
       const { equations } = state;
 
-      return addExprIfComplete({
+      return {
         ...state,
         equations: [
           ...equations.slice(0, eqIdx),
           { ...equations[eqIdx], operator },
           ...equations.slice(eqIdx + 1)
         ]
-      });
+      };
     }
     case "addSource": {
       const {
@@ -94,7 +115,7 @@ const reducer = (state, action) => {
       const equation = equations[eqIdx];
       const { expressions } = equation;
 
-      return addExprIfComplete({
+      return {
         ...state,
         equations: [
           ...equations.slice(0, eqIdx),
@@ -108,7 +129,7 @@ const reducer = (state, action) => {
           },
           ...equations.slice(eqIdx + 1)
         ]
-      });
+      };
     }
     case "addMetric": {
       const { metric, eqIdx, exprIdx } = action;
@@ -116,7 +137,7 @@ const reducer = (state, action) => {
       const equation = equations[eqIdx];
       const { expressions } = equation;
 
-      return addExprIfComplete({
+      return {
         ...state,
         equations: [
           ...equations.slice(0, eqIdx),
@@ -130,7 +151,7 @@ const reducer = (state, action) => {
           },
           ...equations.slice(eqIdx + 1)
         ]
-      });
+      };
     }
     case "addRecipient": {
       const { recipient } = action;
@@ -143,39 +164,9 @@ const reducer = (state, action) => {
   }
 };
 
-const addExprIfComplete = state => {
-  state.equations.forEach(eq => {
-    let [lComplete, rComplete] = [true, true];
-    eq.expressions
-      .filter(expr => !expressionComplete(expr))
-      .forEach(expr => {
-        if (expr.isLeft) {
-          lComplete = false;
-        } else {
-          rComplete = false;
-        }
-      });
-
-    if (lComplete) {
-      eq.expressions = [
-        ...eq.expressions,
-        { ...initialExpression, isLeft: true }
-      ];
-    }
-    if (rComplete) {
-      eq.expressions = [
-        ...eq.expressions,
-        { ...initialExpression, isLeft: false }
-      ];
-    }
-  });
-
-  return state;
-};
-
 const expressionComplete = expression => {
     const { player, game, metric } = expression;
-    return player && game && metric ? true : false;
+    return !!(player && game && metric) ? true : false;
 };
     
 const equationComplete = equation => {
@@ -204,8 +195,6 @@ const betComplete = bet => {
     return equations.length > 0 && recipient ? true : false;
   };
 
-// components
-
 export function NewBet({ setAlertMsg }) {
   const [{ recipient, equations }, dispatch] = useReducer(
     reducer,
@@ -216,7 +205,6 @@ export function NewBet({ setAlertMsg }) {
       setAlertMsg("Bet sent!");
     }
   });
-  const [findingUser, setFindingUser] = useState(false);
   const complete = betComplete({ recipient, equations });
 
   const saveBet = () => {
@@ -255,35 +243,20 @@ export function NewBet({ setAlertMsg }) {
   const recipientName =
     (recipient &&
       (recipient.userName ||
-        (recipient.twitterUser && "@" + recipient.twitterUser.screenName))) ||
-    "?";
-  const titleWrapperClass = findingUser
-    ? "section-title-wrapper"
-    : "section-title-wrapper inline-flex";
+        (recipient.twitterUser && "@" + recipient.twitterUser.screenName))) || "";
 
   return (
     <div className="fact-section">
-      <div className={titleWrapperClass}>
+      <div className="section-title-wrapper inline-flex">
         <h1 className="section-title">
-          New Bet with
-          {!findingUser && (
-            <span
-              className="underline hover:text-blue-500 cursor-pointer ml-2"
-              onClick={() => setFindingUser(true)}
-            >
-              {recipientName}
-            </span>
-          )}
-          {findingUser && (
+            New Bet with
             <div className="section-subtitle">
-              <UserSearch
-                onExit={() => setFindingUser(false)}
-                onSelect={({ user: recipient }) =>
-                  dispatch({ type: "addRecipient", recipient })
-                }
-              />
+            <UserSearch
+                value={recipientName}
+                onSelect={({ user: recipient }) => dispatch({ type: "addRecipient", recipient })}
+                onClear={() => dispatch({ type: "addRecipient", recipient: undefined })}
+            />
             </div>
-          )}
         </h1>
         <p className="section-subtitle">
           {moment().format("MMMM Do YYYY, h:mm:ss a")}
@@ -300,9 +273,113 @@ export function NewBet({ setAlertMsg }) {
       {equations &&
         Object.values(equations).map((eq, i) => (
           <div key={i}>
-            <Equation eqIdx={i} equation={eq} dispatch={dispatch} />
+            <Equation eqIdx={i} equation={eq} dispatch={dispatch} focus={{}} />
           </div>
         ))}
     </div>
   );
 }
+
+export function Equation({ eqIdx, equation, dispatch, focus }) {
+    const { operator = {}, expressions = [] } = equation;
+    const [leftExpressions, rightExpressions] = [[], []];
+    expressions &&
+      expressions.forEach((expr, i) => {
+        if (expr.isLeft) {
+          leftExpressions.push([expr, i]);
+        } else {
+          rightExpressions.push([expr, i]);
+        }
+      });
+
+    const addLeft = expressionComplete(leftExpressions[leftExpressions.length - 1][0])
+    const addRight = expressionComplete(rightExpressions[rightExpressions.length - 1][0])
+
+    const onSelect = operator => dispatch({ type: "addOperator", operator, eqIdx });
+    const onClear = () => dispatch({ type: "addOperator", operator: undefined, eqIdx });
+  
+    return (
+      <div className="flex w-full">
+        <div className="flex flex-col px-4 py-2 m-2 w-full">
+          {leftExpressions.map(([expr, i]) => (
+            <div key={i}>
+              <Expression
+                eqIdx={eqIdx}
+                exprIdx={i}
+                expression={expr}
+                dispatch={dispatch}
+                focus={focus && focus["l"+i]}
+              />
+            </div>
+          ))}
+          { addLeft && 
+            <button 
+              className="bg-indigo-800 text-white font-serif mt-2 p-2 rounded"
+              onClick={() => dispatch({ type: "addExpression", isLeft: true, eqIdx })}
+            >
+              Add Player
+            </button>
+          }
+        </div>
+        <OperatorSearch operator={operator} onSelect={onSelect} onClear={onClear} />
+        <div className="flex flex-col px-4 py-2 m-2 w-full">
+          {rightExpressions.map(([expr, i]) => (
+            <div key={i}>
+              <Expression
+                eqIdx={eqIdx}
+                exprIdx={i}
+                expression={expr}
+                dispatch={dispatch}
+                focus={focus && focus["r"+i]}
+              />
+            </div>
+          ))}
+          { addRight && 
+            <button 
+              className="bg-indigo-800 text-white font-serif mt-2 p-2 rounded"
+              onClick={() => dispatch({ type: "addExpression", isLeft: false, eqIdx })}
+            >
+              Add Player
+            </button>
+          }
+        </div>
+      </div>
+    );
+  }
+  
+  export function Expression({ eqIdx, exprIdx, expression, dispatch }) {
+    const { player, game, metric = {} } = expression;
+    const onSelectSource = source => dispatch({ type: "addSource", source, eqIdx, exprIdx });
+    const onSelectMetric = metric => dispatch({ type: "addMetric", metric, eqIdx, exprIdx });
+    const onClearSource = () => {
+        dispatch({ type: "addSource",
+            source: { player: undefined, game: undefined },
+            eqIdx,
+            exprIdx,
+        })
+    }
+    const onClearMetric = () => dispatch({ type: "addMetric", metric: undefined, eqIdx, exprIdx });
+  
+    return (
+      <div>
+        <div className="fact-wrapper flex flex-col bg-gray-200">
+            <div className="m-1">
+                <PlayerSearch
+                    playerAndGame={ { player, game } }
+                    onSelect={source => onSelectSource(source)}
+                    onClear={onClearSource}
+                />
+            </div>
+            <div className="m-1">
+                <MetricSelect
+                    metric={metric}
+                    onSelect={onSelectMetric}
+                    onClear={onClearMetric}
+                />
+            </div>
+        </div>
+      </div>
+    );
+  }
+  
+

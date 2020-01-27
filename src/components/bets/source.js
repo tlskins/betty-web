@@ -31,15 +31,11 @@ export const SEARCH_PLAYER = gql`
   }
 `;
 
-export function Source({ player, game, onSelect }) {
-  const [edit, setEdit] = useState(false);
-
-  let playerName = "?";
+export function playerTitle(player, game) {
+  let playerName = "";
   if (player) {
     const { firstName, lastName, teamShort, position } = player;
-    playerName = `${firstName[0]}.${lastName} (${teamShort}-${position})`;
-  } else if (player && onSelect) {
-    playerName = "Add Player";
+    playerName = `${firstName[0]}.${lastName} (${position})`;
   }
 
   let vsTeam = "";
@@ -51,100 +47,108 @@ export function Source({ player, game, onSelect }) {
     }
   }
 
-  const onExit = onSelect && (() => setEdit(false));
-  const onSelectPlayer = onSelect && (source => onSelect(source));
-  const onClick = onSelect && (() => setEdit(true));
+  return [playerName, vsTeam]
+}
 
+export function Source({ player, game }) {
+  const [playerName, vsTeam] = playerTitle(player, game)
   return (
     <span className="fact-label">
-      {edit && <PlayerSearch onExit={onExit} onSelect={onSelectPlayer} />}
-      {!edit && (
-        <div>
+      <div>
           <div
             className="underline hover:text-blue-500 cursor-pointer"
-            onClick={onClick}
           >
             {playerName}
           </div>
           {vsTeam}
         </div>
-      )}
     </span>
   );
 }
 
-function PlayerSearch({ onExit, onSelect }) {
-  const [execute, { data }] = useLazyQuery(SEARCH_PLAYER);
+export function PlayerSearch({ playerAndGame, onSelect, onClear }) {
+  const [searchPlayer, { data }] = useLazyQuery(SEARCH_PLAYER);
   const [searchIdx, setSearchIdx] = useState(0);
-  const search = useThrottle(execute, 300);
+  const [search, setSearch] = useState("");
+  const [showDropdown, setShowDropdown] = useState(false);
+  const throttleSearch = useThrottle(searchPlayer, 300);
+  const { player, game } = playerAndGame
+  const players = data && data.findPlayers || []
 
   const onChange = e => {
     const name = e.target.value;
-    if (name.length === 0) return;
-    search({ variables: { name } });
+    setSearch(name)
+    throttleSearch({ variables: { name } });
   };
 
   const onKeyDown = e => {
     if (e.keyCode === 27) {
-      // esc
-      onExit();
-    } else if (
-      e.keyCode === 13 &&
-      data &&
-      data.findPlayers &&
-      data.findPlayers.length > 0
-    ) {
-      // enter
-      onSelect({ user: data.findPlayers[searchIdx] });
-      onExit();
+      onSearchExit(); // esc
+    } else if (e.keyCode === 13 && players.length > 0) {
+      const { game, ...onlyPlayer } = players[searchIdx]
+      onSelect({ game, player: onlyPlayer});
+      onSearchExit(); // enter
     } else if (e.keyCode === 40) {
-      // down
-      const idx = searchIdx === data.findPlayers.length - 1 ? 0 : searchIdx + 1;
-      setSearchIdx(idx);
+      const idx = searchIdx === players.length - 1 ? 0 : searchIdx + 1;
+      setSearchIdx(idx); // down
     } else if (e.keyCode === 38) {
-      // up
-      const idx = searchIdx === 0 ? data.findPlayers.length - 1 : searchIdx - 1;
-      setSearchIdx(idx);
+      const idx = searchIdx === 0 ? players.length - 1 : searchIdx - 1;
+      setSearchIdx(idx); // up
     }
   };
 
+  const selectPlayer = player => {
+    onSelect(player);
+    onSearchExit()
+  }
+
+  const onSearchExit = () => {
+    setSearch("")
+    setShowDropdown(false)
+  }
+
   return (
     <div className="dropdown-menu flex flex-row">
-      <button className="dropdown-btn">
-        <ExitButton onClick={onExit} />
-        <div className="dropdown-title ml-2">Player / Team</div>
+      <button className="dropdown-btn relative">
+        <ExitButton onClick={() => {
+            onSearchExit()
+            onClear()
+          }} />
         <div className="dropdown-selection">
-          <input
-            type="text"
-            autoFocus={true}
-            placeholder="search"
-            className="p-2 mx-5"
-            onChange={onChange}
-            onKeyDown={onKeyDown}
-          />
+          { player && <Source player={player} game={game} /> }
+          { !player &&
+            <input
+              value={search}
+              type="text"
+              placeholder="NFL Player"
+              className="p-2 mx-5 text-xs"
+              onChange={onChange}
+              onKeyDown={onKeyDown}
+              onFocus={() => setShowDropdown(true)}
+            />
+          }
         </div>
-        {data && data.findPlayers && (
+        { showDropdown &&
           <ul className="dropdown-list">
-            {data.findPlayers.map((player, i) => (
+            {players.map((player, i) => (
               <div key={i}>
-                <Player
+                <PlayerCard
                   player={player}
                   searchIdx={searchIdx}
                   setSearchIdx={setSearchIdx}
                   index={i}
-                  onSelect={onSelect}
-                  onExit={onExit}
+                  onSelect={selectPlayer}
                 />
               </div>
             ))}
           </ul>
-        )}
+        }
       </button>
     </div>
   );
 }
 
-function Player({ player, searchIdx, setSearchIdx, index, onSelect, onExit }) {
+function PlayerCard({ player, searchIdx, setSearchIdx, index, onSelect }) {
   const { game, ...onlyPlayer } = player;
   const { id, firstName, lastName, teamShort, position, teamFk } = player;
 
@@ -166,10 +170,7 @@ function Player({ player, searchIdx, setSearchIdx, index, onSelect, onExit }) {
     <div
       key={id}
       className={className}
-      onClick={() => {
-        onSelect({ game, player: onlyPlayer });
-        onExit();
-      }}
+      onClick={() => onSelect({ game, player: onlyPlayer })}
       onMouseEnter={() => setSearchIdx(index)}
     >
       <div className="dropdown-list-item-text flex flex-row">

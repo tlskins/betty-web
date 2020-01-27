@@ -4,36 +4,30 @@ import { useApolloClient } from "@apollo/react-hooks";
 import { GET_SETTINGS } from "../../pages/yourBets";
 import { ExitButton } from "../exitButton";
 
-export function Operator({ operator, onSelect }) {
-  const [edit, setEdit] = useState(false);
-  const { name = "?" } = operator || {};
-
-  const onExit = onSelect && (() => setEdit(false));
-  const onClick = onSelect && (() => setEdit(true));
-
+export function Operator({ operator }) {
   return (
     <div>
-      {edit && <OperatorSearch onExit={onExit} onSelect={onSelect} />}
-      {!edit && (
-        <div
-          className="underline hover:text-blue-500 cursor-pointer px-4 py-2 m-2"
-          onClick={onClick}
-        >
-          {name}
-        </div>
-      )}
+      <div className="underline hover:text-blue-500 cursor-pointer px-4 py-2 m-2">
+        {operator && operator.name || "?"}
+      </div>
     </div>
   );
 }
 
-function OperatorSearch({ onExit, onSelect }) {
+export function OperatorSearch({ operator, onSelect, onClear }) {
   const apolloClient = useApolloClient();
-  const data = apolloClient.readQuery({
-    query: GET_SETTINGS,
-    variables: { id: "nfl" }
-  });
+  let data = { leagueSettings: { betEquations: [] }}
+  try {
+    data = apolloClient && apolloClient.readQuery({
+      query: GET_SETTINGS,
+      variables: { id: "nfl" }
+    });
+  } catch {}
   const [search, setSearch] = useState("");
   const [searchIdx, setSearchIdx] = useState(0);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const { name } = operator
+  const betEqs = data.leagueSettings.betEquations || []
 
   const onChange = e => {
     const value = e.target.value;
@@ -41,71 +35,73 @@ function OperatorSearch({ onExit, onSelect }) {
   };
 
   const onKeyDown = e => {
-    const lastIdx = data.leagueSettings.betEquations.length || 0;
+    const lastIdx = betEqs.length || 0;
     if (e.keyCode === 27) {
-      // esc
-      onExit();
-    } else if (
-      e.keyCode === 13 &&
-      data.leagueSettings.betEquations.length > 0
-    ) {
-      // enter
-      onSelect(data.leagueSettings.betEquations[searchIdx]);
-      onExit();
+      onSearchExit(); // esc
+    } else if (e.keyCode === 13 && betEqs.length > 0) {
+      onSelect(betEqs[searchIdx]);
+      onSearchExit(); // enter
     } else if (e.keyCode === 40) {
-      // down
       const idx = searchIdx === lastIdx - 1 ? 0 : searchIdx + 1;
-      setSearchIdx(idx);
+      setSearchIdx(idx); // down
     } else if (e.keyCode === 38) {
-      // up
       const idx = searchIdx === 0 ? lastIdx - 1 : searchIdx - 1;
-      setSearchIdx(idx);
+      setSearchIdx(idx); // up
     }
   };
 
+  const selectOperator = operator => () => {
+    onSelect(operator);
+    onSearchExit()
+  }
+
+  const onSearchExit = () => {
+    setSearch("")
+    setShowDropdown(false)
+  }
+
+  const itemClassName = index => searchIdx === index ? "dropdown-list-item bg-gray-200" : "dropdown-list-item";
+
   return (
     <div className="dropdown-menu flex flex-row">
-      <div className="dropdown-btn flex-row">
-        <ExitButton onClick={onExit} />
-        <div className="dropdown-title ml-2">Equivalency</div>
-        <div className="dropdown-selection">
+      <div className="dropdown-btn flex-row relative">
+        <ExitButton onClick={() => {
+            onSearchExit()
+            onClear()
+          }}
+        />
+        <div className="dropdown-selection flex flex-col">
           <input
+            disabled={!!name}
+            value={search || name || ""}
             type="text"
-            autoFocus={true}
-            placeholder="search"
-            className="p-2"
+            placeholder="Compare"
+            className="p-2 text-sm"
             onChange={onChange}
             onKeyDown={onKeyDown}
+            onFocus={() => setShowDropdown(true)}
           />
-        </div>
-        {data && data.leagueSettings && data.leagueSettings.betEquations && (
-          <ul className="dropdown-list">
-            {data.leagueSettings.betEquations
-              .filter(bet => RegExp(search, "i").test(bet.name))
-              .map((bet, i) => {
-                const { name } = bet;
-                const className =
-                  searchIdx === i
-                    ? "dropdown-list-item bg-gray-200"
-                    : "dropdown-list-item";
-                return (
-                  <div
-                    key={name}
-                    className={className}
-                    onClick={() => {
-                      onSelect(bet);
-                      onExit();
-                    }}
-                    onMouseEnter={() => setSearchIdx(i)}
-                  >
-                    <div className="dropdown-list-item-text flex flex-row">
-                      {name}
+          {showDropdown && (
+            <ul className="dropdown-list">
+              {betEqs
+                .filter(operator => RegExp(search, "i").test(operator.name))
+                .map((operator, i) => {
+                  return (
+                    <div
+                      key={operator.name}
+                      className={itemClassName(i)}
+                      onClick={selectOperator(operator)}
+                      onMouseEnter={() => setSearchIdx(i)}
+                    >
+                      <div className="dropdown-list-item-text flex flex-row">
+                        {operator.name}
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
-          </ul>
-        )}
+                  );
+                })}
+            </ul>
+          )}
+        </div>
       </div>
     </div>
   );

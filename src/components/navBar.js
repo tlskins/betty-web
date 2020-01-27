@@ -58,7 +58,7 @@ export function NavBar({ clickRoto, clickProfile }) {
           className="nav-link-m-left hover:text-blue-500 cursor-pointer"
           href="/info"
         >
-          <button>INFO</button>
+          INFO
         </a>
         {profile && (
           <Fragment>
@@ -66,7 +66,7 @@ export function NavBar({ clickRoto, clickProfile }) {
               className="nav-link-m-left hover:text-blue-500 cursor-pointer"
               href="/bets"
             >
-              <button>MY BETS</button>
+              MY BETS
             </a>
             <button
               className="nav-link-m-left hover:text-blue-500 cursor-pointer"

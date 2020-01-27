@@ -139,7 +139,7 @@ export function Bet({ bet, onClick, setAlertMsg }) {
   );
 }
 
-export function Equation({ eqIdx, equation, dispatch }) {
+export function Equation({ eqIdx, equation, dispatch, focus }) {
   const { operator = {}, expressions = [] } = equation;
   const [leftExpressions, rightExpressions] = [[], []];
   expressions &&
@@ -165,6 +165,7 @@ export function Equation({ eqIdx, equation, dispatch }) {
               exprIdx={i}
               expression={expr}
               dispatch={dispatch}
+              focus={focus && focus["l"+i]}
             />
           </div>
         ))}
@@ -178,6 +179,7 @@ export function Equation({ eqIdx, equation, dispatch }) {
               exprIdx={i}
               expression={expr}
               dispatch={dispatch}
+              focus={focus && focus["r"+i]}
             />
           </div>
         ))}
@@ -191,7 +193,7 @@ const expressionComplete = expression => {
   return player && game && metric ? true : false;
 };
 
-export function Expression({ eqIdx, exprIdx, expression, dispatch }) {
+export function Expression({ eqIdx, exprIdx, expression, dispatch, focus }) {
   const complete = expressionComplete(expression);
   const { player, game, metric } = expression;
 
@@ -207,7 +209,7 @@ export function Expression({ eqIdx, exprIdx, expression, dispatch }) {
   return (
     <div>
       <div className={className}>
-        <Source player={player} game={game} onSelect={onSelectSource} />
+        <Source player={player} game={game} onSelect={onSelectSource} focus={focus} />
         <Metric metric={metric} onSelect={onSelectMetric} />
       </div>
     </div>

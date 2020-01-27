@@ -135,8 +135,8 @@ export function YourBets() {
           <div className="page-wrapper my-10">
             <div className="page-content">
               <div className="page-content-area">
-                <div className="page-section">
-                  <CurrentGames />
+                <div className="page-section bg-blue-200 rounded p-8">
+                  <NewBet setAlertMsg={setAlertMsg} />
                 </div>
               </div>
             </div>
@@ -145,7 +145,7 @@ export function YourBets() {
             <div className="page-content">
               <div className="page-content-area">
                 <div className="page-section">
-                  <NewBet setAlertMsg={setAlertMsg} />
+                  <CurrentGames />
                 </div>
               </div>
             </div>

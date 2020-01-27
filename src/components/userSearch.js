@@ -19,12 +19,12 @@ export const FIND_USERS = gql`
   }
 `;
 
-export function UserSearch({ onExit, onSelect }) {
+export function UserSearch({ value, onSelect, onClear }) {
   let [execute, { data }] = useLazyQuery(FIND_USERS);
   const [searchIdx, setSearchIdx] = useState(0);
   const [search, setSearch] = useState("");
+  const [showDropdown, setShowDropdown] = useState(false);
   const onSearch = useThrottle(execute, 300);
-
   let users = (data && data.findUsers) || [];
   if (search && search.charAt(0) === "@") {
     users = [{ twitterUser: { screenName: search.replace("@", "") } }].concat(
@@ -41,11 +41,11 @@ export function UserSearch({ onExit, onSelect }) {
 
   const onKeyDown = e => {
     if (e.keyCode === 27) {
-      onExit(); // esc
+      onSearchExit(); // esc
     } else if (users.length > 0) {
       if (e.keyCode === 13) {
         onSelect({ user: users[searchIdx] });
-        onExit(); // enter
+        onSearchExit() // enter
       } else if (e.keyCode === 40) {
         const idx = searchIdx === 0 ? users.length - 1 : searchIdx - 1;
         setSearchIdx(idx); // down
@@ -56,51 +56,65 @@ export function UserSearch({ onExit, onSelect }) {
     }
   };
 
+  const selectUser = user => () => {
+    onSelect({ user });
+    onSearchExit()
+  }
+
+  const onSearchExit = () => {
+    setSearch("")
+    setShowDropdown(false)
+  }
+
   return (
     <div className="dropdown-menu flex flex-row">
-      <button className="dropdown-btn">
-        <ExitButton onClick={onExit} />
-        <div className="dropdown-title ml-2">User</div>
+      <div className="dropdown-btn relative">
+        <ExitButton onClick={() => {
+            onSearchExit()
+            onClear()
+          }}
+        />
         <div className="dropdown-selection">
           <input
+            disabled={!!value}
+            value={search || value}
             type="text"
-            autoFocus={true}
-            placeholder="search"
-            className="p-2"
+            placeholder="user or @twitter_handle"
+            className="p-2 text-sm"
             onChange={onChange}
             onKeyDown={onKeyDown}
+            onFocus={() => setShowDropdown(true)}
           />
         </div>
-        <ul className="dropdown-list">
-          {users.map((user, i) => {
-            const { id, userName, twitterUser = {} } = user;
-            const { screenName } = twitterUser;
-            const className =
-              searchIdx === i
-                ? "dropdown-list-item bg-gray-200"
-                : "dropdown-list-item";
-            return (
-              <div
-                key={id + i}
-                className={className}
-                onClick={() => {
-                  onSelect({ user });
-                  onExit();
-                }}
-                onMouseEnter={() => setSearchIdx(i)}
-              >
-                <div className="dropdown-list-item-text flex flex-row">
-                  <div className="flex flex-col">
-                    {id ? `${userName} (betty)` : "*No betty account"}
-                    <br />
-                    {screenName && `Twitter: @${screenName.replace("@", "")}`}
+        { showDropdown &&
+          <ul className="dropdown-list">
+            {users.map((user, i) => {
+              const { id, userName, twitterUser = {} } = user;
+              const { screenName } = twitterUser;
+              const className =
+                searchIdx === i
+                  ? "dropdown-list-item bg-gray-200"
+                  : "dropdown-list-item";
+              return (
+                <div
+                  key={id + i}
+                  className={className}
+                  onClick={selectUser(user)}
+                  onMouseEnter={() => setSearchIdx(i)}
+                >
+                  <div className="dropdown-list-item-text flex flex-row">
+                    <div className="flex flex-col">
+                      {id ? `${userName} (betty)` : "*No betty account"}
+                      <br />
+                      {screenName && `Twitter: @${screenName.replace("@", "")}`}
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
-        </ul>
-      </button>
+              );
+            })}
+          </ul>
+        }
+      </div>
     </div>
   );
 }
