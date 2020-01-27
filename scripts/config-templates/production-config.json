@@ -1,0 +1,5 @@
+{
+  "env": "production",
+  "gqlWsUri": "wss://api.bettybets.com/query",
+  "gqlHttpUri": "https://api.bettybets.com/query"
+}

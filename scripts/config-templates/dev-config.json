@@ -1,0 +1,5 @@
+{
+  "env": "production",
+  "gqlWsUri": "ws://localhost:8080/query",
+  "gqlHttpUri": "http://localhost:8080/query"
+}
