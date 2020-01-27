@@ -18,6 +18,7 @@ export function ExitButton({ onClick }) {
         overflow: `visible`
       }}
       onClick={onClick}
+      tabIndex="-1"
     >
       <path d="M29,1V29H1V1H29m1-1H0V30H30V0Z"></path>
       <line
