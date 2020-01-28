@@ -93,7 +93,7 @@ export function BetDetail(props) {
         <meta name="twitter:description" content={`Bet from @${proposer}`} />
         <meta
           name="twitter:image"
-          content="https://www.google.com/url?sa=i&source=images&cd=&ved=2ahUKEwi9yLXkoqXnAhXcGTQIHXuGBEQQjRx6BAgBEAQ&url=https%3A%2F%2Fwww.linkedin.com%2Fcompany%2Fnational-football-league&psig=AOvVaw1X56Ar3IpjPo8PGZbMSA4H&ust=1580265677965256"
+          content="https://static01.nyt.com/images/2018/09/06/sports/06helmet-top/06helmet-top-articleLarge.jpg?quality=75&auto=webp&disable=upscale"
         />
       </Helmet>
 
