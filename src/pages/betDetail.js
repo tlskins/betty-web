@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useQuery } from "@apollo/react-hooks";
-import { Helmet } from "react-helmet";
 import gql from "graphql-tag";
 import "typeface-roboto";
 
@@ -86,17 +85,6 @@ export function BetDetail(props) {
 
   return (
     <div className="page-layout-wrapper">
-      <Helmet>
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:site" content="@bettybetbot" />
-        <meta name="twitter:title" content="BettyBets" />
-        <meta name="twitter:description" content={`Bet from @${proposer}`} />
-        <meta
-          name="twitter:image"
-          content="https://static01.nyt.com/images/2018/09/06/sports/06helmet-top/06helmet-top-articleLarge.jpg?quality=75&auto=webp&disable=upscale"
-        />
-      </Helmet>
-
       <NavBar clickRotoNfl={() => setShowSideBar("roto")} />
       <RotoSideBar
         show={showSideBar === "roto"}
