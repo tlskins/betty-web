@@ -329,7 +329,7 @@
   box-sizing: inherit;
   width: 100%;
   max-width: 900px;
-  margin: 0px auto;
+  /* margin: 0px auto; */
   padding: 0px;
 }
 
@@ -386,7 +386,7 @@
   box-sizing: inherit;
   width: 100%;
   max-width: 900px;
-  margin: 0px auto;
+  /* margin: 0px auto; */
   padding: 0px;
 }
 

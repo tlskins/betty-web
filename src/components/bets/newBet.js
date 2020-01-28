@@ -9,7 +9,6 @@ import { OperatorSearch } from "./operator";
 import { PlayerSearch } from "./player";
 import { MetricSelect } from "./metric";
 
-
 const CREATE_BET = gql`
   mutation createBet($changes: BetChanges!) {
     createBet(changes: $changes) {
@@ -74,15 +73,16 @@ const initialState = {
 const reducer = (state, action) => {
   switch (action.type) {
     case "addExpression": {
-      console.log('addexpr', state, action)
-      const { isLeft, eqIdx } = action
-      const { equations } = state
-    
+      console.log("addexpr", state, action);
+      const { isLeft, eqIdx } = action;
+      const { equations } = state;
+
       return {
         ...state,
         equations: [
           ...equations.slice(0, eqIdx),
-          { ...equations[eqIdx],
+          {
+            ...equations[eqIdx],
             expressions: [
               ...equations[eqIdx].expressions,
               { ...initialExpression, isLeft }
@@ -165,35 +165,35 @@ const reducer = (state, action) => {
 };
 
 const expressionComplete = expression => {
-    const { player, game, metric } = expression;
-    return !!(player && game && metric) ? true : false;
+  const { player, game, metric } = expression;
+  return !!(player && game && metric) ? true : false;
 };
-    
+
 const equationComplete = equation => {
-    const left = equation.expressions.filter(e => e.isLeft);
-    const right = equation.expressions.filter(e => !e.isLeft);
-    if (
+  const left = equation.expressions.filter(e => e.isLeft);
+  const right = equation.expressions.filter(e => !e.isLeft);
+  if (
     !equation.operator ||
     left.length === 0 ||
     right.length === 0 ||
     !expressionComplete(left[0]) ||
     !expressionComplete(right[0])
-    ) {
+  ) {
     return false;
-    }
-    return true;
+  }
+  return true;
 };
 
 const betComplete = bet => {
-    const { recipient, equations = [] } = bet;
-    if (equations.length === 0) {
-      return false;
-    }
-    if (!equationComplete(equations[0])) {
-      return false;
-    }
-    return equations.length > 0 && recipient ? true : false;
-  };
+  const { recipient, equations = [] } = bet;
+  if (equations.length === 0) {
+    return false;
+  }
+  if (!equationComplete(equations[0])) {
+    return false;
+  }
+  return equations.length > 0 && recipient ? true : false;
+};
 
 export function NewBet({ setAlertMsg }) {
   const [{ recipient, equations }, dispatch] = useReducer(
@@ -243,20 +243,25 @@ export function NewBet({ setAlertMsg }) {
   const recipientName =
     (recipient &&
       (recipient.userName ||
-        (recipient.twitterUser && "@" + recipient.twitterUser.screenName))) || "";
+        (recipient.twitterUser && "@" + recipient.twitterUser.screenName))) ||
+    "";
 
   return (
-    <div className="fact-section">
+    <div className="fact-section m-2">
       <div className="section-title-wrapper inline-flex">
         <h1 className="section-title">
-            New Bet with
-            <div className="section-subtitle">
+          <div className="text-black font-serif">New Bet with</div>
+          <div className="section-subtitle">
             <UserSearch
-                value={recipientName}
-                onSelect={({ user: recipient }) => dispatch({ type: "addRecipient", recipient })}
-                onClear={() => dispatch({ type: "addRecipient", recipient: undefined })}
+              value={recipientName}
+              onSelect={({ user: recipient }) =>
+                dispatch({ type: "addRecipient", recipient })
+              }
+              onClear={() =>
+                dispatch({ type: "addRecipient", recipient: undefined })
+              }
             />
-            </div>
+          </div>
         </h1>
         <p className="section-subtitle">
           {moment().format("MMMM Do YYYY, h:mm:ss a")}
@@ -281,105 +286,121 @@ export function NewBet({ setAlertMsg }) {
 }
 
 export function Equation({ eqIdx, equation, dispatch, focus }) {
-    const { operator = {}, expressions = [] } = equation;
-    const [leftExpressions, rightExpressions] = [[], []];
-    expressions &&
-      expressions.forEach((expr, i) => {
-        if (expr.isLeft) {
-          leftExpressions.push([expr, i]);
-        } else {
-          rightExpressions.push([expr, i]);
-        }
-      });
+  const { operator = {}, expressions = [] } = equation;
+  const [leftExpressions, rightExpressions] = [[], []];
+  expressions &&
+    expressions.forEach((expr, i) => {
+      if (expr.isLeft) {
+        leftExpressions.push([expr, i]);
+      } else {
+        rightExpressions.push([expr, i]);
+      }
+    });
 
-    const addLeft = expressionComplete(leftExpressions[leftExpressions.length - 1][0])
-    const addRight = expressionComplete(rightExpressions[rightExpressions.length - 1][0])
+  const addLeft = expressionComplete(
+    leftExpressions[leftExpressions.length - 1][0]
+  );
+  const addRight = expressionComplete(
+    rightExpressions[rightExpressions.length - 1][0]
+  );
 
-    const onSelect = operator => dispatch({ type: "addOperator", operator, eqIdx });
-    const onClear = () => dispatch({ type: "addOperator", operator: undefined, eqIdx });
-  
-    return (
-      <div className="flex w-full">
-        <div className="flex flex-col px-4 py-2 m-2 w-full">
-          {leftExpressions.map(([expr, i]) => (
-            <div key={i}>
-              <Expression
-                eqIdx={eqIdx}
-                exprIdx={i}
-                expression={expr}
-                dispatch={dispatch}
-                focus={focus && focus["l"+i]}
-              />
-            </div>
-          ))}
-          { addLeft && 
-            <button 
-              className="bg-indigo-800 text-white font-serif mt-2 p-2 rounded"
-              onClick={() => dispatch({ type: "addExpression", isLeft: true, eqIdx })}
-            >
-              Add Player
-            </button>
-          }
+  const onSelect = operator =>
+    dispatch({ type: "addOperator", operator, eqIdx });
+  const onClear = () =>
+    dispatch({ type: "addOperator", operator: undefined, eqIdx });
+
+  return (
+    <div className="flex w-full">
+      <div className="flex flex-col px-4 py-2 m-2 w-full">
+        {leftExpressions.map(([expr, i]) => (
+          <div key={i}>
+            <Expression
+              eqIdx={eqIdx}
+              exprIdx={i}
+              expression={expr}
+              dispatch={dispatch}
+              focus={focus && focus["l" + i]}
+            />
+          </div>
+        ))}
+        {addLeft && (
+          <button
+            className="bg-indigo-800 text-white font-serif mt-2 p-2 rounded"
+            onClick={() =>
+              dispatch({ type: "addExpression", isLeft: true, eqIdx })
+            }
+          >
+            Add Player
+          </button>
+        )}
+      </div>
+      <OperatorSearch
+        operator={operator}
+        onSelect={onSelect}
+        onClear={onClear}
+      />
+      <div className="flex flex-col px-4 py-2 m-2 w-full">
+        {rightExpressions.map(([expr, i]) => (
+          <div key={i}>
+            <Expression
+              eqIdx={eqIdx}
+              exprIdx={i}
+              expression={expr}
+              dispatch={dispatch}
+              focus={focus && focus["r" + i]}
+            />
+          </div>
+        ))}
+        {addRight && (
+          <button
+            className="bg-indigo-800 text-white font-serif mt-2 p-2 rounded"
+            onClick={() =>
+              dispatch({ type: "addExpression", isLeft: false, eqIdx })
+            }
+          >
+            Add Player
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export function Expression({ eqIdx, exprIdx, expression, dispatch }) {
+  const { player, game, metric = {} } = expression;
+  const onSelectSource = source =>
+    dispatch({ type: "addSource", source, eqIdx, exprIdx });
+  const onSelectMetric = metric =>
+    dispatch({ type: "addMetric", metric, eqIdx, exprIdx });
+  const onClearSource = () => {
+    dispatch({
+      type: "addSource",
+      source: { player: undefined, game: undefined },
+      eqIdx,
+      exprIdx
+    });
+  };
+  const onClearMetric = () =>
+    dispatch({ type: "addMetric", metric: undefined, eqIdx, exprIdx });
+
+  return (
+    <div>
+      <div className="fact-wrapper flex flex-col bg-gray-200">
+        <div className="m-1">
+          <PlayerSearch
+            playerAndGame={{ player, game }}
+            onSelect={source => onSelectSource(source)}
+            onClear={onClearSource}
+          />
         </div>
-        <OperatorSearch operator={operator} onSelect={onSelect} onClear={onClear} />
-        <div className="flex flex-col px-4 py-2 m-2 w-full">
-          {rightExpressions.map(([expr, i]) => (
-            <div key={i}>
-              <Expression
-                eqIdx={eqIdx}
-                exprIdx={i}
-                expression={expr}
-                dispatch={dispatch}
-                focus={focus && focus["r"+i]}
-              />
-            </div>
-          ))}
-          { addRight && 
-            <button 
-              className="bg-indigo-800 text-white font-serif mt-2 p-2 rounded"
-              onClick={() => dispatch({ type: "addExpression", isLeft: false, eqIdx })}
-            >
-              Add Player
-            </button>
-          }
+        <div className="m-1">
+          <MetricSelect
+            metric={metric}
+            onSelect={onSelectMetric}
+            onClear={onClearMetric}
+          />
         </div>
       </div>
-    );
-  }
-  
-  export function Expression({ eqIdx, exprIdx, expression, dispatch }) {
-    const { player, game, metric = {} } = expression;
-    const onSelectSource = source => dispatch({ type: "addSource", source, eqIdx, exprIdx });
-    const onSelectMetric = metric => dispatch({ type: "addMetric", metric, eqIdx, exprIdx });
-    const onClearSource = () => {
-        dispatch({ type: "addSource",
-            source: { player: undefined, game: undefined },
-            eqIdx,
-            exprIdx,
-        })
-    }
-    const onClearMetric = () => dispatch({ type: "addMetric", metric: undefined, eqIdx, exprIdx });
-  
-    return (
-      <div>
-        <div className="fact-wrapper flex flex-col bg-gray-200">
-            <div className="m-1">
-                <PlayerSearch
-                    playerAndGame={ { player, game } }
-                    onSelect={source => onSelectSource(source)}
-                    onClear={onClearSource}
-                />
-            </div>
-            <div className="m-1">
-                <MetricSelect
-                    metric={metric}
-                    onSelect={onSelectMetric}
-                    onClear={onClearMetric}
-                />
-            </div>
-        </div>
-      </div>
-    );
-  }
-  
-
+    </div>
+  );
+}

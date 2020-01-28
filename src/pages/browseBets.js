@@ -92,7 +92,7 @@ export function BrowseBets() {
         <div className="page-inner-layout">
           <div className="page-wrapper my-10">
             <div className="page-content">
-              <div className="page-content-area">
+              <div className="page-content-area flex justify-center">
                 <div className="page-section">
                   <CurrentGames />
                 </div>
@@ -111,7 +111,7 @@ export function BrowseBets() {
               </div>
             </div>
             <div className="page-content">
-              <div className="page-content-area">
+              <div className="page-content-area flex justify-center">
                 <div className="page-section">
                   {data &&
                     data.currentBets &&

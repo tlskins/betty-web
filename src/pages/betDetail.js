@@ -113,7 +113,7 @@ export function BetDetail(props) {
           </div>
           <div className="page-wrapper">
             <div className="page-content">
-              <div className="page-content-area">
+              <div className="page-content-area flex justify-center">
                 <div className="page-section flex flex-col">
                   {!signedIn && (
                     <div className="text-center font-serif inline-block bg-indigo-200 rounded p-2 w-1/2 self-center mb-6">

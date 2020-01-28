@@ -8,27 +8,30 @@ export function Metric({ metric }) {
   const { name } = metric || { name: "?" };
   return (
     <span className="fact-value">
-      <div className="underline hover:text-blue-500 cursor-pointer">
-          {name}
-        </div>
+      <div className="underline hover:text-blue-500 cursor-pointer">{name}</div>
     </span>
   );
 }
 
 export function MetricSelect({ metric, onSelect, onClear }) {
   const apolloClient = useApolloClient();
-  let data = { leagueSettings: { playerBets: [] }}
+  let data = { leagueSettings: { playerBets: [] } };
   try {
-    data = apolloClient && apolloClient.readQuery({
-      query: GET_SETTINGS,
-      variables: { id: "nfl" }
-    });
+    data =
+      apolloClient &&
+      apolloClient.readQuery({
+        query: GET_SETTINGS,
+        variables: { id: "nfl" }
+      });
   } catch {}
   const [search, setSearch] = useState("");
   const [searchIdx, setSearchIdx] = useState(0);
   const [showDropdown, setShowDropdown] = useState(false);
-  const { name } = metric
-  const metrics = data.leagueSettings.playerBets || []
+  const { name } = metric;
+  const metrics = data.leagueSettings.playerBets || [];
+  const metricsChoices = metrics.filter(metric =>
+    RegExp(search, "i").test(metric.name)
+  );
 
   const onChange = e => {
     const value = e.target.value;
@@ -36,11 +39,11 @@ export function MetricSelect({ metric, onSelect, onClear }) {
   };
 
   const onKeyDown = e => {
-    const lastIdx = metrics.length || 0;
+    const lastIdx = metricsChoices.length || 0;
     if (e.keyCode === 27) {
       onSearchExit(); // esc
     } else if (e.keyCode === 13 && metrics.length > 0) {
-      onSelect(metrics[searchIdx]);
+      onSelect(metricsChoices[searchIdx]);
       onSearchExit(); // enter
     } else if (e.keyCode === 40) {
       const idx = searchIdx === lastIdx - 1 ? 0 : searchIdx + 1;
@@ -53,23 +56,28 @@ export function MetricSelect({ metric, onSelect, onClear }) {
 
   const selectMetric = metric => () => {
     onSelect(metric);
-    onSearchExit()
-  }
+    onSearchExit();
+  };
 
   const onSearchExit = () => {
-    setSearch("")
-    setShowDropdown(false)
-  }
+    setSearch("");
+    setShowDropdown(false);
+  };
 
-  const itemClassName = index => searchIdx === index ? "dropdown-list-item bg-gray-200" : "dropdown-list-item";
+  const itemClassName = index =>
+    searchIdx === index
+      ? "dropdown-list-item bg-gray-200"
+      : "dropdown-list-item";
 
   return (
     <div className="dropdown-menu flex flex-row">
       <button className="dropdown-btn relative">
-        <ExitButton onClick={() => {
-            onSearchExit()
-            onClear()
-          }} />
+        <ExitButton
+          onClick={() => {
+            onSearchExit();
+            onClear();
+          }}
+        />
         <div className="dropdown-selection">
           <input
             disabled={!!name}
@@ -84,22 +92,20 @@ export function MetricSelect({ metric, onSelect, onClear }) {
         </div>
         {showDropdown && (
           <ul className="dropdown-list">
-            {metrics
-              .filter(metric => RegExp(search, "i").test(metric.name))
-              .map((metric, i) => {
-                return (
-                  <div
-                    key={metric.name}
-                    className={itemClassName(i)}
-                    onClick={selectMetric(metric)}
-                    onMouseEnter={() => setSearchIdx(i)}
-                  >
-                    <div className="dropdown-list-item-text flex flex-row">
-                      {metric.name}
-                    </div>
+            {metricsChoices.map((metric, i) => {
+              return (
+                <div
+                  key={metric.name}
+                  className={itemClassName(i)}
+                  onClick={selectMetric(metric)}
+                  onMouseEnter={() => setSearchIdx(i)}
+                >
+                  <div className="dropdown-list-item-text flex flex-row">
+                    {metric.name}
                   </div>
-                );
-              })}
+                </div>
+              );
+            })}
           </ul>
         )}
       </button>

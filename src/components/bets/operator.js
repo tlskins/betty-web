@@ -8,7 +8,7 @@ export function Operator({ operator }) {
   return (
     <div>
       <div className="underline hover:text-blue-500 cursor-pointer px-4 py-2 m-2">
-        {operator && operator.name || "?"}
+        {(operator && operator.name) || "?"}
       </div>
     </div>
   );
@@ -16,18 +16,23 @@ export function Operator({ operator }) {
 
 export function OperatorSearch({ operator, onSelect, onClear }) {
   const apolloClient = useApolloClient();
-  let data = { leagueSettings: { betEquations: [] }}
+  let data = { leagueSettings: { betEquations: [] } };
   try {
-    data = apolloClient && apolloClient.readQuery({
-      query: GET_SETTINGS,
-      variables: { id: "nfl" }
-    });
+    data =
+      apolloClient &&
+      apolloClient.readQuery({
+        query: GET_SETTINGS,
+        variables: { id: "nfl" }
+      });
   } catch {}
   const [search, setSearch] = useState("");
   const [searchIdx, setSearchIdx] = useState(0);
   const [showDropdown, setShowDropdown] = useState(false);
-  const { name } = operator
-  const betEqs = data.leagueSettings.betEquations || []
+  const { name } = operator;
+  const operators = data.leagueSettings.betEquations || [];
+  const opChoices = operators.filter(operator =>
+    RegExp(search, "i").test(operator.name)
+  );
 
   const onChange = e => {
     const value = e.target.value;
@@ -35,11 +40,11 @@ export function OperatorSearch({ operator, onSelect, onClear }) {
   };
 
   const onKeyDown = e => {
-    const lastIdx = betEqs.length || 0;
+    const lastIdx = opChoices.length || 0;
     if (e.keyCode === 27) {
       onSearchExit(); // esc
-    } else if (e.keyCode === 13 && betEqs.length > 0) {
-      onSelect(betEqs[searchIdx]);
+    } else if (e.keyCode === 13 && opChoices.length > 0) {
+      onSelect(opChoices[searchIdx]);
       onSearchExit(); // enter
     } else if (e.keyCode === 40) {
       const idx = searchIdx === lastIdx - 1 ? 0 : searchIdx + 1;
@@ -52,22 +57,26 @@ export function OperatorSearch({ operator, onSelect, onClear }) {
 
   const selectOperator = operator => () => {
     onSelect(operator);
-    onSearchExit()
-  }
+    onSearchExit();
+  };
 
   const onSearchExit = () => {
-    setSearch("")
-    setShowDropdown(false)
-  }
+    setSearch("");
+    setShowDropdown(false);
+  };
 
-  const itemClassName = index => searchIdx === index ? "dropdown-list-item bg-gray-200" : "dropdown-list-item";
+  const itemClassName = index =>
+    searchIdx === index
+      ? "dropdown-list-item bg-gray-200"
+      : "dropdown-list-item";
 
   return (
     <div className="dropdown-menu flex flex-row">
       <div className="dropdown-btn flex-row relative">
-        <ExitButton onClick={() => {
-            onSearchExit()
-            onClear()
+        <ExitButton
+          onClick={() => {
+            onSearchExit();
+            onClear();
           }}
         />
         <div className="dropdown-selection flex flex-col">
@@ -83,22 +92,20 @@ export function OperatorSearch({ operator, onSelect, onClear }) {
           />
           {showDropdown && (
             <ul className="dropdown-list">
-              {betEqs
-                .filter(operator => RegExp(search, "i").test(operator.name))
-                .map((operator, i) => {
-                  return (
-                    <div
-                      key={operator.name}
-                      className={itemClassName(i)}
-                      onClick={selectOperator(operator)}
-                      onMouseEnter={() => setSearchIdx(i)}
-                    >
-                      <div className="dropdown-list-item-text flex flex-row">
-                        {operator.name}
-                      </div>
+              {opChoices.map((operator, i) => {
+                return (
+                  <div
+                    key={operator.name}
+                    className={itemClassName(i)}
+                    onClick={selectOperator(operator)}
+                    onMouseEnter={() => setSearchIdx(i)}
+                  >
+                    <div className="dropdown-list-item-text flex flex-row">
+                      {operator.name}
                     </div>
-                  );
-                })}
+                  </div>
+                );
+              })}
             </ul>
           )}
         </div>

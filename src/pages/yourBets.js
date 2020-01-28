@@ -134,8 +134,8 @@ export function YourBets() {
         <div className="page-inner-layout">
           <div className="page-wrapper my-10">
             <div className="page-content">
-              <div className="page-content-area">
-                <div className="page-section bg-blue-200 rounded p-8">
+              <div className="page-content-area flex justify-center">
+                <div className="page-section m-12 bg-gray-300 rounded p-8 shadow-2xl">
                   <NewBet setAlertMsg={setAlertMsg} />
                 </div>
               </div>
@@ -143,7 +143,7 @@ export function YourBets() {
           </div>
           <div className="page-wrapper my-10">
             <div className="page-content">
-              <div className="page-content-area">
+              <div className="page-content-area flex justify-center">
                 <div className="page-section">
                   <CurrentGames />
                 </div>
@@ -162,12 +162,12 @@ export function YourBets() {
               </div>
             </div>
             <div className="page-content">
-              <div className="page-content-area">
+              <div className="page-content-area flex justify-center">
                 <div className="page-section">
                   {data &&
                     data.bets &&
                     data.bets.map((bet, idx) => (
-                      <div key={idx}>
+                      <div key={idx} className="my-20">
                         <Bet
                           bet={bet}
                           onClick={onRedirectBet(bet.id)}

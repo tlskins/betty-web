@@ -64,7 +64,7 @@ export function NavBar({ clickRoto, clickProfile }) {
         <div
           className="nav-link m-6"
           style={{
-            borderLeft: `4px solid lightgray`,
+            borderLeft: `3px solid lightgray`,
             height: `20px`,
             borderRadius: `8px`
           }}
