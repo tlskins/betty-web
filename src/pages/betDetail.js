@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useQuery } from "@apollo/react-hooks";
+import { Helmet } from "react-helmet";
 import gql from "graphql-tag";
 import "typeface-roboto";
 
@@ -77,9 +78,25 @@ export function BetDetail(props) {
   const [registration, setRegistration] = useState(false);
   const profile = JSON.parse(localStorage.getItem("profile"));
   const signedIn = !!(profile && profile.id);
+  const bet = data && data.bet;
+  const proposer =
+    bet &&
+    ((bet.proposer.twitterUser && bet.proposer.twitterUser.name) ||
+      bet.proposer.userName);
 
   return (
     <div className="page-layout-wrapper">
+      <Helmet>
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@bettybetbot" />
+        <meta name="twitter:title" content="BettyBets" />
+        <meta name="twitter:description" content={`Bet from @${proposer}`} />
+        <meta
+          name="twitter:image"
+          content="https://www.google.com/url?sa=i&source=images&cd=&ved=2ahUKEwi9yLXkoqXnAhXcGTQIHXuGBEQQjRx6BAgBEAQ&url=https%3A%2F%2Fwww.linkedin.com%2Fcompany%2Fnational-football-league&psig=AOvVaw1X56Ar3IpjPo8PGZbMSA4H&ust=1580265677965256"
+        />
+      </Helmet>
+
       <NavBar clickRotoNfl={() => setShowSideBar("roto")} />
       <RotoSideBar
         show={showSideBar === "roto"}
@@ -112,9 +129,7 @@ export function BetDetail(props) {
                     </div>
                   )}
                   <div>{registration && <RegistrationDetails />}</div>
-                  {data && data.bet && (
-                    <Bet bet={data.bet} setAlertMsg={setAlertMsg} />
-                  )}
+                  {bet && <Bet bet={bet} setAlertMsg={setAlertMsg} />}
                 </div>
               </div>
             </div>
