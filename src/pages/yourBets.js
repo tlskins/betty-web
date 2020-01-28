@@ -10,7 +10,7 @@ import { RotoSideBar } from "../components/rotoSideBar";
 import { ProfileSideBar } from "../components/profileSideBar";
 import { Bet } from "../components/bets/bet";
 import { NewBet } from "../components/bets/newBet";
-import { RotoAlerts } from "../components/rotoAlerts";
+import { UserAlerts } from "../components/userAlerts";
 import { FilterButton } from "../components/filterButton";
 import { Alert } from "../components/alert";
 
@@ -129,7 +129,7 @@ export function YourBets() {
         open={alertMsg !== undefined}
         onClose={() => setAlertMsg(undefined)}
       />
-      <RotoAlerts />
+      <UserAlerts />
       <div className="page-layout">
         <div className="page-inner-layout">
           <div className="page-wrapper my-10">

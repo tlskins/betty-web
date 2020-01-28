@@ -7,8 +7,9 @@ import gql from "graphql-tag";
 import { CurrentGames } from "../components/currentGames";
 import { NavBar } from "../components/navBar";
 import { RotoSideBar } from "../components/rotoSideBar";
+import { ProfileSideBar } from "../components/profileSideBar";
 import { Bet } from "../components/bets/bet";
-import { RotoAlerts } from "../components/rotoAlerts";
+import { UserAlerts } from "../components/userAlerts";
 import { FilterButton } from "../components/filterButton";
 
 export const BROWSE_BETS = gql`
@@ -74,12 +75,19 @@ export function BrowseBets() {
 
   return (
     <div className="page-layout-wrapper">
-      <NavBar clickRotoNfl={() => setShowSideBar("RotoNfl")} />
+      <NavBar
+        clickRoto={() => setShowSideBar("roto")}
+        clickProfile={() => setShowSideBar("profile")}
+      />
       <RotoSideBar
-        show={showSideBar === "RotoNfl"}
+        show={showSideBar === "roto"}
         hide={() => setShowSideBar(undefined)}
       />
-      <RotoAlerts />
+      <ProfileSideBar
+        show={showSideBar === "profile"}
+        hide={() => setShowSideBar(undefined)}
+      />
+      <UserAlerts />
       <div className="page-layout">
         <div className="page-inner-layout">
           <div className="page-wrapper my-10">

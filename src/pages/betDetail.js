@@ -5,8 +5,9 @@ import "typeface-roboto";
 
 import { NavBar } from "../components/navBar";
 import { RotoSideBar } from "../components/rotoSideBar";
+import { ProfileSideBar } from "../components/profileSideBar";
 import { Bet } from "../components/bets/bet";
-import { RotoAlerts } from "../components/rotoAlerts";
+import { UserAlerts } from "../components/userAlerts";
 import { GET_SETTINGS } from "./yourBets";
 import { Alert } from "../components/alert";
 import { RegistrationDetails } from "./signIn";
@@ -19,6 +20,8 @@ export const GET_BET = gql`
       finalizedAt
       expiresAt
       betStatus
+      proposerReplyFk
+      recipientReplyFk
       proposer {
         id
         name
@@ -85,9 +88,16 @@ export function BetDetail(props) {
 
   return (
     <div className="page-layout-wrapper">
-      <NavBar clickRotoNfl={() => setShowSideBar("roto")} />
+      <NavBar
+        clickRoto={() => setShowSideBar("roto")}
+        clickProfile={() => setShowSideBar("profile")}
+      />
       <RotoSideBar
         show={showSideBar === "roto"}
+        hide={() => setShowSideBar(undefined)}
+      />
+      <ProfileSideBar
+        show={showSideBar === "profile"}
         hide={() => setShowSideBar(undefined)}
       />
       <Alert
@@ -95,7 +105,7 @@ export function BetDetail(props) {
         open={alertMsg !== undefined}
         onClose={() => setAlertMsg(undefined)}
       />
-      <RotoAlerts />
+      <UserAlerts />
       <div className="page-layout">
         <div className="page-inner-layout">
           <div className="page-hdr-box">

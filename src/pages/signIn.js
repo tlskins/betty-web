@@ -5,7 +5,6 @@ import gql from "graphql-tag";
 
 import { NavBar } from "../components/navBar";
 import { RotoSideBar } from "../components/rotoSideBar";
-import { RotoAlerts } from "../components/rotoAlerts";
 import { Alert } from "../components/alert";
 
 export const SIGN_IN = gql`
@@ -79,7 +78,6 @@ export function SignIn() {
         show={showSideBar === "roto"}
         hide={() => setShowSideBar(undefined)}
       />
-      <RotoAlerts />
       <Alert
         title={alertMsg}
         open={alertMsg !== undefined}

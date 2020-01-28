@@ -8,16 +8,14 @@ import IconButton from "@material-ui/core/IconButton";
 import { makeStyles } from "@material-ui/core/styles";
 import CloseIcon from "@material-ui/icons/Close";
 
-export const Subscription = gql`
-  subscription MoreArticles {
-    rotoArticleAdded {
+export const SUBSCRIBE_USER_NOTES = gql`
+  subscription UserNotificiations {
+    userNotification {
       id
-      playerName
-      position
-      team
+      sentAt
       title
-      article
-      scrapedAt
+      type
+      message
     }
   }
 `;
@@ -40,18 +38,20 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export function RotoAlerts() {
+export function UserAlerts() {
   const [open, setOpen] = useState(false);
-  const { data } = useSubscription(Subscription, {
+  const { data } = useSubscription(SUBSCRIBE_USER_NOTES, {
     onSubscriptionData: () => setOpen(true)
   });
   const classes = useStyles();
 
-  if (!data || !data.rotoArticleAdded) {
+  console.log(("user alerts data": data));
+
+  if (!data || !data.userNotification) {
     return null;
   }
 
-  const { title } = data.rotoArticleAdded;
+  const { title } = data.userNotification;
 
   return (
     <Snackbar

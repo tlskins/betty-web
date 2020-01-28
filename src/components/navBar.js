@@ -47,13 +47,6 @@ export function NavBar({ clickRoto, clickProfile }) {
             BETTY
           </a>
         </div>
-
-        <button
-          className="nav-link hover:text-blue-500 cursor-pointer"
-          onClick={clickRoto}
-        >
-          ROTO
-        </button>
         <a
           className="nav-link-m-left hover:text-blue-500 cursor-pointer"
           href="/info"
@@ -61,13 +54,29 @@ export function NavBar({ clickRoto, clickProfile }) {
           INFO
         </a>
         {profile && (
+          <a
+            className="nav-link-m-left hover:text-blue-500 cursor-pointer"
+            href="/bets"
+          >
+            MY BETS
+          </a>
+        )}
+        <div
+          className="nav-link m-6"
+          style={{
+            borderLeft: `4px solid lightgray`,
+            height: `20px`,
+            borderRadius: `8px`
+          }}
+        />
+        <button
+          className="nav-link hover:text-blue-500 cursor-pointer"
+          onClick={clickRoto}
+        >
+          ROTO
+        </button>
+        {profile && (
           <Fragment>
-            <a
-              className="nav-link-m-left hover:text-blue-500 cursor-pointer"
-              href="/bets"
-            >
-              MY BETS
-            </a>
             <button
               className="nav-link-m-left hover:text-blue-500 cursor-pointer"
               onClick={clickProfile}

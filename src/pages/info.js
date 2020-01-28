@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 import { NavBar } from "../components/navBar";
 import { RotoSideBar } from "../components/rotoSideBar";
-import { RotoAlerts } from "../components/rotoAlerts";
+import { UserAlerts } from "../components/userAlerts";
 import { ProfileSideBar } from "../components/profileSideBar";
 
 export function Info() {
@@ -24,7 +24,7 @@ export function Info() {
         show={showSideBar === "profile"}
         hide={() => setShowSideBar(undefined)}
       />
-      <RotoAlerts />
+      <UserAlerts />
       <div className="page-layout">
         <div className="page-inner-layout">
           <div className="page-wrapper my-10">

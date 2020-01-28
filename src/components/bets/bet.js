@@ -28,6 +28,12 @@ export function Bet({ bet, onClick, setAlertMsg }) {
     recipientReplyFk
   } = bet;
   const profile = JSON.parse(localStorage.getItem("profile"));
+  console.log(
+    "profile, proposer, recip id",
+    profile.id,
+    proposer.id,
+    recipient.id
+  );
   const isProposer = profile && proposer.id === profile.id;
   const isRecipient = profile && recipient.id === profile.id;
 
@@ -144,19 +150,25 @@ export function Equation({ equation }) {
   return (
     <div className="flex w-full">
       <div className="flex flex-col px-4 py-2 m-2 w-full">
-        {expressions.filter( expr => expr.isLeft ).map((expr,i) => (
-          <div key={"leftExpr" + i}>
-            <Expression expression={expr} />
-          </div>
-        ))}
+        {expressions &&
+          expressions
+            .filter(expr => expr.isLeft)
+            .map((expr, i) => (
+              <div key={"leftExpr" + i}>
+                <Expression expression={expr} />
+              </div>
+            ))}
       </div>
       <Operator operator={operator} />
       <div className="flex flex-col px-4 py-2 m-2 w-full">
-        {expressions.filter( expr => !expr.isLeft ).map((expr, i) => (
-          <div key={"leftExpr" + i}>
-            <Expression expression={expr} />
-          </div>
-        ))}
+        {expressions &&
+          expressions
+            .filter(expr => !expr.isLeft)
+            .map((expr, i) => (
+              <div key={"leftExpr" + i}>
+                <Expression expression={expr} />
+              </div>
+            ))}
       </div>
     </div>
   );
@@ -167,7 +179,7 @@ export function Expression({ expression }) {
   return (
     <div>
       <div className="fact-wrapper">
-        <Player player={player} game={game}/>
+        <Player player={player} game={game} />
         <Metric metric={metric} />
       </div>
     </div>
