@@ -444,7 +444,7 @@
   height: 40px;
   /* width: 100%; */
   background-color: white;
-  z-index: 60;
+  /* z-index: 90; */
   border-width: 1px;
   border-style: solid;
   border-color: black;

@@ -33,10 +33,9 @@ export function UserSearch({ value, onSelect, onClear }) {
   }
 
   const onChange = e => {
-    let { value } = e.target;
-    if (value.length === 0) return;
-    onSearch({ variables: { search: value.replace("@", "") } });
-    setSearch(value);
+    const txt = e.target.value;
+    onSearch({ variables: { search: txt.replace("@", "") } });
+    setSearch(txt);
   };
 
   const onKeyDown = e => {
@@ -45,7 +44,7 @@ export function UserSearch({ value, onSelect, onClear }) {
     } else if (users.length > 0) {
       if (e.keyCode === 13) {
         onSelect({ user: users[searchIdx] });
-        onSearchExit() // enter
+        onSearchExit(); // enter
       } else if (e.keyCode === 40) {
         const idx = searchIdx === 0 ? users.length - 1 : searchIdx - 1;
         setSearchIdx(idx); // down
@@ -58,20 +57,21 @@ export function UserSearch({ value, onSelect, onClear }) {
 
   const selectUser = user => () => {
     onSelect({ user });
-    onSearchExit()
-  }
+    onSearchExit();
+  };
 
   const onSearchExit = () => {
-    setSearch("")
-    setShowDropdown(false)
-  }
+    setSearch("");
+    setShowDropdown(false);
+  };
 
   return (
     <div className="dropdown-menu flex flex-row">
       <div className="dropdown-btn relative">
-        <ExitButton onClick={() => {
-            onSearchExit()
-            onClear()
+        <ExitButton
+          onClick={() => {
+            onSearchExit();
+            onClear();
           }}
         />
         <div className="dropdown-selection">
@@ -86,7 +86,7 @@ export function UserSearch({ value, onSelect, onClear }) {
             onFocus={() => setShowDropdown(true)}
           />
         </div>
-        { showDropdown &&
+        {showDropdown && (
           <ul className="dropdown-list">
             {users.map((user, i) => {
               const { id, userName, twitterUser = {} } = user;
@@ -113,7 +113,7 @@ export function UserSearch({ value, onSelect, onClear }) {
               );
             })}
           </ul>
-        }
+        )}
       </div>
     </div>
   );

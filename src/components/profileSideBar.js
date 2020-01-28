@@ -59,6 +59,8 @@ function ProfileForm({ profile, setAlertMsg }) {
         setAlertMsg(data.error.message);
       } else if (data) {
         setAlertMsg("Updates saved!");
+        setPassword("");
+        setConfirmation("");
         setPassword(undefined);
         setConfirmation(undefined);
       }
