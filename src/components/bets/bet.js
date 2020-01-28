@@ -28,12 +28,6 @@ export function Bet({ bet, onClick, setAlertMsg }) {
     recipientReplyFk
   } = bet;
   const profile = JSON.parse(localStorage.getItem("profile"));
-  console.log(
-    "profile, proposer, recip id",
-    profile.id,
-    proposer.id,
-    recipient.id
-  );
   const isProposer = profile && proposer.id === profile.id;
   const isRecipient = profile && recipient.id === profile.id;
 

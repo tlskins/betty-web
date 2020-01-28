@@ -73,7 +73,7 @@ export function SignIn() {
 
   return (
     <div className="page-layout-wrapper">
-      <NavBar clickRotoNfl={() => setShowSideBar("roto")} />
+      <NavBar clickRoto={() => setShowSideBar("roto")} />
       <RotoSideBar
         show={showSideBar === "roto"}
         hide={() => setShowSideBar(undefined)}
