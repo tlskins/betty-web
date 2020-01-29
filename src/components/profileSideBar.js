@@ -34,7 +34,7 @@ export const UPDATE_USER = gql`
   }
 `;
 
-export function ProfileSideBar({ show, hide, profile, viewedProfile }) {
+export function ProfileSideBar({ show, hide, profile }) {
   const [alertMsg, setAlertMsg] = useState(undefined);
   const navClass = show ? "nav-sidebar" : "nav-sidebar-hidden";
   const overlayClass = show ? "nav-overlay" : "nav-overlay-hidden";

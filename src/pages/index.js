@@ -14,8 +14,8 @@ import { ProfileSideBar } from "../components/profileSideBar";
 import { Alert } from "../components/alert";
 
 export const VIEW_PROFILE = gql`
-  mutation viewProfile {
-    viewProfile {
+  mutation viewProfile($sync: Boolean!) {
+    viewProfile(sync: $sync) {
       id
       name
       userName
@@ -52,7 +52,7 @@ export default function Pages() {
   const [profile, setProfile] = useState(sessionProfile);
   const [showSideBar, setShowSideBar] = useState(undefined);
   const [alertMsg, setAlertMsg] = useState(undefined);
-  const [viewedProfile] = useMutation(VIEW_PROFILE, {
+  const [viewProfile] = useMutation(VIEW_PROFILE, {
     onCompleted(data) {
       const profile = data && data.viewProfile;
       if (profile) {
@@ -69,7 +69,7 @@ export default function Pages() {
         setProfile={setProfile}
         clickRoto={() => setShowSideBar("roto")}
         clickProfile={() => {
-          viewedProfile({ variables: { sync: false } });
+          viewProfile({ variables: { sync: false } });
           setShowSideBar("profile");
         }}
       />
@@ -78,11 +78,10 @@ export default function Pages() {
           <ProfileSideBar
             profile={profile}
             setProfile={setProfile}
-            viewedProfile={viewedProfile}
             show={showSideBar === "profile"}
             hide={() => {
               setShowSideBar(undefined);
-              viewedProfile({ variables: { sync: true } });
+              viewProfile({ variables: { sync: true } });
             }}
           />
           <RotoSideBar
