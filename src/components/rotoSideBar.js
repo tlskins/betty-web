@@ -23,6 +23,7 @@ export function RotoSideBar({ show, hide }) {
   let { data } = queryResults;
   const [showing, setShowing] = useState(false);
   const [expanded, setExpanded] = useState(undefined);
+  const articles = (data && data.currentRotoArticles) || [];
   const navClass = show ? "nav-sidebar" : "nav-sidebar-hidden";
   const overlayClass = show ? "nav-overlay" : "nav-overlay-hidden";
 
@@ -56,53 +57,50 @@ export function RotoSideBar({ show, hide }) {
               </div>
             </li>
           )}
-          {data &&
-            data.currentRotoArticles &&
-            data.currentRotoArticles.map((a, i) => {
-              const { title, playerName, team, position, article } = a;
-              const contentClass = expanded === title ? "" : "hidden";
-
-              return (
-                <li
-                  key={i}
-                  className="nav-sidebar-list-item"
-                  onMouseEnter={() => setExpanded(title)}
-                  onMouseLeave={() => setExpanded(undefined)}
-                >
-                  <label className="nav-sidebar-list-label">
-                    <div className="article-container">
-                      <div className="article-title">
-                        <div className="article-title-lg-details">
-                          <span className="article-title-detail-lg-span">
-                            <span className="article-title-detail-value">
-                              {team}
+          {articles.map((a, i) => {
+            const { title, playerName, team, position, article } = a;
+            const contentClass = expanded === title ? "" : "hidden";
+            return (
+              <li
+                key={i}
+                className="nav-sidebar-list-item"
+                onMouseEnter={() => setExpanded(title)}
+                onMouseLeave={() => setExpanded(undefined)}
+              >
+                <label className="nav-sidebar-list-label">
+                  <div className="article-container">
+                    <div className="article-title">
+                      <div className="article-title-lg-details">
+                        <span className="article-title-detail-lg-span">
+                          <span className="article-title-detail-value">
+                            {team}
+                          </span>
+                        </span>
+                      </div>
+                      <span className="article-title-span">{title}</span>
+                      <div className={contentClass}>
+                        <hr className="article-divider" />
+                        <div className="article-title-details">
+                          <span className="article-title-detail-span">
+                            {playerName}
+                            <span className="article-title-detail-divider">
+                              ·
                             </span>
                           </span>
+                          <span className="article-title-detail-span">
+                            {position}
+                          </span>
                         </div>
-                        <span className="article-title-span">{title}</span>
-                        <div className={contentClass}>
-                          <hr className="article-divider" />
-                          <div className="article-title-details">
-                            <span className="article-title-detail-span">
-                              {playerName}
-                              <span className="article-title-detail-divider">
-                                ·
-                              </span>
-                            </span>
-                            <span className="article-title-detail-span">
-                              {position}
-                            </span>
-                          </div>
-                          <p className="lowercase bg-gray-200 rounded-lg p-2">
-                            {article}
-                          </p>
-                        </div>
+                        <p className="lowercase bg-gray-200 rounded-lg p-2">
+                          {article}
+                        </p>
                       </div>
                     </div>
-                  </label>
-                </li>
-              );
-            })}
+                  </div>
+                </label>
+              </li>
+            );
+          })}
         </ul>
       </nav>
     </div>

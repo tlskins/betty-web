@@ -1,4 +1,15 @@
 import { useRef, useEffect, useState } from "react";
+import moment from "moment-timezone";
+
+export const toMoment = dateStr => moment(dateStr, "YYYY-MM-DD HH:mm:ss Z");
+
+export function usePrevious(value) {
+  const ref = useRef();
+  useEffect(() => {
+    ref.current = value;
+  });
+  return ref.current;
+}
 
 export function useThrottle(fun, timeout, changes = []) {
   // Create the mutable local ref to store timer.

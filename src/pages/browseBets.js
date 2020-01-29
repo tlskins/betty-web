@@ -5,11 +5,7 @@ import "typeface-roboto";
 import gql from "graphql-tag";
 
 import { CurrentGames } from "../components/currentGames";
-import { NavBar } from "../components/navBar";
-import { RotoSideBar } from "../components/rotoSideBar";
-import { ProfileSideBar } from "../components/profileSideBar";
 import { Bet } from "../components/bets/bet";
-import { UserAlerts } from "../components/userAlerts";
 import { FilterButton } from "../components/filterButton";
 
 export const BROWSE_BETS = gql`
@@ -64,8 +60,7 @@ export const BROWSE_BETS = gql`
   }
 `;
 
-export function BrowseBets() {
-  const [showSideBar, setShowSideBar] = useState(undefined);
+export function BrowseBets({ profile }) {
   const [redirectTo, setRedirectTo] = useState(undefined);
   const { data } = useQuery(BROWSE_BETS);
 
@@ -75,19 +70,6 @@ export function BrowseBets() {
 
   return (
     <div className="page-layout-wrapper">
-      <NavBar
-        clickRoto={() => setShowSideBar("roto")}
-        clickProfile={() => setShowSideBar("profile")}
-      />
-      <RotoSideBar
-        show={showSideBar === "roto"}
-        hide={() => setShowSideBar(undefined)}
-      />
-      <ProfileSideBar
-        show={showSideBar === "profile"}
-        hide={() => setShowSideBar(undefined)}
-      />
-      <UserAlerts />
       <div className="page-layout">
         <div className="page-inner-layout">
           <div className="page-wrapper my-10">
@@ -117,7 +99,11 @@ export function BrowseBets() {
                     data.currentBets &&
                     data.currentBets.map((bet, idx) => (
                       <div key={idx}>
-                        <Bet bet={bet} onClick={onRedirectBet(bet.id)} />
+                        <Bet
+                          bet={bet}
+                          onClick={onRedirectBet(bet.id)}
+                          profile={profile}
+                        />
                       </div>
                     ))}
                   {redirectTo && <Redirect to={redirectTo} noThrow />}

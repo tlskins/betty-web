@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, Fragment } from "react";
 import { useSubscription } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import Snackbar from "@material-ui/core/Snackbar";
@@ -8,9 +8,9 @@ import IconButton from "@material-ui/core/IconButton";
 import { makeStyles } from "@material-ui/core/styles";
 import CloseIcon from "@material-ui/icons/Close";
 
-export const SUBSCRIBE_USER_NOTES = gql`
-  subscription UserNotificiations {
-    userNotification {
+export const SUBSCRIBE_NOTIFICATIONS = gql`
+  subscription subscribeNotifications {
+    subscribeNotifications {
       id
       sentAt
       title
@@ -22,7 +22,7 @@ export const SUBSCRIBE_USER_NOTES = gql`
 
 const useStyles = makeStyles(theme => ({
   info: {
-    backgroundColor: theme.palette.primary.main,
+    backgroundColor: theme.palette.secondary.main,
     margin: theme.spacing(1)
   },
   icon: {
@@ -40,18 +40,17 @@ const useStyles = makeStyles(theme => ({
 
 export function UserAlerts() {
   const [open, setOpen] = useState(false);
-  const { data } = useSubscription(SUBSCRIBE_USER_NOTES, {
+  const { data } = useSubscription(SUBSCRIBE_NOTIFICATIONS, {
     onSubscriptionData: () => setOpen(true)
   });
   const classes = useStyles();
+  console.log("useralerts data:", data);
 
-  console.log(("user alerts data": data));
-
-  if (!data || !data.userNotification) {
+  if (!data || !data.subscribeNotifications) {
     return null;
   }
 
-  const { title } = data.userNotification;
+  const { title, type } = data.subscribeNotifications;
 
   return (
     <Snackbar

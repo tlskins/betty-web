@@ -3,20 +3,30 @@ import { Redirect } from "@reach/router";
 import { useLazyQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
-import { NavBar } from "../components/navBar";
-import { RotoSideBar } from "../components/rotoSideBar";
-import { Alert } from "../components/alert";
-
 export const SIGN_IN = gql`
   query signIn($userName: String!, $password: String!) {
     signIn(userName: $userName, password: $password) {
       id
       name
       userName
+      email
+      viewedProfileLast
+      betsWon
+      betsLost
+      inProgressBetIds
+      pendingYouBetIds
+      pendingThemBetIds
       twitterUser {
         idStr
         screenName
         name
+      }
+      notifications {
+        id
+        sentAt
+        title
+        type
+        message
       }
     }
   }
@@ -52,12 +62,10 @@ export function RegistrationDetails() {
   );
 }
 
-export function SignIn() {
+export function SignIn({ setProfile, setAlertMsg }) {
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [redirect, setRedirect] = useState(false);
-  const [alertMsg, setAlertMsg] = useState(undefined);
-  const [showSideBar, setShowSideBar] = useState(undefined);
 
   const [signIn] = useLazyQuery(SIGN_IN, {
     onError(error) {
@@ -65,7 +73,7 @@ export function SignIn() {
     },
     onCompleted(data) {
       if (data && data.signIn) {
-        localStorage.setItem("profile", JSON.stringify(data.signIn));
+        setProfile(data.signIn);
         setRedirect(true);
       }
     }
@@ -73,16 +81,6 @@ export function SignIn() {
 
   return (
     <div className="page-layout-wrapper">
-      <NavBar clickRoto={() => setShowSideBar("roto")} />
-      <RotoSideBar
-        show={showSideBar === "roto"}
-        hide={() => setShowSideBar(undefined)}
-      />
-      <Alert
-        title={alertMsg}
-        open={alertMsg !== undefined}
-        onClose={() => setAlertMsg(undefined)}
-      />
       <div className="page-layout">
         <div className="page-inner-layout">
           <div className="page-wrapper my-10">

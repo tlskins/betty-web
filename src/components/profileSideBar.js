@@ -1,8 +1,38 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useMutation } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
 import { Alert } from "../components/alert";
+import { toMoment, usePrevious } from "../utils";
+
+export const SUBSCRIBE_USER_PROFILE = gql`
+  subscription subscribeUserNotifications {
+    subscribeUserNotifications {
+      id
+      name
+      userName
+      email
+      viewedProfileLast
+      betsWon
+      betsLost
+      inProgressBetIds
+      pendingYouBetIds
+      pendingThemBetIds
+      twitterUser {
+        idStr
+        screenName
+        name
+      }
+      notifications {
+        id
+        sentAt
+        title
+        type
+        message
+      }
+    }
+  }
+`;
 
 export const UPDATE_USER = gql`
   mutation updateUser($changes: ProfileChanges!) {
@@ -10,22 +40,78 @@ export const UPDATE_USER = gql`
       id
       name
       userName
+      email
+      viewedProfileLast
+      betsWon
+      betsLost
+      inProgressBetIds
+      pendingYouBetIds
+      pendingThemBetIds
       twitterUser {
         idStr
         screenName
         name
       }
+      notifications {
+        id
+        sentAt
+        title
+        type
+        message
+      }
     }
   }
 `;
 
-export function ProfileSideBar({ show, hide }) {
+export const VIEW_PROFILE = gql`
+  mutation viewProfile {
+    viewProfile {
+      id
+      name
+      userName
+      email
+      viewedProfileLast
+      betsWon
+      betsLost
+      inProgressBetIds
+      pendingYouBetIds
+      pendingThemBetIds
+      twitterUser {
+        idStr
+        screenName
+        name
+      }
+      notifications {
+        id
+        sentAt
+        title
+        type
+        message
+      }
+    }
+  }
+`;
+
+export function ProfileSideBar({ show, hide, profile, setProfile }) {
   const [alertMsg, setAlertMsg] = useState(undefined);
   const [showing, setShowing] = useState(false);
+  const [viewProfile] = useMutation(VIEW_PROFILE, {
+    onCompleted(data) {
+      const profile = data && data.viewProfile;
+      if (profile) {
+        setProfile(profile);
+      }
+    }
+  });
+  const prevShow = usePrevious(show);
+  useEffect(() => {
+    if (!show && prevShow) {
+      viewProfile(); // sync last view after viewing and closing profile
+      setProfile();
+    }
+  }, [show]);
   const navClass = show ? "nav-sidebar" : "nav-sidebar-hidden";
   const overlayClass = show ? "nav-overlay" : "nav-overlay-hidden";
-
-  const profile = JSON.parse(localStorage.getItem("profile"));
 
   if (showing && !show) {
     setShowing(false);
@@ -59,17 +145,13 @@ function ProfileForm({ profile, setAlertMsg }) {
         setAlertMsg(data.error.message);
       } else if (data) {
         setAlertMsg("Updates saved!");
-        setPassword("");
+        setPassword(""); // text input doesnt clear on undefined value
         setConfirmation("");
         setPassword(undefined);
         setConfirmation(undefined);
       }
     }
   });
-
-  const twtName = (profile.twitterUser && profile.twitterUser.name) || "";
-  const twtScreenName =
-    (profile.twitterUser && profile.twitterUser.screenName) || "";
 
   const onUpdate = e => {
     e.preventDefault();
@@ -89,8 +171,31 @@ function ProfileForm({ profile, setAlertMsg }) {
     updateUser({ variables: { changes } });
   };
 
+  const twtName = (profile.twitterUser && profile.twitterUser.name) || "";
+  const twtScreenName =
+    (profile.twitterUser && profile.twitterUser.screenName) || "";
+  const notifications = (profile && profile.notifications) || [];
+
   return (
     <div className="leading-loose">
+      <div className="nav-sidebar-list">
+        <li className="nav-sidebar-list-item my-8">
+          <div>
+            <label className="nav-sidebar-list-label">
+              <span className="nav-sidebar-list-txt">
+                Profile Notifications
+              </span>
+            </label>
+          </div>
+        </li>
+        {notifications.map(note => (
+          <Notification
+            note={note}
+            viewedProfileLast={profile.viewedProfileLast}
+          />
+        ))}
+      </div>
+
       <form className="max-w-xl m-4 p-10 bg-white rounded shadow-xl">
         <p className="text-gray-800 font-medium m-2">Profile</p>
         <div className="">
@@ -178,5 +283,44 @@ function ProfileForm({ profile, setAlertMsg }) {
         </div>
       </form>
     </div>
+  );
+}
+
+function Notification({ note, viewedProfileLast: last }) {
+  const [expanded, setExpanded] = useState(undefined);
+  const { title, type, message, sentAt } = note;
+  const sentAtMoment = toMoment(sentAt);
+  const bgColor = toMoment(last).isBefore(sentAtMoment) ? "bg-blue-200" : "";
+  const contentClass = expanded === title ? "" : "hidden";
+  const setAtString = sentAtMoment.format("MMM Do YYYY, h:mm a");
+
+  return (
+    <li
+      className={`nav-sidebar-list-item my-2 ${bgColor}`}
+      onMouseEnter={() => setExpanded(title)}
+      onMouseLeave={() => setExpanded(undefined)}
+    >
+      <label className="nav-sidebar-list-label">
+        <div className="article-container">
+          <div className="article-title">
+            <div className="article-title-lg-details">
+              <span className="article-title-detail-lg-span">
+                <span className="article-title-detail-value underline">
+                  {type}
+                </span>
+              </span>
+            </div>
+            <span className="article-title-span">{title}</span>
+            <div className={contentClass}>
+              <hr className="article-divider" />
+              <div className="article-title-details">
+                <span className="article-title-detail-span">{setAtString}</span>
+              </div>
+              <p className="lowercase bg-gray-200 rounded-lg p-2">{message}</p>
+            </div>
+          </div>
+        </div>
+      </label>
+    </li>
   );
 }

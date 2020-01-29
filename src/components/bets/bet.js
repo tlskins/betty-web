@@ -14,7 +14,7 @@ const ACCEPT_BET = gql`
   }
 `;
 
-export function Bet({ bet, onClick, setAlertMsg }) {
+export function Bet({ bet, onClick, setAlertMsg, profile }) {
   const {
     id,
     createdAt,
@@ -27,7 +27,6 @@ export function Bet({ bet, onClick, setAlertMsg }) {
     proposerReplyFk,
     recipientReplyFk
   } = bet;
-  const profile = JSON.parse(localStorage.getItem("profile"));
   const isProposer = profile && proposer.id === profile.id;
   const isRecipient = profile && recipient.id === profile.id;
 

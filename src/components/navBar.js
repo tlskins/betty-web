@@ -1,23 +1,15 @@
 import React, { useState, Fragment } from "react";
 import { Redirect } from "@reach/router";
-import { useMutation, useApolloClient } from "@apollo/react-hooks";
-
+import {
+  useMutation,
+  useSubscription,
+  useApolloClient
+} from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
-export const GET_PROFILE = gql`
-  {
-    profile @client {
-      id
-      name
-      userName
-      twitterUser {
-        idStr
-        screenName
-        name
-      }
-    }
-  }
-`;
+import { SUBSCRIBE_USER_PROFILE } from "../components/profileSideBar";
+import { Alert } from "../components/alert";
+import { toMoment } from "../utils";
 
 const LOG_OUT = gql`
   mutation signOut {
@@ -25,7 +17,21 @@ const LOG_OUT = gql`
   }
 `;
 
-export function NavBar({ clickRoto, clickProfile }) {
+function newNotifications(profile) {
+  if (!profile || !profile.notifications || profile.notifications.length == 0) {
+    return 0;
+  }
+  if (!profile.viewedProfileLast) {
+    return profile.notifications.length;
+  }
+  const lastView = toMoment(profile.viewedProfileLast);
+  console.log("lastview", lastView);
+  return profile.notifications.filter(n =>
+    lastView.isBefore(toMoment(n.sentAt))
+  ).length;
+}
+
+export function NavBar({ clickRoto, clickProfile, profile, setProfile }) {
   const client = useApolloClient();
   const [logout] = useMutation(LOG_OUT, {
     onCompleted(data) {
@@ -36,8 +42,25 @@ export function NavBar({ clickRoto, clickProfile }) {
       }
     }
   });
+  const { data } = useSubscription(SUBSCRIBE_USER_PROFILE, {
+    onSubscriptionData(data) {
+      console.log("onSubscriptionData:", data);
+      const profile =
+        data &&
+        data.subscriptionData &&
+        data.subscriptionData.data &&
+        data.subscriptionData.data.subscribeUserNotifications;
+      if (profile) {
+        setProfile(profile);
+        setNewNotes(newNotifications(profile));
+      }
+    }
+  });
+  console.log("subscription profile data:", data);
   const [redirectTo, setRedirectTo] = useState(undefined);
-  const profile = JSON.parse(localStorage.getItem("profile"));
+  const [alertMsg, setAlertMsg] = useState(undefined);
+  const [newNotes, setNewNotes] = useState(newNotifications(profile));
+  console.log("newNotesCount: ", newNotes);
 
   return (
     <nav className="nav-bar">
@@ -69,19 +92,20 @@ export function NavBar({ clickRoto, clickProfile }) {
             borderRadius: `8px`
           }}
         />
-        <button
-          className="nav-link hover:text-blue-500 cursor-pointer"
-          onClick={clickRoto}
-        >
-          ROTO
-        </button>
+
         {profile && (
           <Fragment>
+            <button
+              className="nav-link hover:text-blue-500 cursor-pointer"
+              onClick={clickRoto}
+            >
+              ROTO
+            </button>
             <button
               className="nav-link-m-left hover:text-blue-500 cursor-pointer"
               onClick={clickProfile}
             >
-              PROFILE
+              PROFILE {newNotes > 0 && `(${newNotes})`}
             </button>
             <button
               className="nav-link-m-left hover:text-blue-500 cursor-pointer"
@@ -91,6 +115,7 @@ export function NavBar({ clickRoto, clickProfile }) {
             </button>
           </Fragment>
         )}
+
         {!profile && (
           <a
             className="nav-link-m-left hover:text-blue-500 cursor-pointer"
@@ -100,6 +125,11 @@ export function NavBar({ clickRoto, clickProfile }) {
           </a>
         )}
         {redirectTo && <Redirect to={redirectTo} noThrow />}
+        <Alert
+          title={alertMsg}
+          open={alertMsg !== undefined}
+          onClose={() => setAlertMsg(undefined)}
+        />
       </div>
     </nav>
   );

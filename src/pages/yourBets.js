@@ -93,10 +93,8 @@ export const GET_SETTINGS = gql`
   }
 `;
 
-export function YourBets() {
-  const [showSideBar, setShowSideBar] = useState(undefined);
+export function YourBets({ profile, setAlertMsg }) {
   const [redirectTo, setRedirectTo] = useState(undefined);
-  const [alertMsg, setAlertMsg] = useState(undefined);
   useQuery(GET_SETTINGS, {
     variables: { id: "nfl" }
   });
@@ -112,24 +110,6 @@ export function YourBets() {
 
   return (
     <div className="page-layout-wrapper">
-      <NavBar
-        clickRoto={() => setShowSideBar("roto")}
-        clickProfile={() => setShowSideBar("profile")}
-      />
-      <RotoSideBar
-        show={showSideBar === "roto"}
-        hide={() => setShowSideBar(undefined)}
-      />
-      <ProfileSideBar
-        show={showSideBar === "profile"}
-        hide={() => setShowSideBar(undefined)}
-      />
-      <Alert
-        title={alertMsg}
-        open={alertMsg !== undefined}
-        onClose={() => setAlertMsg(undefined)}
-      />
-      <UserAlerts />
       <div className="page-layout">
         <div className="page-inner-layout">
           <div className="page-wrapper my-10">
@@ -170,6 +150,7 @@ export function YourBets() {
                       <div key={idx} className="my-20">
                         <Bet
                           bet={bet}
+                          profile={profile}
                           onClick={onRedirectBet(bet.id)}
                           setAlertMsg={setAlertMsg}
                         />

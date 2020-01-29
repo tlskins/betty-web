@@ -1,30 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 
-import { NavBar } from "../components/navBar";
-import { RotoSideBar } from "../components/rotoSideBar";
-import { UserAlerts } from "../components/userAlerts";
-import { ProfileSideBar } from "../components/profileSideBar";
-
-export function Info() {
-  const [showSideBar, setShowSideBar] = useState(undefined);
-  const profile = JSON.parse(localStorage.getItem("profile"));
+export function Info({ profile }) {
   const signedIn = !!(profile && profile.id);
 
   return (
     <div className="page-layout-wrapper">
-      <NavBar
-        clickRoto={() => setShowSideBar("roto")}
-        clickProfile={() => setShowSideBar("profile")}
-      />
-      <RotoSideBar
-        show={showSideBar === "roto"}
-        hide={() => setShowSideBar(undefined)}
-      />
-      <ProfileSideBar
-        show={showSideBar === "profile"}
-        hide={() => setShowSideBar(undefined)}
-      />
-      <UserAlerts />
       <div className="page-layout">
         <div className="page-inner-layout">
           <div className="page-wrapper my-10">
