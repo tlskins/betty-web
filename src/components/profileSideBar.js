@@ -1,38 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useMutation } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
 import { Alert } from "../components/alert";
-import { toMoment, usePrevious } from "../utils";
-
-export const SUBSCRIBE_USER_PROFILE = gql`
-  subscription subscribeUserNotifications {
-    subscribeUserNotifications {
-      id
-      name
-      userName
-      email
-      viewedProfileLast
-      betsWon
-      betsLost
-      inProgressBetIds
-      pendingYouBetIds
-      pendingThemBetIds
-      twitterUser {
-        idStr
-        screenName
-        name
-      }
-      notifications {
-        id
-        sentAt
-        title
-        type
-        message
-      }
-    }
-  }
-`;
+import { toMoment } from "../utils";
 
 export const UPDATE_USER = gql`
   mutation updateUser($changes: ProfileChanges!) {
@@ -63,59 +34,10 @@ export const UPDATE_USER = gql`
   }
 `;
 
-export const VIEW_PROFILE = gql`
-  mutation viewProfile {
-    viewProfile {
-      id
-      name
-      userName
-      email
-      viewedProfileLast
-      betsWon
-      betsLost
-      inProgressBetIds
-      pendingYouBetIds
-      pendingThemBetIds
-      twitterUser {
-        idStr
-        screenName
-        name
-      }
-      notifications {
-        id
-        sentAt
-        title
-        type
-        message
-      }
-    }
-  }
-`;
-
-export function ProfileSideBar({ show, hide, profile, setProfile }) {
+export function ProfileSideBar({ show, hide, profile, viewedProfile }) {
   const [alertMsg, setAlertMsg] = useState(undefined);
-  const [showing, setShowing] = useState(false);
-  const [viewProfile] = useMutation(VIEW_PROFILE, {
-    onCompleted(data) {
-      const profile = data && data.viewProfile;
-      if (profile) {
-        setProfile(profile);
-      }
-    }
-  });
-  const prevShow = usePrevious(show);
-  useEffect(() => {
-    if (!show && prevShow) {
-      viewProfile(); // sync last view after viewing and closing profile
-      setProfile();
-    }
-  }, [show]);
   const navClass = show ? "nav-sidebar" : "nav-sidebar-hidden";
   const overlayClass = show ? "nav-overlay" : "nav-overlay-hidden";
-
-  if (showing && !show) {
-    setShowing(false);
-  }
 
   return (
     <div className="nav-sidebar-wrapper">
@@ -174,22 +96,23 @@ function ProfileForm({ profile, setAlertMsg }) {
   const twtName = (profile.twitterUser && profile.twitterUser.name) || "";
   const twtScreenName =
     (profile.twitterUser && profile.twitterUser.screenName) || "";
-  const notifications = (profile && profile.notifications) || [];
+  const notifications = profile
+    ? profile.notifications.sort(
+        (a, b) => toMoment(b.sentAt) - toMoment(a.sentAt)
+      )
+    : [];
 
   return (
     <div className="leading-loose">
       <div className="nav-sidebar-list">
-        <li className="nav-sidebar-list-item my-8">
-          <div>
-            <label className="nav-sidebar-list-label">
-              <span className="nav-sidebar-list-txt">
-                Profile Notifications
-              </span>
-            </label>
-          </div>
-        </li>
+        <div className="p-8">
+          <label className="nav-sidebar-list-label p-8">
+            <span className="nav-sidebar-list-txt">Profile Notifications</span>
+          </label>
+        </div>
         {notifications.map(note => (
           <Notification
+            key={note.id}
             note={note}
             viewedProfileLast={profile.viewedProfileLast}
           />
@@ -290,32 +213,29 @@ function Notification({ note, viewedProfileLast: last }) {
   const [expanded, setExpanded] = useState(undefined);
   const { title, type, message, sentAt } = note;
   const sentAtMoment = toMoment(sentAt);
-  const bgColor = toMoment(last).isBefore(sentAtMoment) ? "bg-blue-200" : "";
+  const newNoteColors = toMoment(last).isBefore(sentAtMoment)
+    ? "bg-indigo-800 text-white"
+    : "";
   const contentClass = expanded === title ? "" : "hidden";
   const setAtString = sentAtMoment.format("MMM Do YYYY, h:mm a");
 
   return (
     <li
-      className={`nav-sidebar-list-item my-2 ${bgColor}`}
+      key={note.id}
+      className={`nav-sidebar-list-item my-4 shadow-md ${newNoteColors}`}
       onMouseEnter={() => setExpanded(title)}
       onMouseLeave={() => setExpanded(undefined)}
     >
-      <label className="nav-sidebar-list-label">
+      <label className="nav-sidebar-list-label ml-2">
         <div className="article-container">
           <div className="article-title">
-            <div className="article-title-lg-details">
-              <span className="article-title-detail-lg-span">
-                <span className="article-title-detail-value underline">
-                  {type}
-                </span>
-              </span>
+            <div className={`article-title-span font-serif ${newNoteColors}`}>
+              {type} | {setAtString}
+              <hr />
+              <div clasName="my-4">{title}</div>
             </div>
-            <span className="article-title-span">{title}</span>
             <div className={contentClass}>
               <hr className="article-divider" />
-              <div className="article-title-details">
-                <span className="article-title-detail-span">{setAtString}</span>
-              </div>
               <p className="lowercase bg-gray-200 rounded-lg p-2">{message}</p>
             </div>
           </div>

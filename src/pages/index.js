@@ -1,5 +1,7 @@
 import React, { Fragment, useState } from "react";
+import { useMutation } from "@apollo/react-hooks";
 import { Router } from "@reach/router";
+import gql from "graphql-tag";
 
 import { YourBets } from "./yourBets";
 import { BrowseBets } from "./browseBets";
@@ -9,14 +11,57 @@ import { SignIn } from "./signIn";
 import { NavBar } from "../components/navBar";
 import { RotoSideBar } from "../components/rotoSideBar";
 import { ProfileSideBar } from "../components/profileSideBar";
-import { UserAlerts } from "../components/userAlerts";
 import { Alert } from "../components/alert";
 
+export const VIEW_PROFILE = gql`
+  mutation viewProfile {
+    viewProfile {
+      id
+      name
+      userName
+      email
+      viewedProfileLast
+      betsWon
+      betsLost
+      inProgressBetIds
+      pendingYouBetIds
+      pendingThemBetIds
+      twitterUser {
+        idStr
+        screenName
+        name
+      }
+      notifications {
+        id
+        sentAt
+        title
+        type
+        message
+      }
+    }
+  }
+`;
+
 export default function Pages() {
-  const sessionProfile = JSON.parse(localStorage.getItem("profile"));
+  let sessionProfile = localStorage.getItem("profile");
+  try {
+    sessionProfile = sessionProfile ? JSON.parse(sessionProfile) : undefined;
+  } catch (e) {
+    sessionProfile = undefined;
+  }
   const [profile, setProfile] = useState(sessionProfile);
   const [showSideBar, setShowSideBar] = useState(undefined);
   const [alertMsg, setAlertMsg] = useState(undefined);
+  const [viewedProfile] = useMutation(VIEW_PROFILE, {
+    onCompleted(data) {
+      const profile = data && data.viewProfile;
+      if (profile) {
+        localStorage.setItem("profile", JSON.stringify(profile));
+        setProfile(profile);
+      }
+    }
+  });
+
   return (
     <div>
       <NavBar
@@ -30,8 +75,12 @@ export default function Pages() {
           <ProfileSideBar
             profile={profile}
             setProfile={setProfile}
+            viewedProfile={viewedProfile}
             show={showSideBar === "profile"}
-            hide={() => setShowSideBar(undefined)}
+            hide={() => {
+              setShowSideBar(undefined);
+              viewedProfile();
+            }}
           />
           <RotoSideBar
             show={showSideBar === "roto"}
@@ -42,7 +91,6 @@ export default function Pages() {
             open={alertMsg !== undefined}
             onClose={() => setAlertMsg(undefined)}
           />
-          <UserAlerts />
         </Fragment>
       )}
 

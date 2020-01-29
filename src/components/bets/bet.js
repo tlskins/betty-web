@@ -49,7 +49,6 @@ export function Bet({ bet, onClick, setAlertMsg, profile }) {
     });
   };
   const onDecline = e => {
-    console.log(e);
     e.stopPropagation();
     rejectBet({
       variables: { id, accept: false },

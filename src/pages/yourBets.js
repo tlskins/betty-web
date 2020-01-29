@@ -5,14 +5,9 @@ import gql from "graphql-tag";
 import "typeface-roboto";
 
 import { CurrentGames } from "../components/currentGames";
-import { NavBar } from "../components/navBar";
-import { RotoSideBar } from "../components/rotoSideBar";
-import { ProfileSideBar } from "../components/profileSideBar";
 import { Bet } from "../components/bets/bet";
 import { NewBet } from "../components/bets/newBet";
-import { UserAlerts } from "../components/userAlerts";
 import { FilterButton } from "../components/filterButton";
-import { Alert } from "../components/alert";
 
 export const GET_BETS = gql`
   query bets {

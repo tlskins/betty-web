@@ -693,7 +693,7 @@
 .nav-sidebar-list-label {
   -webkit-font-smoothing: antialiased !important;
   list-style-type: none;
-  color: #0b0b0b;
+  /* color: #0b0b0b; */
   font-weight: normal;
   box-sizing: inherit;
   display: flex;
@@ -773,8 +773,8 @@
   -webkit-font-smoothing: antialiased;
   cursor: pointer;
   -webkit-box-direction: normal;
-  color: #101820;
-  font: 12px/14px "Calibre-Medium";
+  /* color: #101820; */
+  /* font: 12px/14px "Calibre-Medium"; */
   letter-spacing: 0.086em;
   text-transform: none;
   border-bottom: 1px solid transparent;
@@ -854,10 +854,10 @@
   -webkit-font-smoothing: antialiased;
   cursor: pointer;
   -webkit-box-direction: normal;
-  font: 12px/14px "Calibre-Medium";
+  /* font: 12px/14px "Calibre-Medium"; */
   letter-spacing: 0.061em;
   text-transform: uppercase;
-  color: #b70038;
+  /* color: #b70038; */
 }
 
 .article-divider {

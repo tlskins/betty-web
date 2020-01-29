@@ -35,7 +35,7 @@ export function playerTitle(player, game) {
   let playerName = "";
   if (player) {
     const { firstName, lastName, teamShort, position } = player;
-    playerName = `${firstName[0]}.${lastName} (${position})`;
+    playerName = `${firstName[0]}.${lastName} (${teamShort}-${position})`;
   }
 
   let vsTeam = "";
@@ -47,21 +47,19 @@ export function playerTitle(player, game) {
     }
   }
 
-  return [playerName, vsTeam]
+  return [playerName, vsTeam];
 }
 
 export function Player({ player, game }) {
-  const [playerName, vsTeam] = playerTitle(player, game)
+  const [playerName, vsTeam] = playerTitle(player, game);
   return (
     <span className="fact-label">
       <div>
-          <div
-            className="underline hover:text-blue-500 cursor-pointer"
-          >
-            {playerName}
-          </div>
-          {vsTeam}
+        <div className="underline hover:text-blue-500 cursor-pointer">
+          {playerName}
         </div>
+        {vsTeam}
+      </div>
     </span>
   );
 }
@@ -72,12 +70,12 @@ export function PlayerSearch({ playerAndGame, onSelect, onClear }) {
   const [search, setSearch] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const throttleSearch = useThrottle(searchPlayer, 300);
-  const { player, game } = playerAndGame
-  const players = data && data.findPlayers || []
+  const { player, game } = playerAndGame;
+  const players = (data && data.findPlayers) || [];
 
   const onChange = e => {
     const name = e.target.value;
-    setSearch(name)
+    setSearch(name);
     throttleSearch({ variables: { name } });
   };
 
@@ -85,8 +83,8 @@ export function PlayerSearch({ playerAndGame, onSelect, onClear }) {
     if (e.keyCode === 27) {
       onSearchExit(); // esc
     } else if (e.keyCode === 13 && players.length > 0) {
-      const { game, ...onlyPlayer } = players[searchIdx]
-      onSelect({ game, player: onlyPlayer});
+      const { game, ...onlyPlayer } = players[searchIdx];
+      onSelect({ game, player: onlyPlayer });
       onSearchExit(); // enter
     } else if (e.keyCode === 40) {
       const idx = searchIdx === players.length - 1 ? 0 : searchIdx + 1;
@@ -99,24 +97,26 @@ export function PlayerSearch({ playerAndGame, onSelect, onClear }) {
 
   const selectPlayer = player => {
     onSelect(player);
-    onSearchExit()
-  }
+    onSearchExit();
+  };
 
   const onSearchExit = () => {
-    setSearch("")
-    setShowDropdown(false)
-  }
+    setSearch("");
+    setShowDropdown(false);
+  };
 
   return (
     <div className="dropdown-menu flex flex-row">
       <button className="dropdown-btn relative">
-        <ExitButton onClick={() => {
-            onSearchExit()
-            onClear()
-          }} />
+        <ExitButton
+          onClick={() => {
+            onSearchExit();
+            onClear();
+          }}
+        />
         <div className="dropdown-selection">
-          { player && <Player player={player} game={game} /> }
-          { !player &&
+          {player && <Player player={player} game={game} />}
+          {!player && (
             <input
               value={search}
               type="text"
@@ -126,9 +126,9 @@ export function PlayerSearch({ playerAndGame, onSelect, onClear }) {
               onKeyDown={onKeyDown}
               onFocus={() => setShowDropdown(true)}
             />
-          }
+          )}
         </div>
-        { showDropdown &&
+        {showDropdown && (
           <ul className="dropdown-list">
             {players.map((player, i) => (
               <div key={i}>
@@ -142,7 +142,7 @@ export function PlayerSearch({ playerAndGame, onSelect, onClear }) {
               </div>
             ))}
           </ul>
-        }
+        )}
       </button>
     </div>
   );

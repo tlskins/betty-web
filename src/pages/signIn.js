@@ -73,6 +73,7 @@ export function SignIn({ setProfile, setAlertMsg }) {
     },
     onCompleted(data) {
       if (data && data.signIn) {
+        localStorage.setItem("profile", JSON.stringify(data.signIn));
         setProfile(data.signIn);
         setRedirect(true);
       }

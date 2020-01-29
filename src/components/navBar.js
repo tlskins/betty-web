@@ -7,9 +7,37 @@ import {
 } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
-import { SUBSCRIBE_USER_PROFILE } from "../components/profileSideBar";
 import { Alert } from "../components/alert";
 import { toMoment } from "../utils";
+
+export const SUBSCRIBE_USER_PROFILE = gql`
+  subscription subscribeUserNotifications {
+    subscribeUserNotifications {
+      id
+      name
+      userName
+      email
+      viewedProfileLast
+      betsWon
+      betsLost
+      inProgressBetIds
+      pendingYouBetIds
+      pendingThemBetIds
+      twitterUser {
+        idStr
+        screenName
+        name
+      }
+      notifications {
+        id
+        sentAt
+        title
+        type
+        message
+      }
+    }
+  }
+`;
 
 const LOG_OUT = gql`
   mutation signOut {
@@ -18,14 +46,17 @@ const LOG_OUT = gql`
 `;
 
 function newNotifications(profile) {
-  if (!profile || !profile.notifications || profile.notifications.length == 0) {
+  if (
+    !profile ||
+    !profile.notifications ||
+    profile.notifications.length === 0
+  ) {
     return 0;
   }
   if (!profile.viewedProfileLast) {
     return profile.notifications.length;
   }
   const lastView = toMoment(profile.viewedProfileLast);
-  console.log("lastview", lastView);
   return profile.notifications.filter(n =>
     lastView.isBefore(toMoment(n.sentAt))
   ).length;
@@ -42,25 +73,28 @@ export function NavBar({ clickRoto, clickProfile, profile, setProfile }) {
       }
     }
   });
-  const { data } = useSubscription(SUBSCRIBE_USER_PROFILE, {
+  useSubscription(SUBSCRIBE_USER_PROFILE, {
     onSubscriptionData(data) {
-      console.log("onSubscriptionData:", data);
       const profile =
         data &&
         data.subscriptionData &&
         data.subscriptionData.data &&
         data.subscriptionData.data.subscribeUserNotifications;
       if (profile) {
-        setProfile(profile);
-        setNewNotes(newNotifications(profile));
+        if (profile.id.length > 0) {
+          // workaround for single ws and non persisted push notes
+          localStorage.setItem("profile", JSON.stringify(profile));
+          setProfile(profile);
+        }
+        if (profile.notifications.length > 0) {
+          setAlertMsg(profile.notifications[0].title);
+        }
       }
     }
   });
-  console.log("subscription profile data:", data);
   const [redirectTo, setRedirectTo] = useState(undefined);
   const [alertMsg, setAlertMsg] = useState(undefined);
-  const [newNotes, setNewNotes] = useState(newNotifications(profile));
-  console.log("newNotesCount: ", newNotes);
+  const newNotesCount = newNotifications(profile);
 
   return (
     <nav className="nav-bar">
@@ -105,7 +139,12 @@ export function NavBar({ clickRoto, clickProfile, profile, setProfile }) {
               className="nav-link-m-left hover:text-blue-500 cursor-pointer"
               onClick={clickProfile}
             >
-              PROFILE {newNotes > 0 && `(${newNotes})`}
+              PROFILE{" "}
+              {newNotesCount > 0 && (
+                <span className="bg-indigo-400 text-white rounded-full py-1 px-2">
+                  {newNotesCount}
+                </span>
+              )}
             </button>
             <button
               className="nav-link-m-left hover:text-blue-500 cursor-pointer"

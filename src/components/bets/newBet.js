@@ -73,7 +73,6 @@ const initialState = {
 const reducer = (state, action) => {
   switch (action.type) {
     case "addExpression": {
-      console.log("addexpr", state, action);
       const { isLeft, eqIdx } = action;
       const { equations } = state;
 
