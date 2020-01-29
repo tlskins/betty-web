@@ -33,11 +33,17 @@ export function Bet({ bet, onClick, setAlertMsg, profile }) {
   const [acceptBet] = useMutation(ACCEPT_BET, {
     onCompleted(data) {
       setAlertMsg("Bet Accepted!");
+    },
+    onError(error) {
+      setAlertMsg(error.message);
     }
   });
   const [rejectBet] = useMutation(ACCEPT_BET, {
     onCompleted(data) {
       setAlertMsg(`Bet ${isProposer ? "Withdrawn" : "Declined"}!`);
+    },
+    onError(error) {
+      setAlertMsg(error.message);
     }
   });
 

@@ -56,7 +56,7 @@ export function ProfileSideBar({ show, hide, profile }) {
   );
 }
 
-function ProfileForm({ profile, setAlertMsg }) {
+function ProfileForm({ profile = {}, setAlertMsg }) {
   const [name, setName] = useState(profile.name);
   const [password, setPassword] = useState(undefined);
   const [confirmation, setConfirmation] = useState(undefined);
@@ -102,6 +102,13 @@ function ProfileForm({ profile, setAlertMsg }) {
           (a, b) => toMoment(b.sentAt) - toMoment(a.sentAt)
         )
       : [];
+  const {
+    betsWon,
+    betsLost,
+    inProgressBetIds,
+    pendingYouBetIds,
+    pendingThemBetIds
+  } = profile;
 
   return (
     <div className="leading-loose">
@@ -182,6 +189,28 @@ function ProfileForm({ profile, setAlertMsg }) {
             value={confirmation}
             onChange={e => setConfirmation(e.target.value)}
           />
+        </div>
+        <div className="mt-6 p-4 bg-gray-300 font-serif text-xs">
+          <ul>
+            <li>
+              <span className="font-bold">Bets Won:</span> {betsWon}
+            </li>
+            <li>
+              <span className="font-bold">Bets Lost:</span> {betsLost}
+            </li>
+            <li>
+              <span className="font-bold">Bets In Progress:</span>{" "}
+              {inProgressBetIds.length}
+            </li>
+            <li>
+              <span className="font-bold">Bets pending your approval:</span>{" "}
+              {pendingYouBetIds.length}
+            </li>
+            <li>
+              <span className="font-bold">Bets pending their approval:</span>{" "}
+              {pendingThemBetIds.length}
+            </li>
+          </ul>
         </div>
         <div className="mt-6">
           <ul className="p-4 bg-blue-200 rounded text-xs font-sans">
