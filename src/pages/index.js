@@ -68,7 +68,10 @@ export default function Pages() {
         profile={profile}
         setProfile={setProfile}
         clickRoto={() => setShowSideBar("roto")}
-        clickProfile={() => setShowSideBar("profile")}
+        clickProfile={() => {
+          viewedProfile({ variables: { sync: false } });
+          setShowSideBar("profile");
+        }}
       />
       {profile && (
         <Fragment>
@@ -79,7 +82,7 @@ export default function Pages() {
             show={showSideBar === "profile"}
             hide={() => {
               setShowSideBar(undefined);
-              viewedProfile();
+              viewedProfile({ variables: { sync: true } });
             }}
           />
           <RotoSideBar
