@@ -153,11 +153,6 @@ const reducer = (state, action) => {
       const { equations } = state;
       const equation = equations[eqIdx];
       const { expressions } = equation;
-      const newExpr = {
-        ...expressions[exprIdx],
-        metric: undefined,
-        ...subject
-      };
 
       return {
         ...state,
@@ -167,7 +162,11 @@ const reducer = (state, action) => {
             ...equation,
             expressions: [
               ...expressions.slice(0, exprIdx),
-              newExpr,
+              {
+                ...expressions[exprIdx],
+                metric: undefined,
+                ...subject
+              },
               ...expressions.slice(exprIdx + 1)
             ]
           },
@@ -246,8 +245,10 @@ const reducer = (state, action) => {
 };
 
 const expressionComplete = expression => {
-  const { player, game, metric } = expression;
-  return !!(player && game && metric) ? true : false;
+  const { player, game, team, metric, value } = expression;
+  return value != null || (player && game && metric) || (team && game && metric)
+    ? true
+    : false;
 };
 
 const equationComplete = equation => {
@@ -283,37 +284,43 @@ export function NewBet({ setAlertMsg }) {
   );
   const [createBet] = useMutation(CREATE_BET, {
     onCompleted(data) {
-      setAlertMsg("Bet sent!");
+      // setAlertMsg("Bet sent!");
     }
   });
   const complete = betComplete({ recipient, equations });
 
   const saveBet = () => {
     const changes = {
-      equationsChanges: [],
       betRecipient: {
-        id: recipient.id,
-        twitterScreenName:
-          recipient.twitterUser && recipient.twitterUser.screenName
-      }
+        userId: recipient.id,
+        twitterScreenName: recipient?.twitterUser?.screenName
+      },
+      newEquations: equations.map(eq => {
+        return {
+          operatorId: eq.operator.id,
+          newExpressions: eq.expressions.map(exp => {
+            const newExp = { isLeft: exp.isLeft };
+            if (exp.player?.id) {
+              newExp.playerId = exp.player.id;
+            }
+            if (exp.team?.id) {
+              newExp.teamId = exp.team.id;
+            }
+            if (exp.value != null) {
+              newExp.value = exp.value;
+            }
+            if (exp.metric?.id) {
+              newExp.metricId = exp.metric.id;
+            }
+            if (exp.game?.id) {
+              newExp.gameId = exp.game.id;
+            }
+            return newExp;
+          })
+        };
+      })
     };
-    equations.forEach(eq => {
-      const eqChg = {
-        operatorId: eq.operator.id,
-        expressionChanges: []
-      };
-      eq.expressions.forEach(expr => {
-        if (expressionComplete(expr)) {
-          eqChg.expressionChanges.push({
-            isLeft: expr.isLeft,
-            playerFk: expr.player.fk,
-            gameFk: expr.game.fk,
-            metricId: expr.metric.id
-          });
-        }
-      });
-      changes.equationsChanges.push(eqChg);
-    });
+
     createBet({
       variables: { changes },
       refetchQueries: [{ query: GET_BETS }]
@@ -380,10 +387,10 @@ export function Equation({ eqIdx, equation, dispatch }) {
 
   const lastLeft = leftExpressions[leftExpressions.length - 1][0];
   const lastRight = rightExpressions[rightExpressions.length - 1][0];
-  const addLeft = expressionComplete(lastLeft) && !lastLeft.metric.leftOnly;
-  const addRight = expressionComplete(lastRight) && !lastRight.metric.leftOnly;
-  const hideRight =
-    lastLeft && lastLeft.metric && lastLeft.metric.rightExpressionValue != null;
+  const addLeft = expressionComplete(lastLeft) && !lastLeft?.metric?.leftOnly;
+  const addRight =
+    expressionComplete(lastRight) && !lastRight?.metric?.leftOnly;
+  const hideRight = lastLeft?.metric?.rightExpressionValue != null;
 
   const onSelect = operator =>
     dispatch({ type: "addOperator", operator, eqIdx });

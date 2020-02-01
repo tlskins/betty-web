@@ -69,6 +69,7 @@ export const GET_BETS = gql`
             }
             metric {
               name
+              leftOnly
             }
           }
           ... on TeamExpression {
@@ -92,6 +93,7 @@ export const GET_BETS = gql`
             }
             metric {
               name
+              leftOnly
             }
           }
         }

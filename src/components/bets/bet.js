@@ -1,12 +1,13 @@
-import React from "react";
+import React, { Fragment } from "react";
 import { useMutation } from "@apollo/react-hooks";
 import moment from "moment-timezone";
 import gql from "graphql-tag";
 
 import { GET_BETS } from "../../pages/yourBets";
 import { Operator } from "./operator";
-import { Player } from "./player";
 import { Metric } from "./metric";
+import { StaticInput } from "./static";
+import { Subject } from "./subject";
 
 const ACCEPT_BET = gql`
   mutation acceptBet($id: ID!, $accept: Boolean!) {
@@ -27,8 +28,8 @@ export function Bet({ bet, onClick, setAlertMsg, profile }) {
     proposerReplyFk,
     recipientReplyFk
   } = bet;
-  const isProposer = profile && proposer.id === profile.id;
-  const isRecipient = profile && recipient.id === profile.id;
+  const isProposer = proposer?.id === profile.id;
+  const isRecipient = recipient?.id === profile.id;
 
   const [acceptBet] = useMutation(ACCEPT_BET, {
     onCompleted(data) {
@@ -144,39 +145,56 @@ export function Bet({ bet, onClick, setAlertMsg, profile }) {
 
 export function Equation({ equation }) {
   const { operator = {}, expressions = [] } = equation;
+  const leftExpressions = expressions.filter(exp => exp.isLeft);
+  const rightExpressions = expressions.filter(exp => !exp.isLeft);
+  const lastLeft = leftExpressions[leftExpressions.length - 1];
+  console.log("lastleft", lastLeft);
+
   return (
     <div className="flex w-full">
       <div className="flex flex-col px-4 py-2 m-2 w-full">
-        {expressions &&
-          expressions
-            .filter(expr => expr.isLeft)
-            .map((expr, i) => (
+        {leftExpressions.map((expr, i) => (
+          <div key={"leftExpr" + i}>
+            <Expression expression={expr} />
+          </div>
+        ))}
+      </div>
+      {lastLeft?.leftOnly && (
+        <Fragment>
+          <Operator operator={operator} />
+          <div className="flex flex-col px-4 py-2 m-2 w-full">
+            {rightExpressions.map((expr, i) => (
               <div key={"leftExpr" + i}>
                 <Expression expression={expr} />
               </div>
             ))}
-      </div>
-      <Operator operator={operator} />
-      <div className="flex flex-col px-4 py-2 m-2 w-full">
-        {expressions &&
-          expressions
-            .filter(expr => !expr.isLeft)
-            .map((expr, i) => (
-              <div key={"leftExpr" + i}>
-                <Expression expression={expr} />
-              </div>
-            ))}
-      </div>
+          </div>
+        </Fragment>
+      )}
     </div>
   );
 }
 
 export function Expression({ expression }) {
-  const { player, game, metric } = expression;
+  const { player, game, metric, value, team } = expression;
+  const subject = player || team;
+
+  if (!subject && value != null) {
+    return (
+      <div>
+        <div className="fact-wrapper flex flex-col bg-gray-200">
+          <div className="m-1">
+            <StaticInput value={value} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
       <div className="fact-wrapper">
-        <Player player={player} game={game} />
+        <Subject subject={subject} game={game} />
         <Metric metric={metric} />
       </div>
     </div>

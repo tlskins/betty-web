@@ -146,9 +146,9 @@ export function SubjectSearch({ subject, game, onSelect }) {
 }
 
 export function Subject({ subject, game }) {
-  if (subject.__typename === "Player") {
+  if (subject?.__typename === "Player") {
     return <Player player={subject} game={game} />;
-  } else if (subject.__typename === "Team") {
+  } else if (subject?.__typename === "Team") {
     return <Team team={subject} game={game} />;
   }
 
