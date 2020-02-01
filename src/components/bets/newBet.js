@@ -375,22 +375,17 @@ export function NewBet({ setAlertMsg }) {
 
 export function Equation({ eqIdx, equation, dispatch }) {
   const { operator = {}, expressions = [] } = equation;
-  const [leftExpressions, rightExpressions] = [[], []];
-  expressions &&
-    expressions.forEach((expr, i) => {
-      if (expr.isLeft) {
-        leftExpressions.push([expr, i]);
-      } else {
-        rightExpressions.push([expr, i]);
-      }
-    });
-
-  const lastLeft = leftExpressions[leftExpressions.length - 1][0];
-  const lastRight = rightExpressions[rightExpressions.length - 1][0];
-  const addLeft = expressionComplete(lastLeft) && !lastLeft?.metric?.leftOnly;
-  const addRight =
-    expressionComplete(lastRight) && !lastRight?.metric?.leftOnly;
-  const hideRight = lastLeft?.metric?.rightExpressionValue != null;
+  const leftExpressions = expressions
+    .map((exp, i) => [exp, i])
+    .filter(expArr => expArr[0].isLeft);
+  const rightExpressions = expressions
+    .map((exp, i) => [exp, i])
+    .filter(expArr => !expArr[0].isLeft);
+  const lstLft = leftExpressions[leftExpressions.length - 1][0];
+  const lstRgt = rightExpressions[rightExpressions.length - 1][0];
+  const addLeft = expressionComplete(lstLft) && !lstLft?.metric?.leftOnly;
+  const addRight = expressionComplete(lstRgt) && !lstRgt?.metric?.leftOnly;
+  const hideRight = lstLft?.metric?.rightExpressionValue != null;
 
   const onSelect = operator =>
     dispatch({ type: "addOperator", operator, eqIdx });

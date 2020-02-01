@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, forwardRef, createRef } from "react";
 import { useLazyQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import { useThrottle } from "../../utils";
@@ -70,7 +70,8 @@ export function SubjectSearch({ subject, game, onSelect }) {
   const [search, setSearch] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const throttleSearch = useThrottle(searchSubject, 300);
-  const subjects = (data && data.searchSubjects) || [];
+  const cardRefs = useRef(new Array(10).fill(createRef()));
+  const subjects = data?.searchSubjects || [];
 
   const onChange = e => {
     const search = e.target.value;
@@ -82,7 +83,7 @@ export function SubjectSearch({ subject, game, onSelect }) {
     if (e.keyCode === 27) {
       onSearchExit(); // esc
     } else if (e.keyCode === 13 && subjects.length > 0) {
-      selectSubject(subjects[searchIdx]); // enter
+      cardRefs.current[searchIdx].current.onClick();
     } else if (e.keyCode === 40) {
       const idx = searchIdx === subjects.length - 1 ? 0 : searchIdx + 1;
       setSearchIdx(idx); // down
@@ -127,17 +128,20 @@ export function SubjectSearch({ subject, game, onSelect }) {
         </div>
         {showDropdown && (
           <ul className="dropdown-list">
-            {subjects.map((subject, i) => (
-              <div key={i}>
-                <SubjectCard
-                  subject={subject}
-                  searchIdx={searchIdx}
-                  setSearchIdx={setSearchIdx}
-                  index={i}
-                  onSelect={selectSubject}
-                />
-              </div>
-            ))}
+            {subjects.map((subject, i) => {
+              return (
+                <div key={i}>
+                  <SubjectCard
+                    subject={subject}
+                    searchIdx={searchIdx}
+                    setSearchIdx={setSearchIdx}
+                    index={i}
+                    onSelect={selectSubject}
+                    ref={cardRefs.current[i]}
+                  />
+                </div>
+              );
+            })}
           </ul>
         )}
       </button>
@@ -155,28 +159,33 @@ export function Subject({ subject, game }) {
   return null;
 }
 
-function SubjectCard({ subject, searchIdx, setSearchIdx, index, onSelect }) {
-  if (subject.__typename === "Player") {
-    return (
-      <PlayerCard
-        player={subject}
-        searchIdx={searchIdx}
-        setSearchIdx={setSearchIdx}
-        index={index}
-        onSelect={onSelect}
-      />
-    );
-  } else if (subject.__typename === "Team") {
-    return (
-      <TeamCard
-        team={subject}
-        searchIdx={searchIdx}
-        setSearchIdx={setSearchIdx}
-        index={index}
-        onSelect={onSelect}
-      />
-    );
-  }
+const SubjectCard = forwardRef(
+  ({ subject, searchIdx, setSearchIdx, index, onSelect }, ref) => {
+    console.log("subject ref", ref);
+    if (subject.__typename === "Player") {
+      return (
+        <PlayerCard
+          player={subject}
+          searchIdx={searchIdx}
+          setSearchIdx={setSearchIdx}
+          index={index}
+          onSelect={onSelect}
+          ref={ref}
+        />
+      );
+    } else if (subject.__typename === "Team") {
+      return (
+        <TeamCard
+          team={subject}
+          searchIdx={searchIdx}
+          setSearchIdx={setSearchIdx}
+          index={index}
+          onSelect={onSelect}
+          ref={ref}
+        />
+      );
+    }
 
-  return null;
-}
+    return null;
+  }
+);
