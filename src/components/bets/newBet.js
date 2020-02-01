@@ -1,13 +1,15 @@
-import React, { useReducer } from "react";
-import { useMutation } from "@apollo/react-hooks";
+import React, { useReducer, Fragment } from "react";
+import { useMutation, useApolloClient } from "@apollo/react-hooks";
 import moment from "moment-timezone";
 import gql from "graphql-tag";
 
 import { GET_BETS } from "../../pages/yourBets";
+import { GET_SETTINGS } from "../../pages/yourBets";
 import { UserSearch } from "../userSearch";
 import { OperatorSearch } from "./operator";
 import { SubjectSearch } from "./subject";
 import { MetricSelect } from "./metric";
+import { StaticInput } from "./static";
 
 const CREATE_BET = gql`
   mutation createBet($changes: NewBet!) {
@@ -146,22 +148,16 @@ const reducer = (state, action) => {
       };
     }
     case "addSubject": {
-      const { subject, eqIdx, exprIdx } = action;
+      const { eqIdx, exprIdx, type, ...subject } = action;
+
       const { equations } = state;
       const equation = equations[eqIdx];
       const { expressions } = equation;
-      let newExpr = {
+      const newExpr = {
         ...expressions[exprIdx],
-        subject: undefined,
-        metric: undefined
+        metric: undefined,
+        ...subject
       };
-      if (subject && subject.player) {
-        newExpr.player = { ...subject };
-      } else if (subject && subject.team) {
-        newExpr.team = { ...subject };
-      }
-
-      console.log("addsubject", action, newExpr);
 
       return {
         ...state,
@@ -180,23 +176,60 @@ const reducer = (state, action) => {
       };
     }
     case "addMetric": {
-      const { metric, eqIdx, exprIdx } = action;
+      const { metric, eqIdx, exprIdx, operators } = action;
       const { equations } = state;
       const equation = equations[eqIdx];
       const { expressions } = equation;
+
+      const newEq = {
+        ...equation,
+        expressions: [
+          ...expressions.slice(0, exprIdx),
+          { ...expressions[exprIdx], metric },
+          ...expressions.slice(exprIdx + 1)
+        ]
+      };
+
+      // add metric dependencies
+      if (metric && metric.operatorId) {
+        const operator = operators.find(op => op.id === metric.operatorId);
+        newEq.operator = operator;
+      }
+      if (metric && metric.rightExpressionValue != null) {
+        const firstRight = newEq.expressions.findIndex(exp => !exp.isLeft);
+        newEq.expressions = [
+          ...newEq.expressions.slice(0, firstRight),
+          {
+            ...initialExpression,
+            value: metric.rightExpressionValue,
+            isLeft: false
+          },
+          ...newEq.expressions.slice(firstRight + 1)
+        ];
+      }
+      // reverse old metric dependencies when clearing metric
+      if (!metric) {
+        const oldMetric = expressions[exprIdx].metric;
+        if (oldMetric) {
+          if (oldMetric.operatorId) {
+            newEq.operator = undefined;
+          }
+          if (oldMetric.rightExpressionValue) {
+            const firstRight = newEq.expressions.findIndex(exp => !exp.isLeft);
+            newEq.expressions = [
+              ...newEq.expressions.slice(0, firstRight),
+              { ...initialExpression, isLeft: false },
+              ...newEq.expressions.slice(firstRight + 1)
+            ];
+          }
+        }
+      }
 
       return {
         ...state,
         equations: [
           ...equations.slice(0, eqIdx),
-          {
-            ...equation,
-            expressions: [
-              ...expressions.slice(0, exprIdx),
-              { ...expressions[exprIdx], metric },
-              ...expressions.slice(exprIdx + 1)
-            ]
-          },
+          newEq,
           ...equations.slice(eqIdx + 1)
         ]
       };
@@ -326,14 +359,14 @@ export function NewBet({ setAlertMsg }) {
       {equations &&
         Object.values(equations).map((eq, i) => (
           <div key={i}>
-            <Equation eqIdx={i} equation={eq} dispatch={dispatch} focus={{}} />
+            <Equation eqIdx={i} equation={eq} dispatch={dispatch} />
           </div>
         ))}
     </div>
   );
 }
 
-export function Equation({ eqIdx, equation, dispatch, focus }) {
+export function Equation({ eqIdx, equation, dispatch }) {
   const { operator = {}, expressions = [] } = equation;
   const [leftExpressions, rightExpressions] = [[], []];
   expressions &&
@@ -345,12 +378,12 @@ export function Equation({ eqIdx, equation, dispatch, focus }) {
       }
     });
 
-  const addLeft = expressionComplete(
-    leftExpressions[leftExpressions.length - 1][0]
-  );
-  const addRight = expressionComplete(
-    rightExpressions[rightExpressions.length - 1][0]
-  );
+  const lastLeft = leftExpressions[leftExpressions.length - 1][0];
+  const lastRight = rightExpressions[rightExpressions.length - 1][0];
+  const addLeft = expressionComplete(lastLeft) && !lastLeft.metric.leftOnly;
+  const addRight = expressionComplete(lastRight) && !lastRight.metric.leftOnly;
+  const hideRight =
+    lastLeft && lastLeft.metric && lastLeft.metric.rightExpressionValue != null;
 
   const onSelect = operator =>
     dispatch({ type: "addOperator", operator, eqIdx });
@@ -367,7 +400,6 @@ export function Equation({ eqIdx, equation, dispatch, focus }) {
               exprIdx={i}
               expression={expr}
               dispatch={dispatch}
-              focus={focus && focus["l" + i]}
             />
           </div>
         ))}
@@ -382,73 +414,105 @@ export function Equation({ eqIdx, equation, dispatch, focus }) {
           </button>
         )}
       </div>
-      <OperatorSearch
-        operator={operator}
-        onSelect={onSelect}
-        onClear={onClear}
-      />
-      <div className="flex flex-col px-4 py-2 m-2 w-full">
-        {rightExpressions.map(([expr, i]) => (
-          <div key={i}>
-            <Expression
-              eqIdx={eqIdx}
-              exprIdx={i}
-              expression={expr}
-              dispatch={dispatch}
-              focus={focus && focus["r" + i]}
-            />
+      {!hideRight && (
+        <Fragment>
+          <OperatorSearch
+            operator={operator}
+            onSelect={onSelect}
+            onClear={onClear}
+          />
+          <div className="flex flex-col px-4 py-2 m-2 w-full">
+            {rightExpressions.map(([expr, i]) => (
+              <div key={i}>
+                <Expression
+                  eqIdx={eqIdx}
+                  exprIdx={i}
+                  expression={expr}
+                  dispatch={dispatch}
+                />
+              </div>
+            ))}
+            {addRight && (
+              <button
+                className="bg-indigo-800 text-white font-serif mt-2 p-2 rounded"
+                onClick={() =>
+                  dispatch({ type: "addExpression", isLeft: false, eqIdx })
+                }
+              >
+                Add Player
+              </button>
+            )}
           </div>
-        ))}
-        {addRight && (
-          <button
-            className="bg-indigo-800 text-white font-serif mt-2 p-2 rounded"
-            onClick={() =>
-              dispatch({ type: "addExpression", isLeft: false, eqIdx })
-            }
-          >
-            Add Player
-          </button>
-        )}
-      </div>
+        </Fragment>
+      )}
     </div>
   );
 }
 
 export function Expression({ eqIdx, exprIdx, expression, dispatch }) {
-  const { player, team, metric = {} } = expression;
+  const apolloClient = useApolloClient();
+  const { player, team, game, value, metric = {} } = expression;
+  const subject = player || team;
 
-  console.log("expression", expression);
+  if (!subject && value != null) {
+    const onSelect = staticValue =>
+      dispatch({
+        type: "addSubject",
+        eqIdx,
+        exprIdx,
+        value: staticValue
+      });
+    const onClear = () =>
+      dispatch({
+        type: "addSubject",
+        eqIdx,
+        exprIdx,
+        value: undefined
+      });
+
+    return (
+      <div>
+        <div className="fact-wrapper flex flex-col bg-gray-200">
+          <div className="m-1">
+            <StaticInput value={value} onSelect={onSelect} onClear={onClear} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  let data = { leagueSettings: { betEquations: [] } };
+  try {
+    data =
+      apolloClient &&
+      apolloClient.readQuery({
+        query: GET_SETTINGS,
+        variables: { id: "nfl" }
+      });
+  } catch {}
+  const operators = data.leagueSettings.betEquations;
 
   const onSelectSubject = subject =>
-    dispatch({ type: "addSubject", subject, eqIdx, exprIdx });
+    dispatch({ type: "addSubject", eqIdx, exprIdx, ...subject });
+
   const onSelectMetric = metric =>
-    dispatch({ type: "addMetric", metric, eqIdx, exprIdx });
-  const onClearSubject = () => {
-    dispatch({
-      type: "addSubject",
-      subject: undefined,
-      eqIdx,
-      exprIdx
-    });
-  };
-  const onClearMetric = () =>
-    dispatch({ type: "addMetric", metric: undefined, eqIdx, exprIdx });
+    dispatch({ type: "addMetric", eqIdx, exprIdx, operators, metric });
 
   return (
     <div>
       <div className="fact-wrapper flex flex-col bg-gray-200">
         <div className="m-1">
           <SubjectSearch
-            subject={player || team}
-            onSelect={subject => onSelectSubject(subject)}
-            onClear={onClearSubject}
+            subject={subject}
+            game={game}
+            onSelect={onSelectSubject}
           />
         </div>
         <div className="m-1">
           <MetricSelect
+            subject={subject}
             metric={metric}
             onSelect={onSelectMetric}
-            onClear={onClearMetric}
           />
         </div>
       </div>

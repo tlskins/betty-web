@@ -64,7 +64,7 @@ export const SEARCH_SUBJECT = gql`
   }
 `;
 
-export function SubjectSearch({ subject, onSelect, onClear }) {
+export function SubjectSearch({ subject, game, onSelect }) {
   const [searchSubject, { data }] = useLazyQuery(SEARCH_SUBJECT);
   const [searchIdx, setSearchIdx] = useState(0);
   const [search, setSearch] = useState("");
@@ -82,8 +82,7 @@ export function SubjectSearch({ subject, onSelect, onClear }) {
     if (e.keyCode === 27) {
       onSearchExit(); // esc
     } else if (e.keyCode === 13 && subjects.length > 0) {
-      onSelect(subjects[searchIdx]);
-      onSearchExit(); // enter
+      selectSubject(subjects[searchIdx]); // enter
     } else if (e.keyCode === 40) {
       const idx = searchIdx === subjects.length - 1 ? 0 : searchIdx + 1;
       setSearchIdx(idx); // down
@@ -109,11 +108,11 @@ export function SubjectSearch({ subject, onSelect, onClear }) {
         <ExitButton
           onClick={() => {
             onSearchExit();
-            onClear();
+            onSelect({ player: undefined, team: undefined, game: undefined });
           }}
         />
         <div className="dropdown-selection">
-          {subject && <Subject subject={subject} />}
+          {subject && <Subject subject={subject} game={game} />}
           {!subject && (
             <input
               value={search}
@@ -146,13 +145,11 @@ export function SubjectSearch({ subject, onSelect, onClear }) {
   );
 }
 
-export function Subject({ subject }) {
-  if (subject.player) {
-    const { game, player } = subject;
-    return <Player player={player} game={game} />;
-  } else if (subject.team) {
-    const { game, team } = subject;
-    return <Team team={team} game={game} />;
+export function Subject({ subject, game }) {
+  if (subject.__typename === "Player") {
+    return <Player player={subject} game={game} />;
+  } else if (subject.__typename === "Team") {
+    return <Team team={subject} game={game} />;
   }
 
   return null;

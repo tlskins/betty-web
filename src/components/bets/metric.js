@@ -13,7 +13,7 @@ export function Metric({ metric }) {
   );
 }
 
-export function MetricSelect({ metric, onSelect, onClear }) {
+export function MetricSelect({ subject, metric, onSelect }) {
   const apolloClient = useApolloClient();
   let data = { leagueSettings: { playerBets: [] } };
   try {
@@ -27,11 +27,10 @@ export function MetricSelect({ metric, onSelect, onClear }) {
   const [search, setSearch] = useState("");
   const [searchIdx, setSearchIdx] = useState(0);
   const [showDropdown, setShowDropdown] = useState(false);
-  const { name } = metric;
-  const metrics = data.leagueSettings.playerBets || [];
-  const metricsChoices = metrics.filter(metric =>
-    RegExp(search, "i").test(metric.name)
-  );
+
+  if (!subject) {
+    return null;
+  }
 
   const onChange = e => {
     const value = e.target.value;
@@ -43,8 +42,7 @@ export function MetricSelect({ metric, onSelect, onClear }) {
     if (e.keyCode === 27) {
       onSearchExit(); // esc
     } else if (e.keyCode === 13 && metrics.length > 0) {
-      onSelect(metricsChoices[searchIdx]);
-      onSearchExit(); // enter
+      selectMetric(metricsChoices[searchIdx]); // enter
     } else if (e.keyCode === 40) {
       const idx = searchIdx === lastIdx - 1 ? 0 : searchIdx + 1;
       setSearchIdx(idx); // down
@@ -55,6 +53,7 @@ export function MetricSelect({ metric, onSelect, onClear }) {
   };
 
   const selectMetric = metric => () => {
+    console.log("seelctmectric", metric);
     onSelect(metric);
     onSearchExit();
   };
@@ -69,19 +68,24 @@ export function MetricSelect({ metric, onSelect, onClear }) {
       ? "dropdown-list-item bg-gray-200"
       : "dropdown-list-item";
 
+  let metrics = [];
+  if (subject.__typename === "Player") {
+    metrics = data.leagueSettings.playerBets || [];
+  } else if (subject.__typename === "Team") {
+    metrics = data.leagueSettings.teamBets || [];
+  }
+  const metricsChoices = metrics.filter(metric =>
+    RegExp(search, "i").test(metric.name)
+  );
+
   return (
     <div className="dropdown-menu flex flex-row">
       <button className="dropdown-btn relative">
-        <ExitButton
-          onClick={() => {
-            onSearchExit();
-            onClear();
-          }}
-        />
+        <ExitButton onClick={selectMetric(undefined)} />
         <div className="dropdown-selection">
           <input
-            disabled={!!name}
-            value={search || name || ""}
+            disabled={!!metric.name}
+            value={search || metric.name || ""}
             type="text"
             placeholder="Metric"
             className="p-2 mx-5 text-sm"

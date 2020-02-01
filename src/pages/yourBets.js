@@ -114,6 +114,10 @@ export const GET_SETTINGS = gql`
       teamBets {
         id
         name
+        leftOnly
+        operatorId
+        rightExpressionValue
+        rightExpressionTypes
       }
       betEquations {
         id
