@@ -42,7 +42,7 @@
     "eslint-plugin-react-hooks": "^1.6.1",
     "file-loader": "4.3.0",
     "fs-extra": "^8.1.0",
-    "graphql": "^14.5.8",
+    "graphql": "^14.6.0",
     "graphql-tag": "^2.10.1",
     "html-webpack-plugin": "4.0.0-beta.5",
     "identity-obj-proxy": "3.0.0",
@@ -87,7 +87,8 @@
     "tailwind:css": "tailwind build src/css/tailwind.src.css -c  tailwind.js -o src/css/tailwind.css",
     "start": "yarn run tailwind:css && node scripts/start.js",
     "build": "yarn run tailwind:css && node scripts/build.js",
-    "test": "yarn run tailwind:css && node scripts/test.js"
+    "test": "yarn run tailwind:css && node scripts/test.js",
+    "generate": "graphql-codegen --config codegen.yml"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -105,6 +106,12 @@
     ]
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "^1.12.1",
+    "@graphql-codegen/fragment-matcher": "1.12.1",
+    "@graphql-codegen/introspection": "^1.12.1",
+    "@graphql-codegen/typescript": "1.12.1",
+    "@graphql-codegen/typescript-operations": "1.12.1",
+    "@graphql-codegen/typescript-react-apollo": "1.12.1",
     "css-loader": "^3.4.1",
     "style-loader": "^1.1.2"
   },

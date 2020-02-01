@@ -2,19 +2,23 @@ import React from "react";
 import ReactDOM from "react-dom";
 
 import { ApolloClient } from "apollo-client";
-import { InMemoryCache } from "apollo-cache-inmemory";
+import {
+  InMemoryCache,
+  IntrospectionFragmentMatcher
+} from "apollo-cache-inmemory";
 import { HttpLink } from "apollo-link-http";
 import { ApolloProvider } from "@apollo/react-hooks";
 import { split } from "apollo-link";
 import { WebSocketLink } from "apollo-link-ws";
 import { getMainDefinition } from "apollo-utilities";
 
-import config from "./config"
+import introspectionQueryResultData from "./graphql.schema.json";
+import config from "./config";
 import Pages from "./pages";
 import "./css/tailwind.css";
 import "./css/styles.css";
 
-config.setConfig( require( './config.json' ))
+config.setConfig(require("./config.json"));
 
 const wsLink = new WebSocketLink({
   uri: config.gqlWsUri,
@@ -39,10 +43,13 @@ const link = split(
   httpLink
 );
 
-const apolloClient = new ApolloClient({
-  link,
-  cache: new InMemoryCache()
+const fragmentMatcher = new IntrospectionFragmentMatcher({
+  introspectionQueryResultData
 });
+
+const cache = new InMemoryCache({ fragmentMatcher });
+
+const apolloClient = new ApolloClient({ link, cache });
 
 if (module.hot) {
   module.hot.accept("./pages", () => {

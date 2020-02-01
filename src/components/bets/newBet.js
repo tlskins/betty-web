@@ -6,23 +6,25 @@ import gql from "graphql-tag";
 import { GET_BETS } from "../../pages/yourBets";
 import { UserSearch } from "../userSearch";
 import { OperatorSearch } from "./operator";
-import { PlayerSearch } from "./player";
+import { SubjectSearch } from "./subject";
 import { MetricSelect } from "./metric";
 
 const CREATE_BET = gql`
-  mutation createBet($changes: BetChanges!) {
+  mutation createBet($changes: NewBet!) {
     createBet(changes: $changes) {
       id
       createdAt
+      betStatus
       proposer {
-        id
         name
         userName
       }
       recipient {
-        id
         name
         userName
+        twitterUser {
+          screenName
+        }
       }
       equations {
         id
@@ -31,18 +33,57 @@ const CREATE_BET = gql`
           name
         }
         expressions {
-          id
-          isLeft
-          player {
-            fk
-            name
+          ... on StaticExpression {
+            id
+            isLeft
+            value
           }
-          game {
-            fk
-            name
+          ... on PlayerExpression {
+            id
+            isLeft
+            value
+            player {
+              id
+              teamFk
+              leagueId
+              firstName
+              lastName
+              teamShort
+              position
+              updatedAt
+            }
+            game {
+              id
+              homeTeamFk
+              homeTeamName
+              awayTeamName
+            }
+            metric {
+              name
+            }
           }
-          metric {
-            name
+          ... on TeamExpression {
+            isLeft
+            value
+            team {
+              id
+              leagueId
+              fk
+              name
+              url
+              updatedAt
+              shortName
+              location
+            }
+            game {
+              id
+              homeTeamFk
+              homeTeamName
+              awayTeamName
+            }
+            metric {
+              name
+            }
           }
         }
       }
@@ -104,15 +145,23 @@ const reducer = (state, action) => {
         ]
       };
     }
-    case "addSource": {
-      const {
-        source: { player, game },
-        eqIdx,
-        exprIdx
-      } = action;
+    case "addSubject": {
+      const { subject, eqIdx, exprIdx } = action;
       const { equations } = state;
       const equation = equations[eqIdx];
       const { expressions } = equation;
+      let newExpr = {
+        ...expressions[exprIdx],
+        subject: undefined,
+        metric: undefined
+      };
+      if (subject && subject.player) {
+        newExpr.player = { ...subject };
+      } else if (subject && subject.team) {
+        newExpr.team = { ...subject };
+      }
+
+      console.log("addsubject", action, newExpr);
 
       return {
         ...state,
@@ -122,7 +171,7 @@ const reducer = (state, action) => {
             ...equation,
             expressions: [
               ...expressions.slice(0, exprIdx),
-              { ...expressions[exprIdx], player, game },
+              newExpr,
               ...expressions.slice(exprIdx + 1)
             ]
           },
@@ -366,15 +415,18 @@ export function Equation({ eqIdx, equation, dispatch, focus }) {
 }
 
 export function Expression({ eqIdx, exprIdx, expression, dispatch }) {
-  const { player, game, metric = {} } = expression;
-  const onSelectSource = source =>
-    dispatch({ type: "addSource", source, eqIdx, exprIdx });
+  const { player, team, metric = {} } = expression;
+
+  console.log("expression", expression);
+
+  const onSelectSubject = subject =>
+    dispatch({ type: "addSubject", subject, eqIdx, exprIdx });
   const onSelectMetric = metric =>
     dispatch({ type: "addMetric", metric, eqIdx, exprIdx });
-  const onClearSource = () => {
+  const onClearSubject = () => {
     dispatch({
-      type: "addSource",
-      source: { player: undefined, game: undefined },
+      type: "addSubject",
+      subject: undefined,
       eqIdx,
       exprIdx
     });
@@ -386,10 +438,10 @@ export function Expression({ eqIdx, exprIdx, expression, dispatch }) {
     <div>
       <div className="fact-wrapper flex flex-col bg-gray-200">
         <div className="m-1">
-          <PlayerSearch
-            playerAndGame={{ player, game }}
-            onSelect={source => onSelectSource(source)}
-            onClear={onClearSource}
+          <SubjectSearch
+            subject={player || team}
+            onSelect={subject => onSelectSubject(subject)}
+            onClear={onClearSubject}
           />
         </div>
         <div className="m-1">

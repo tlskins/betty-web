@@ -40,22 +40,57 @@ export const GET_BET = gql`
           name
         }
         expressions {
-          id
-          isLeft
-          player {
-            teamFk
-            firstName
-            lastName
-            teamShort
-            position
+          ... on StaticExpression {
+            id
+            isLeft
+            value
           }
-          game {
-            homeTeamFk
-            homeTeamName
-            awayTeamName
+          ... on PlayerExpression {
+            id
+            isLeft
+            value
+            player {
+              id
+              teamFk
+              leagueId
+              firstName
+              lastName
+              teamShort
+              position
+              updatedAt
+            }
+            game {
+              id
+              homeTeamFk
+              homeTeamName
+              awayTeamName
+            }
+            metric {
+              name
+            }
           }
-          metric {
-            name
+          ... on TeamExpression {
+            isLeft
+            value
+            team {
+              id
+              leagueId
+              fk
+              name
+              url
+              updatedAt
+              shortName
+              location
+            }
+            game {
+              id
+              homeTeamFk
+              homeTeamName
+              awayTeamName
+            }
+            metric {
+              name
+            }
           }
         }
       }

@@ -31,7 +31,7 @@ export const SEARCH_PLAYER = gql`
   }
 `;
 
-export function playerTitle(player, game) {
+function playerTitle(player, game) {
   let playerName = "";
   if (player) {
     const { firstName, lastName, teamShort, position } = player;
@@ -148,7 +148,13 @@ export function PlayerSearch({ playerAndGame, onSelect, onClear }) {
   );
 }
 
-function PlayerCard({ player, searchIdx, setSearchIdx, index, onSelect }) {
+export function PlayerCard({
+  player,
+  searchIdx,
+  setSearchIdx,
+  index,
+  onSelect
+}) {
   const { game, ...onlyPlayer } = player;
   const { id, firstName, lastName, teamShort, position, teamFk } = player;
 
