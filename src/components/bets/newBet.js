@@ -206,6 +206,18 @@ const reducer = (state, action) => {
           ...newEq.expressions.slice(firstRight + 1)
         ];
       }
+      if (metric && metric.rightExpressionTypes !== ["Static"]) {
+        const firstRight = newEq.expressions.findIndex(exp => !exp.isLeft);
+        newEq.expressions = [
+          ...newEq.expressions.slice(0, firstRight),
+          {
+            ...initialExpression,
+            value: 0,
+            isLeft: false
+          },
+          ...newEq.expressions.slice(firstRight + 1)
+        ];
+      }
       // reverse old metric dependencies when clearing metric
       if (!metric) {
         const oldMetric = expressions[exprIdx].metric;
@@ -384,7 +396,7 @@ export function Equation({ eqIdx, equation, dispatch }) {
   const lstLft = leftExpressions[leftExpressions.length - 1][0];
   const lstRgt = rightExpressions[rightExpressions.length - 1][0];
   const addLeft = expressionComplete(lstLft) && !lstLft?.metric?.leftOnly;
-  const addRight = expressionComplete(lstRgt) && !lstRgt?.metric?.leftOnly;
+  const addRight = expressionComplete(lstRgt) && !lstLft?.metric?.leftOnly;
   const hideRight = lstLft?.metric?.rightExpressionValue != null;
 
   const onSelect = operator =>

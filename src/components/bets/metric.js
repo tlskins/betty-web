@@ -42,7 +42,7 @@ export function MetricSelect({ subject, metric, onSelect }) {
     if (e.keyCode === 27) {
       onSearchExit(); // esc
     } else if (e.keyCode === 13 && metrics.length > 0) {
-      selectMetric(metricsChoices[searchIdx]); // enter
+      selectMetric(metricsChoices[searchIdx])(); // enter
     } else if (e.keyCode === 40) {
       const idx = searchIdx === lastIdx - 1 ? 0 : searchIdx + 1;
       setSearchIdx(idx); // down
@@ -53,7 +53,6 @@ export function MetricSelect({ subject, metric, onSelect }) {
   };
 
   const selectMetric = metric => () => {
-    console.log("seelctmectric", metric);
     onSelect(metric);
     onSearchExit();
   };

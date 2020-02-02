@@ -26,7 +26,6 @@ export function StaticInput({ value, onSelect, onClear }) {
           <input
             value={value || stateValue}
             type="text"
-            disabled={value != null}
             placeholder="Value"
             className="p-2 mx-5 text-xs"
             onChange={onChange}
