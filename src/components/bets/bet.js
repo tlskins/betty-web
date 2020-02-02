@@ -22,6 +22,7 @@ export function Bet({ bet, onClick, setAlertMsg, profile }) {
     finalizedAt,
     expiresAt,
     betStatus,
+    betResult,
     equations,
     proposer,
     recipient,
@@ -101,6 +102,14 @@ export function Bet({ bet, onClick, setAlertMsg, profile }) {
     <div id="bet" className={betClass} onClick={onClick}>
       <div className="section-title-wrapper">
         <h1 className="section-title">{title}</h1>
+        {betResult && (
+          <div className="flex flex-col text-center rounded bg-green-200 border border-black p-6 m-6">
+            <div className="section-subject font-extrabold font-lg">
+              Congrats {betResult.winner.getName}
+            </div>
+            <div className="section-subject font-xs">{betResult.response}</div>
+          </div>
+        )}
         <div className={statusClass}>Status: {betStatus}</div>
         <div>
           {acceptable && (
@@ -148,7 +157,6 @@ export function Equation({ equation }) {
   const leftExpressions = expressions.filter(exp => exp.isLeft);
   const rightExpressions = expressions.filter(exp => !exp.isLeft);
   const lastLeft = leftExpressions[leftExpressions.length - 1];
-  console.log("lastleft", lastLeft);
 
   return (
     <div className="flex w-full">
@@ -159,12 +167,12 @@ export function Equation({ equation }) {
           </div>
         ))}
       </div>
-      {lastLeft?.leftOnly && (
+      {!lastLeft?.rightExpressionValue && (
         <Fragment>
           <Operator operator={operator} />
           <div className="flex flex-col px-4 py-2 m-2 w-full">
             {rightExpressions.map((expr, i) => (
-              <div key={"leftExpr" + i}>
+              <div key={"rightExpr" + i}>
                 <Expression expression={expr} />
               </div>
             ))}
@@ -184,7 +192,7 @@ export function Expression({ expression }) {
       <div>
         <div className="fact-wrapper flex flex-col bg-gray-200">
           <div className="m-1">
-            <StaticInput value={value} />
+            <StaticInput value={value} disabled={true} />
           </div>
         </div>
       </div>

@@ -206,7 +206,7 @@ const reducer = (state, action) => {
           ...newEq.expressions.slice(firstRight + 1)
         ];
       }
-      if (metric && metric.rightExpressionTypes !== ["Static"]) {
+      if (metric && metric.rightExpressionTypes?.includes("Static")) {
         const firstRight = newEq.expressions.findIndex(exp => !exp.isLeft);
         newEq.expressions = [
           ...newEq.expressions.slice(0, firstRight),

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { ExitButton } from "../exitButton";
 
-export function StaticInput({ value, onSelect, onClear }) {
+export function StaticInput({ value, onSelect, onClear, disabled }) {
   const [stateValue, setValue] = useState(0);
 
   const onChange = e => {
@@ -21,10 +21,11 @@ export function StaticInput({ value, onSelect, onClear }) {
   return (
     <div className="dropdown-menu flex flex-row">
       <button className="dropdown-btn relative">
-        <ExitButton onClick={onClear} />
+        {!disabled && <ExitButton onClick={onClear} />}
         <div className="dropdown-selection">
           <input
             value={value || stateValue}
+            disabled={disabled}
             type="text"
             placeholder="Value"
             className="p-2 mx-5 text-xs"

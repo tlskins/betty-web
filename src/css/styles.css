@@ -379,6 +379,17 @@
   /* padding: 4px; */
 }
 
+.section-subject {
+  box-sizing: border-box;
+  /* font-weight: normal; */
+  /* font-size: 10px; */
+  font-family: Plain;
+  line-height: 1.5;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgb(119, 119, 119);
+}
+
 .fact-section {
   font-family: GT-Sectra-Book, GT-Sectra-Regular, serif;
   color: rgb(11, 11, 11);

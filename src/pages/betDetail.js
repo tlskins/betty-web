@@ -33,6 +33,21 @@ export const GET_BET = gql`
           screenName
         }
       }
+      betResult {
+        response
+        responseFk
+        decidedAt
+        winner {
+          name
+          userName
+          getName
+        }
+        loser {
+          name
+          userName
+          getName
+        }
+      }
       equations {
         id
         operator {
@@ -92,6 +107,7 @@ export const GET_BET = gql`
             metric {
               name
               leftOnly
+              rightExpressionValue
             }
           }
         }

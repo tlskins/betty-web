@@ -161,7 +161,6 @@ export function Subject({ subject, game }) {
 
 const SubjectCard = forwardRef(
   ({ subject, searchIdx, setSearchIdx, index, onSelect }, ref) => {
-    console.log("subject ref", ref);
     if (subject.__typename === "Player") {
       return (
         <PlayerCard
