@@ -29,8 +29,8 @@ export function Bet({ bet, onClick, setAlertMsg, profile }) {
     proposerReplyFk,
     recipientReplyFk
   } = bet;
-  const isProposer = proposer?.id === profile.id;
-  const isRecipient = recipient?.id === profile.id;
+  const isProposer = profile && proposer?.id === profile?.id;
+  const isRecipient = profile && recipient?.id === profile?.id;
 
   const [acceptBet] = useMutation(ACCEPT_BET, {
     onCompleted(data) {
