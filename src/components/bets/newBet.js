@@ -107,6 +107,7 @@ const initialEquation = {
 };
 
 const initialState = {
+  leagueId: undefined,
   recipient: undefined,
   equations: [{ ...initialEquation }]
 };
@@ -154,6 +155,7 @@ const reducer = (state, action) => {
 
       return {
         ...state,
+        leagueId: subject?.game?.leagueId,
         equations: [
           ...equations.slice(0, eqIdx),
           {
@@ -288,7 +290,7 @@ const betComplete = bet => {
 };
 
 export function NewBet({ setAlertMsg }) {
-  const [{ recipient, equations }, dispatch] = useReducer(
+  const [{ recipient, equations, leagueId }, dispatch] = useReducer(
     reducer,
     initialState
   );
@@ -299,8 +301,11 @@ export function NewBet({ setAlertMsg }) {
   });
   const complete = betComplete({ recipient, equations });
 
+  console.log("leagueId", leagueId);
+
   const saveBet = () => {
     const changes = {
+      leagueId,
       betRecipient: {
         userId: recipient.id,
         twitterScreenName: recipient?.twitterUser?.screenName

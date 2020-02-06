@@ -1,13 +1,13 @@
 import React from "react";
 import { useQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
-import { Carousel } from "./carousel";
+import { GamesCarousel } from "./carousel";
 
 export const CURRENT_GAMES = gql`
   query currentGames {
     currentGames {
-      __typename
       id
+      leagueId
       fk
       name
       awayTeamFk
@@ -23,12 +23,12 @@ export const CURRENT_GAMES = gql`
 
 export function CurrentGames() {
   const { data } = useQuery(CURRENT_GAMES);
+  const games = data?.currentGames || [];
 
   return (
     <div className="fact-section">
       <div className="section-title-wrapper">
-        <h1 className="section-title mb-10">Current Games</h1>
-        <Carousel items={data && data.currentGames} />
+        <GamesCarousel games={games} />
       </div>
     </div>
   );

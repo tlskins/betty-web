@@ -1,4 +1,10 @@
-import React, { useState, useRef, forwardRef, createRef } from "react";
+import React, {
+  useState,
+  useRef,
+  forwardRef,
+  createRef,
+  useEffect
+} from "react";
 import { useLazyQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import { useThrottle } from "../../utils";
@@ -20,6 +26,7 @@ export const SEARCH_SUBJECT = gql`
         game {
           id
           fk
+          leagueId
           name
           awayTeamFk
           awayTeamName
@@ -45,6 +52,7 @@ export const SEARCH_SUBJECT = gql`
         game {
           id
           fk
+          leagueId
           name
           awayTeamFk
           awayTeamName
@@ -66,8 +74,12 @@ export function SubjectSearch({ subject, game, onSelect }) {
   const [search, setSearch] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const throttleSearch = useThrottle(searchSubject, 300);
-  const cardRefs = useRef(new Array(10).fill(createRef()));
+  const cardRefs = useRef([]);
   const subjects = data?.searchSubjects || [];
+
+  useEffect(() => {
+    cardRefs.current = cardRefs.current.slice(0, subjects.length);
+  }, [subjects]);
 
   const onChange = e => {
     const search = e.target.value;
@@ -125,6 +137,7 @@ export function SubjectSearch({ subject, game, onSelect }) {
         {showDropdown && (
           <ul className="dropdown-list">
             {subjects.map((subject, i) => {
+              cardRefs.current[i] = createRef();
               return (
                 <div key={i}>
                   <SubjectCard
