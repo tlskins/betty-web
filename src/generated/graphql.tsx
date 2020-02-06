@@ -32,6 +32,12 @@ export type BetMap = {
    __typename?: 'BetMap',
   id: Scalars['Int'],
   name: Scalars['String'],
+  field: Scalars['String'],
+  type: Scalars['String'],
+  leftOnly: Scalars['Boolean'],
+  operatorId?: Maybe<Scalars['Int']>,
+  rightExpressionValue?: Maybe<Scalars['Float']>,
+  rightExpressionTypes?: Maybe<Array<Scalars['String']>>,
 };
 
 export type BetRecipient = {
@@ -78,9 +84,6 @@ export type Game = {
   homeTeamName?: Maybe<Scalars['String']>,
   gameTime?: Maybe<Scalars['Timestamp']>,
   gameResultsAt?: Maybe<Scalars['Timestamp']>,
-  final?: Maybe<Scalars['Boolean']>,
-  week?: Maybe<Scalars['Int']>,
-  year?: Maybe<Scalars['Int']>,
 };
 
 export type IndexUser = {
@@ -89,16 +92,7 @@ export type IndexUser = {
   name?: Maybe<Scalars['String']>,
   userName: Scalars['String'],
   twitterUser?: Maybe<TwitterUser>,
-};
-
-export type LeagueSettings = {
-   __typename?: 'LeagueSettings',
-  id: Scalars['String'],
-  currentYear: Scalars['Int'],
-  currentWeek: Scalars['Int'],
-  playerBets: Array<Maybe<BetMap>>,
-  teamBets: Array<Maybe<BetMap>>,
-  betEquations: Array<Maybe<BetMap>>,
+  getName: Scalars['String'],
 };
 
 export type Mutation = {
@@ -133,6 +127,7 @@ export type MutationAcceptBetArgs = {
 };
 
 export type NewBet = {
+  leagueId: Scalars['String'],
   betRecipient: BetRecipient,
   newEquations: Array<Maybe<NewEquation>>,
 };
@@ -143,8 +138,6 @@ export type NewEquation = {
 };
 
 export type NewExpression = {
-  id: Scalars['Int'],
-  type: Scalars['String'],
   isLeft: Scalars['Boolean'],
   playerId?: Maybe<Scalars['String']>,
   gameId?: Maybe<Scalars['String']>,
@@ -175,7 +168,6 @@ export type Player = Subject & {
   lastName: Scalars['String'],
   teamFk?: Maybe<Scalars['String']>,
   teamName?: Maybe<Scalars['String']>,
-  teamShort?: Maybe<Scalars['String']>,
   position?: Maybe<Scalars['String']>,
 };
 
@@ -198,7 +190,6 @@ export type ProfileChanges = {
 export type Query = {
    __typename?: 'Query',
   signIn: User,
-  leagueSettings: LeagueSettings,
   currentBets: Array<Bet>,
   bets: Array<Bet>,
   bet?: Maybe<Bet>,
@@ -208,17 +199,13 @@ export type Query = {
   findPlayers: Array<Maybe<Player>>,
   findUsers: Array<Maybe<User>>,
   searchSubjects: Array<Maybe<SubjectUnion>>,
+  getBetMaps: Array<Maybe<BetMap>>,
 };
 
 
 export type QuerySignInArgs = {
   userName: Scalars['String'],
   password: Scalars['String']
-};
-
-
-export type QueryLeagueSettingsArgs = {
-  id: Scalars['String']
 };
 
 
@@ -254,6 +241,12 @@ export type QueryFindUsersArgs = {
 
 export type QuerySearchSubjectsArgs = {
   search: Scalars['String']
+};
+
+
+export type QueryGetBetMapsArgs = {
+  leagueId?: Maybe<Scalars['String']>,
+  betType?: Maybe<Scalars['String']>
 };
 
 export type RotoArticle = {
@@ -301,7 +294,6 @@ export type Team = Subject & {
   url: Scalars['String'],
   updatedAt?: Maybe<Scalars['Timestamp']>,
   game?: Maybe<Game>,
-  shortName: Scalars['String'],
   location: Scalars['String'],
 };
 
@@ -363,13 +355,13 @@ export type User = {
         "name": "Expression",
         "possibleTypes": [
           {
-            "name": "PlayerExpression"
+            "name": "StaticExpression"
           },
           {
             "name": "TeamExpression"
           },
           {
-            "name": "StaticExpression"
+            "name": "PlayerExpression"
           }
         ]
       },
