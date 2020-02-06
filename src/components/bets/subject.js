@@ -21,7 +21,6 @@ export const SEARCH_SUBJECT = gql`
           id
           fk
           name
-          week
           awayTeamFk
           awayTeamName
           homeTeamFk
@@ -34,7 +33,6 @@ export const SEARCH_SUBJECT = gql`
         lastName
         teamFk
         teamName
-        teamShort
         position
       }
       ... on Team {
@@ -48,7 +46,6 @@ export const SEARCH_SUBJECT = gql`
           id
           fk
           name
-          week
           awayTeamFk
           awayTeamName
           homeTeamFk
@@ -57,7 +54,6 @@ export const SEARCH_SUBJECT = gql`
           gameResultsAt
           url
         }
-        shortName
         location
       }
     }
@@ -118,7 +114,7 @@ export function SubjectSearch({ subject, game, onSelect }) {
             <input
               value={search}
               type="text"
-              placeholder="NFL Player / Team"
+              placeholder="Player / Team"
               className="p-2 mx-5 text-xs"
               onChange={onChange}
               onKeyDown={onKeyDown}

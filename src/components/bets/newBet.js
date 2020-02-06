@@ -50,7 +50,6 @@ const CREATE_BET = gql`
               leagueId
               firstName
               lastName
-              teamShort
               position
               updatedAt
             }
@@ -74,7 +73,6 @@ const CREATE_BET = gql`
               name
               url
               updatedAt
-              shortName
               location
             }
             game {

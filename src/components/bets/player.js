@@ -1,12 +1,10 @@
 import React, { forwardRef, useRef, useImperativeHandle } from "react";
-import ListItemAvatar from "@material-ui/core/ListItemAvatar";
-import Avatar from "@material-ui/core/Avatar";
 
 export function Player({ player, game }) {
   let playerName = "";
   if (player) {
-    const { firstName, lastName, teamShort, position } = player;
-    playerName = `${firstName[0]}.${lastName} (${teamShort}-${position})`;
+    const { firstName, lastName, position, teamFk } = player;
+    playerName = `${firstName[0]}.${lastName} (${teamFk}-${position})`;
   }
 
   let vsTeam = "";
@@ -33,7 +31,7 @@ export function Player({ player, game }) {
 export const PlayerCard = forwardRef(
   ({ player, searchIdx, setSearchIdx, index, onSelect }, ref) => {
     const { game, ...onlyPlayer } = player;
-    const { id, firstName, lastName, teamShort, position, teamFk } = player;
+    const { id, firstName, lastName, position, teamFk } = player;
 
     let vsTeam = "No Game";
     if (game) {
@@ -65,16 +63,8 @@ export const PlayerCard = forwardRef(
         ref={inputRef}
       >
         <div className="dropdown-list-item-text flex flex-row">
-          <div>
-            <ListItemAvatar>
-              <Avatar
-                alt={firstName + lastName}
-                src={`https://d395i9ljze9h3x.cloudfront.net/req/20180910/images/headshots/${id}_2018.jpg`}
-              />
-            </ListItemAvatar>
-          </div>
           <div className="flex flex-col">
-            {firstName[0]}.{lastName} ({teamShort}-{position})
+            {firstName[0]}.{lastName} ({teamFk}-{position})
             <br />
             {vsTeam}
           </div>
