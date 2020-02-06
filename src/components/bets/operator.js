@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { useApolloClient } from "@apollo/react-hooks";
+import { useApolloClient, useQuery } from "@apollo/react-hooks";
 
-import { GET_SETTINGS } from "../../pages/yourBets";
+import { GET_BET_MAPS } from "../../components/bets/metric";
 import { ExitButton } from "../exitButton";
 
 export function Operator({ operator }) {
@@ -15,21 +15,14 @@ export function Operator({ operator }) {
 }
 
 export function OperatorSearch({ operator, onSelect, onClear }) {
-  const apolloClient = useApolloClient();
-  let data = { leagueSettings: { betEquations: [] } };
-  try {
-    data =
-      apolloClient &&
-      apolloClient.readQuery({
-        query: GET_SETTINGS,
-        variables: { id: "nfl" }
-      });
-  } catch {}
+  const { data } = useQuery(GET_BET_MAPS, {
+    variables: { betType: "Operator" }
+  });
   const [search, setSearch] = useState("");
   const [searchIdx, setSearchIdx] = useState(0);
   const [showDropdown, setShowDropdown] = useState(false);
   const { name } = operator;
-  const operators = data.leagueSettings.betEquations || [];
+  const operators = data?.getBetMaps || [];
   const opChoices = operators.filter(operator =>
     RegExp(search, "i").test(operator.name)
   );

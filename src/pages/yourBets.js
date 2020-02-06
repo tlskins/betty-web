@@ -117,38 +117,8 @@ export const GET_BETS = gql`
   }
 `;
 
-export const GET_SETTINGS = gql`
-  query getSettings($id: String!) {
-    leagueSettings(id: $id) {
-      __typename
-      id
-      currentYear
-      currentWeek
-      playerBets {
-        id
-        name
-      }
-      teamBets {
-        id
-        name
-        leftOnly
-        operatorId
-        rightExpressionValue
-        rightExpressionTypes
-      }
-      betEquations {
-        id
-        name
-      }
-    }
-  }
-`;
-
 export function YourBets({ profile, setAlertMsg }) {
   const [redirectTo, setRedirectTo] = useState(undefined);
-  useQuery(GET_SETTINGS, {
-    variables: { id: "nfl" }
-  });
   const { error, data } = useQuery(GET_BETS);
 
   if (error) {

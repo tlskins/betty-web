@@ -4,7 +4,6 @@ import gql from "graphql-tag";
 import "typeface-roboto";
 
 import { Bet } from "../components/bets/bet";
-import { GET_SETTINGS } from "./yourBets";
 import { RegistrationDetails } from "./signIn";
 
 export const GET_BET = gql`
@@ -117,9 +116,6 @@ export const GET_BET = gql`
 `;
 
 export function BetDetail({ profile, setAlertMsg, betId }) {
-  useQuery(GET_SETTINGS, {
-    variables: { id: "nfl" }
-  });
   const { data } = useQuery(GET_BET, {
     variables: { id: betId }
   });

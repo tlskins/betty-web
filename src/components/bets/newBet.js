@@ -1,10 +1,10 @@
 import React, { useReducer, Fragment } from "react";
-import { useMutation, useApolloClient } from "@apollo/react-hooks";
+import { useMutation, useQuery } from "@apollo/react-hooks";
 import moment from "moment-timezone";
 import gql from "graphql-tag";
 
 import { GET_BETS } from "../../pages/yourBets";
-import { GET_SETTINGS } from "../../pages/yourBets";
+import { GET_BET_MAPS } from "../../components/bets/metric";
 import { UserSearch } from "../userSearch";
 import { OperatorSearch } from "./operator";
 import { SubjectSearch } from "./subject";
@@ -464,9 +464,12 @@ export function Equation({ eqIdx, equation, dispatch }) {
 }
 
 export function Expression({ eqIdx, exprIdx, expression, dispatch }) {
-  const apolloClient = useApolloClient();
+  const { data } = useQuery(GET_BET_MAPS, {
+    variables: { betType: "Operator" }
+  });
   const { player, team, game, value, metric = {} } = expression;
   const subject = player || team;
+  const operators = data?.getBetMaps || [];
 
   if (!subject && value != null) {
     const onSelect = staticValue =>
@@ -494,17 +497,6 @@ export function Expression({ eqIdx, exprIdx, expression, dispatch }) {
       </div>
     );
   }
-
-  let data = { leagueSettings: { betEquations: [] } };
-  try {
-    data =
-      apolloClient &&
-      apolloClient.readQuery({
-        query: GET_SETTINGS,
-        variables: { id: "nfl" }
-      });
-  } catch {}
-  const operators = data.leagueSettings.betEquations;
 
   const onSelectSubject = subject =>
     dispatch({ type: "addSubject", eqIdx, exprIdx, ...subject });

@@ -1,8 +1,18 @@
 import React, { useState } from "react";
-import { useApolloClient } from "@apollo/react-hooks";
+import { useQuery } from "@apollo/react-hooks";
+import gql from "graphql-tag";
 
-import { GET_SETTINGS } from "../../pages/yourBets";
 import { ExitButton } from "../exitButton";
+
+export const GET_BET_MAPS = gql`
+  query getBetMaps($leagueId: String!) {
+    getBetMaps(leagueId: $leagueId) {
+      id
+      name
+      type
+    }
+  }
+`;
 
 export function Metric({ metric }) {
   const { name } = metric || { name: "?" };
@@ -13,17 +23,9 @@ export function Metric({ metric }) {
   );
 }
 
-export function MetricSelect({ subject, metric, onSelect }) {
-  const apolloClient = useApolloClient();
-  let data = { leagueSettings: { playerBets: [] } };
-  try {
-    data =
-      apolloClient &&
-      apolloClient.readQuery({
-        query: GET_SETTINGS,
-        variables: { id: "nfl" }
-      });
-  } catch {}
+export function MetricSelect({ subject = {}, metric, onSelect }) {
+  const { leagueId } = subject;
+  const { data } = useQuery(GET_BET_MAPS, { variables: { leagueId } });
   const [search, setSearch] = useState("");
   const [searchIdx, setSearchIdx] = useState(0);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -69,9 +71,9 @@ export function MetricSelect({ subject, metric, onSelect }) {
 
   let metrics = [];
   if (subject.__typename === "Player") {
-    metrics = data.leagueSettings.playerBets || [];
+    metrics = data?.getBetMaps?.filter(b => b.type === "PlayerMetric") || [];
   } else if (subject.__typename === "Team") {
-    metrics = data.leagueSettings.teamBets || [];
+    metrics = data?.getBetMaps?.filter(b => b.type === "TeamMetric") || [];
   }
   const metricsChoices = metrics.filter(metric =>
     RegExp(search, "i").test(metric.name)

@@ -67,7 +67,6 @@ export const BROWSE_BETS = gql`
               leagueId
               firstName
               lastName
-              teamShort
               position
               updatedAt
             }
@@ -92,7 +91,6 @@ export const BROWSE_BETS = gql`
               name
               url
               updatedAt
-              shortName
               location
             }
             game {
