@@ -13,6 +13,8 @@ export const BROWSE_BETS = gql`
     currentBets {
       id
       createdAt
+      finalizedAt
+      expiresAt
       betStatus
       proposer {
         id
