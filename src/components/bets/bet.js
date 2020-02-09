@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React from "react";
 import { useMutation } from "@apollo/react-hooks";
 import moment from "moment-timezone";
 import gql from "graphql-tag";
@@ -8,12 +8,6 @@ import { Operator } from "./operator";
 import { Metric } from "./metric";
 import { StaticInput } from "./static";
 import { Subject } from "./subject";
-
-const ACCEPT_BET = gql`
-  mutation acceptBet($id: ID!, $accept: Boolean!) {
-    acceptBet(id: $id, accept: $accept)
-  }
-`;
 
 export function Bet({ bet, onClick, setAlertMsg, profile }) {
   const {
@@ -214,3 +208,9 @@ export function Expression({ expression }) {
     </div>
   );
 }
+
+const ACCEPT_BET = gql`
+  mutation acceptBet($id: ID!, $accept: Boolean!) {
+    acceptBet(id: $id, accept: $accept)
+  }
+`;

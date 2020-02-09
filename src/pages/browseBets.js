@@ -7,6 +7,7 @@ import gql from "graphql-tag";
 import { CurrentGames } from "../components/currentGames";
 import { Bet } from "../components/bets/bet";
 import { FilterButton } from "../components/filterButton";
+import BetFrags from "../fragments/bet";
 
 export function BrowseBets({ profile }) {
   const [redirectTo, setRedirectTo] = useState(undefined);
@@ -68,103 +69,8 @@ export function BrowseBets({ profile }) {
 export const BROWSE_BETS = gql`
   query {
     currentBets {
-      id
-      createdAt
-      finalizedAt
-      expiresAt
-      betStatus
-      proposer {
-        id
-        name
-        userName
-        twitterUser {
-          screenName
-        }
-      }
-      recipient {
-        id
-        name
-        userName
-        twitterUser {
-          screenName
-        }
-      }
-      betResult {
-        response
-        responseFk
-        decidedAt
-        winner {
-          name
-          userName
-          getName
-        }
-        loser {
-          name
-          userName
-          getName
-        }
-      }
-      equations {
-        id
-        operator {
-          id
-          name
-        }
-        expressions {
-          ... on StaticExpression {
-            id
-            isLeft
-            value
-          }
-          ... on PlayerExpression {
-            id
-            isLeft
-            value
-            player {
-              id
-              teamFk
-              leagueId
-              firstName
-              lastName
-              position
-              updatedAt
-            }
-            game {
-              id
-              homeTeamFk
-              homeTeamName
-              awayTeamName
-            }
-            metric {
-              name
-              leftOnly
-            }
-          }
-          ... on TeamExpression {
-            isLeft
-            value
-            team {
-              id
-              leagueId
-              fk
-              name
-              url
-              updatedAt
-              location
-            }
-            game {
-              id
-              homeTeamFk
-              homeTeamName
-              awayTeamName
-            }
-            metric {
-              name
-              leftOnly
-            }
-          }
-        }
-      }
+      ...BetDetail
     }
   }
+  ${BetFrags.fragments.bet}
 `;
