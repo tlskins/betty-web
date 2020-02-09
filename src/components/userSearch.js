@@ -4,20 +4,7 @@ import gql from "graphql-tag";
 import { useThrottle } from "../utils";
 import { ExitButton } from "./exitButton";
 
-export const FIND_USERS = gql`
-  query findUsers($search: String!) {
-    findUsers(search: $search) {
-      id
-      userName
-      name
-      twitterUser {
-        idStr
-        screenName
-        name
-      }
-    }
-  }
-`;
+var publicBetOption = { id: "-1", userName: "*Public Bet" };
 
 export function UserSearch({ value, onSelect, onClear }) {
   let [execute, { data }] = useLazyQuery(FIND_USERS);
@@ -25,11 +12,14 @@ export function UserSearch({ value, onSelect, onClear }) {
   const [search, setSearch] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const onSearch = useThrottle(execute, 300);
-  let users = (data && data.findUsers) || [];
-  if (search && search.charAt(0) === "@") {
+
+  let users = data?.findUsers || [];
+  if (search?.charAt(0) === "@") {
     users = [{ twitterUser: { screenName: search.replace("@", "") } }].concat(
       users
     );
+  } else {
+    users = [publicBetOption].concat(users);
   }
 
   const onChange = e => {
@@ -88,33 +78,67 @@ export function UserSearch({ value, onSelect, onClear }) {
         </div>
         {showDropdown && (
           <ul className="dropdown-list">
-            {users.map((user, i) => {
-              const { id, userName, twitterUser = {} } = user;
-              const { screenName } = twitterUser;
-              const className =
-                searchIdx === i
-                  ? "dropdown-list-item bg-gray-200"
-                  : "dropdown-list-item";
-              return (
-                <div
-                  key={id + i}
-                  className={className}
-                  onClick={selectUser(user)}
-                  onMouseEnter={() => setSearchIdx(i)}
-                >
-                  <div className="dropdown-list-item-text flex flex-row">
-                    <div className="flex flex-col">
-                      {id ? `${userName} (betty)` : "*No betty account"}
-                      <br />
-                      {screenName && `Twitter: @${screenName.replace("@", "")}`}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+            {users.map((user, idx) => (
+              <UserCard
+                key={idx}
+                user={user}
+                searchIdx={searchIdx}
+                idx={idx}
+                selectUser={selectUser}
+                setSearchIdx={setSearchIdx}
+              />
+            ))}
           </ul>
         )}
       </div>
     </div>
   );
 }
+
+function UserCard({ user, searchIdx, idx, selectUser, setSearchIdx }) {
+  const { id, userName, twitterUser = {} } = user;
+  const { screenName } = twitterUser;
+
+  const bkgCol = id === "-1" ? "bg-indigo-" : "bg-gray-";
+  const bkgDrk = searchIdx === idx ? "800" : "200";
+  const bkg = bkgCol + bkgDrk;
+  const fontCol = searchIdx === idx ? "text-white" : "text-black";
+
+  let title = "*No betty account";
+  if (id === "-1") {
+    title = user.userName;
+  } else {
+    title = `${userName} (betty)`;
+  }
+
+  return (
+    <div
+      className={`dropdown-list-item ${bkg} ${fontCol}`}
+      onClick={selectUser(user)}
+      onMouseEnter={() => setSearchIdx(idx)}
+    >
+      <div className="dropdown-list-item-text font-semibold flex flex-row">
+        <div className="flex flex-col">
+          {title}
+          <br />
+          {screenName && `Twitter: @${screenName.replace("@", "")}`}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export const FIND_USERS = gql`
+  query findUsers($search: String!) {
+    findUsers(search: $search) {
+      id
+      userName
+      name
+      twitterUser {
+        idStr
+        screenName
+        name
+      }
+    }
+  }
+`;

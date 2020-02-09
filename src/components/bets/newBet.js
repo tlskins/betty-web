@@ -30,10 +30,6 @@ export function NewBet({ setAlertMsg }) {
   const saveBet = () => {
     const changes = {
       leagueId,
-      betRecipient: {
-        userId: recipient.id,
-        twitterScreenName: recipient?.twitterUser?.screenName
-      },
       newEquations: equations.map(eq => {
         return {
           operatorId: eq.operator.id,
@@ -59,6 +55,13 @@ export function NewBet({ setAlertMsg }) {
         };
       })
     };
+
+    if (recipient && recipient.id !== "-1") {
+      changes.betRecipient = {
+        userId: recipient.id,
+        twitterScreenName: recipient.twitterUser?.screenName
+      };
+    }
 
     createBet({
       variables: { changes },
@@ -92,17 +95,17 @@ export function NewBet({ setAlertMsg }) {
           {moment().format("MMMM Do YYYY, h:mm:ss a")}
         </p>
         {complete && (
-          <p
-            className="section-subtitle underline hover:text-blue-500 cursor-pointer"
+          <div
+            className="underline cursor-pointer my-4 rounded bg-indigo-800 text-white shadow-md px-8 py-2"
             onClick={saveBet}
           >
             Propose
-          </p>
+          </div>
         )}
       </div>
       <div>
         {eqArray.map((eq, i) => (
-          <Equation eqIdx={i} equation={eq} dispatch={dispatch} />
+          <Equation key={i} eqIdx={i} equation={eq} dispatch={dispatch} />
         ))}
       </div>
     </div>
@@ -180,7 +183,7 @@ export function Equation({ eqIdx, equation, dispatch }) {
               ))}
               {addRight && (
                 <button
-                  className="bg-indigo-800 text-white font-serif mt-2 p-2 rounded"
+                  className="bg-indigo-800 text-white font-serif mt-2 p-2 rounded w-full"
                   onClick={() =>
                     dispatch({ type: "addExpression", isLeft: false, eqIdx })
                   }

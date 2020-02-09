@@ -124,7 +124,7 @@ export function Bet({ bet, onClick, setAlertMsg, profile }) {
           {rejectable && (
             <button
               id="reject-btn"
-              className="section-subtitle hover:text-blue-500 bg-red-200 rounded border border-black p-1 mx-3"
+              className="section-subtitle hover:text-blue-500 bg-red-200 rounded border border-black p-1 mx-3 my-4"
               onClick={onDecline}
             >
               {isProposer ? "Withdraw" : "Decline"}

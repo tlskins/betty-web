@@ -5,35 +5,6 @@ import gql from "graphql-tag";
 import { Alert } from "../components/alert";
 import { toMoment } from "../utils";
 
-export const UPDATE_USER = gql`
-  mutation updateUser($changes: ProfileChanges!) {
-    updateUser(changes: $changes) {
-      id
-      name
-      userName
-      email
-      viewedProfileLast
-      betsWon
-      betsLost
-      inProgressBetIds
-      pendingYouBetIds
-      pendingThemBetIds
-      twitterUser {
-        idStr
-        screenName
-        name
-      }
-      notifications {
-        id
-        sentAt
-        title
-        type
-        message
-      }
-    }
-  }
-`;
-
 export function ProfileSideBar({ show, hide, profile }) {
   const [alertMsg, setAlertMsg] = useState(undefined);
   const navClass = show ? "nav-sidebar" : "nav-sidebar-hidden";
@@ -262,7 +233,7 @@ function Notification({ note, viewedProfileLast: last }) {
             <div className={`article-title-span font-serif ${newNoteColors}`}>
               {type} | {setAtString}
               <hr />
-              <div clasName="my-4">{title}</div>
+              <div className="my-4">{title}</div>
             </div>
             <div className={contentClass}>
               <hr className="article-divider" />
@@ -274,3 +245,32 @@ function Notification({ note, viewedProfileLast: last }) {
     </li>
   );
 }
+
+export const UPDATE_USER = gql`
+  mutation updateUser($changes: ProfileChanges!) {
+    updateUser(changes: $changes) {
+      id
+      name
+      userName
+      email
+      viewedProfileLast
+      betsWon
+      betsLost
+      inProgressBetIds
+      pendingYouBetIds
+      pendingThemBetIds
+      twitterUser {
+        idStr
+        screenName
+        name
+      }
+      notifications {
+        id
+        sentAt
+        title
+        type
+        message
+      }
+    }
+  }
+`;

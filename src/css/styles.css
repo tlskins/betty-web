@@ -555,7 +555,7 @@
 
 .dropdown-list-item {
   font-family: GT-Sectra-Book, GT-Sectra-Regular, serif;
-  color: rgb(11, 11, 11);
+  /* color: rgb(11, 11, 11); */
   -webkit-font-smoothing: antialiased !important;
   -webkit-box-direction: normal;
   list-style-type: none;
@@ -575,10 +575,10 @@
   box-sizing: inherit;
   letter-spacing: 1.7px;
   text-transform: uppercase;
-  font-size: 10px;
-  color: rgb(11, 11, 11);
-  font-family: Plain;
-  margin-left: 18px;
+  font-size: 12px;
+  /* color: rgb(11, 11, 11); */
+  /* font-family: Plain; */
+  margin-left: 4px;
   padding: 10px 10px;
 }
 
