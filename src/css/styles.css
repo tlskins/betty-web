@@ -40,7 +40,7 @@
   justify-content: space-between;
   -webkit-box-align: center;
   align-items: center;
-  width: calc(100% - 180px);
+  width: 90%;
   height: 60px;
   margin: 0px auto;
   padding: 0px;
@@ -375,7 +375,7 @@
   letter-spacing: 1.5px;
   text-transform: uppercase;
   color: rgb(119, 119, 119);
-  margin-top: 23px;
+  /* margin-top: 23px; */
   /* padding: 4px; */
 }
 

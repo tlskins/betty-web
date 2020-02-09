@@ -91,8 +91,8 @@ export function Bet({ bet, onClick, setAlertMsg, profile }) {
     statusColor = "bg-red-300";
   }
   const betClass = onClick
-    ? "fact-section rounded-lg border-gray-500 shadow-xl hover:bg-gray-100 cursor-pointer"
-    : "fact-section rounded-lg border-gray-500 shadow-xl";
+    ? "rounded-lg border-gray-500 shadow-xl hover:bg-gray-100 cursor-pointer"
+    : "rounded-lg border-gray-500 shadow-xl";
   const statusClass = `section-subtitle ${statusColor} rounded border border-black p-1`;
   const created = dateToString(createdAt);
   const expires = dateToString(expiresAt);
@@ -159,26 +159,32 @@ export function Equation({ equation }) {
   const lastLeft = leftExpressions[leftExpressions.length - 1];
 
   return (
-    <div className="flex w-full">
-      <div className="flex flex-col px-4 py-2 m-2 w-full">
-        {leftExpressions.map((expr, i) => (
-          <div key={"leftExpr" + i}>
-            <Expression expression={expr} />
+    <div className="flex items-center content-center justify-center">
+      <div className="flex flex-col lg:flex-row px-4 py-2 m-2">
+        <div className="m-4">
+          {leftExpressions.map((expr, i) => (
+            <div key={"leftExpr" + i}>
+              <Expression expression={expr} />
+            </div>
+          ))}
+        </div>
+
+        {!lastLeft?.rightExpressionValue && (
+          <div className="m-4">
+            <Operator operator={operator} />
           </div>
-        ))}
-      </div>
-      {!lastLeft?.rightExpressionValue && (
-        <Fragment>
-          <Operator operator={operator} />
-          <div className="flex flex-col px-4 py-2 m-2 w-full">
+        )}
+
+        {!lastLeft?.rightExpressionValue && (
+          <div className="m-4">
             {rightExpressions.map((expr, i) => (
               <div key={"rightExpr" + i}>
                 <Expression expression={expr} />
               </div>
             ))}
           </div>
-        </Fragment>
-      )}
+        )}
+      </div>
     </div>
   );
 }

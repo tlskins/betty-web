@@ -6,7 +6,7 @@ import { ExitButton } from "../exitButton";
 
 export function Operator({ operator }) {
   return (
-    <div>
+    <div className="text-center">
       <div className="underline hover:text-blue-500 cursor-pointer px-4 py-2 m-2">
         {(operator && operator.name) || "?"}
       </div>
@@ -64,43 +64,45 @@ export function OperatorSearch({ operator, onSelect, onClear }) {
       : "dropdown-list-item";
 
   return (
-    <div className="dropdown-menu flex flex-row">
-      <div className="dropdown-btn flex-row relative">
-        <ExitButton
-          onClick={() => {
-            onSearchExit();
-            onClear();
-          }}
-        />
-        <div className="dropdown-selection flex flex-col">
-          <input
-            disabled={!!name}
-            value={search || name || ""}
-            type="text"
-            placeholder="Compare"
-            className="p-2 text-sm"
-            onChange={onChange}
-            onKeyDown={onKeyDown}
-            onFocus={() => setShowDropdown(true)}
+    <div className="fact-wrapper flex flex-col bg-gray-200">
+      <div className="dropdown-menu flex flex-row m-1">
+        <div className="dropdown-btn flex-row relative">
+          <ExitButton
+            onClick={() => {
+              onSearchExit();
+              onClear();
+            }}
           />
-          {showDropdown && (
-            <ul className="dropdown-list">
-              {opChoices.map((operator, i) => {
-                return (
-                  <div
-                    key={operator.name}
-                    className={itemClassName(i)}
-                    onClick={selectOperator(operator)}
-                    onMouseEnter={() => setSearchIdx(i)}
-                  >
-                    <div className="dropdown-list-item-text flex flex-row">
-                      {operator.name}
+          <div className="dropdown-selection flex flex-col">
+            <input
+              disabled={!!name}
+              value={search || name || ""}
+              type="text"
+              placeholder="Compare"
+              className="p-2 text-sm"
+              onChange={onChange}
+              onKeyDown={onKeyDown}
+              onFocus={() => setShowDropdown(true)}
+            />
+            {showDropdown && (
+              <ul className="dropdown-list">
+                {opChoices.map((operator, i) => {
+                  return (
+                    <div
+                      key={operator.name}
+                      className={itemClassName(i)}
+                      onClick={selectOperator(operator)}
+                      onMouseEnter={() => setSearchIdx(i)}
+                    >
+                      <div className="dropdown-list-item-text flex flex-row">
+                        {operator.name}
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
-            </ul>
-          )}
+                  );
+                })}
+              </ul>
+            )}
+          </div>
         </div>
       </div>
     </div>

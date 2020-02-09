@@ -11,85 +11,253 @@ import { SubjectSearch } from "./subject";
 import { MetricSelect } from "./metric";
 import { StaticInput } from "./static";
 
-const CREATE_BET = gql`
-  mutation createBet($changes: NewBet!) {
-    createBet(changes: $changes) {
-      id
-      createdAt
-      betStatus
-      proposer {
-        name
-        userName
-      }
-      recipient {
-        name
-        userName
-        twitterUser {
-          screenName
-        }
-      }
-      equations {
-        id
-        operator {
-          id
-          name
-        }
-        expressions {
-          ... on StaticExpression {
-            id
-            isLeft
-            value
-          }
-          ... on PlayerExpression {
-            id
-            isLeft
-            value
-            player {
-              id
-              teamFk
-              leagueId
-              firstName
-              lastName
-              position
-              updatedAt
-            }
-            game {
-              id
-              homeTeamFk
-              homeTeamName
-              awayTeamName
-            }
-            metric {
-              name
-            }
-          }
-          ... on TeamExpression {
-            isLeft
-            value
-            team {
-              id
-              leagueId
-              fk
-              name
-              url
-              updatedAt
-              location
-            }
-            game {
-              id
-              homeTeamFk
-              homeTeamName
-              awayTeamName
-            }
-            metric {
-              name
-            }
-          }
-        }
-      }
+export function NewBet({ setAlertMsg }) {
+  const [{ recipient, equations, leagueId }, dispatch] = useReducer(
+    reducer,
+    initialState
+  );
+  const [createBet] = useMutation(CREATE_BET, {
+    onCompleted(data) {
+      // setAlertMsg("Bet sent!");
     }
+  });
+  const complete = betComplete({ recipient, equations });
+
+  const selectUser = ({ user: recipient }) =>
+    dispatch({ type: "addRecipient", recipient });
+  const clearUser = () =>
+    dispatch({ type: "addRecipient", recipient: undefined });
+  const saveBet = () => {
+    const changes = {
+      leagueId,
+      betRecipient: {
+        userId: recipient.id,
+        twitterScreenName: recipient?.twitterUser?.screenName
+      },
+      newEquations: equations.map(eq => {
+        return {
+          operatorId: eq.operator.id,
+          newExpressions: eq.expressions.map(exp => {
+            const newExp = { isLeft: exp.isLeft };
+            if (exp.player?.id) {
+              newExp.playerId = exp.player.id;
+            }
+            if (exp.team?.id) {
+              newExp.teamId = exp.team.id;
+            }
+            if (exp.value != null) {
+              newExp.value = exp.value;
+            }
+            if (exp.metric?.id) {
+              newExp.metricId = exp.metric.id;
+            }
+            if (exp.game?.id) {
+              newExp.gameId = exp.game.id;
+            }
+            return newExp;
+          })
+        };
+      })
+    };
+
+    createBet({
+      variables: { changes },
+      refetchQueries: [{ query: GET_BETS }]
+    });
+    dispatch({ type: "clearBet" });
+  };
+
+  const recipientName =
+    recipient?.userName ||
+    (recipient?.twitterUser && "@" + recipient.twitterUser.screenName) ||
+    "";
+  const eqArray = (equations && Object.values(equations)) || [];
+
+  return (
+    <div className="bg-gray-300 rounded shadow-2xl my-14 mx-4 w-11/12 lg:w-2/3 lg:m-12 p-2">
+      <div className="flex flex-col items-center text-center">
+        <div className="mt-2 p-2">
+          <div className=" w-auto text-black font-serif my-5">
+            <div>New Bet with</div>
+          </div>
+          <div className="my-5">
+            <UserSearch
+              value={recipientName}
+              onSelect={selectUser}
+              onClear={clearUser}
+            />
+          </div>
+        </div>
+        <p className="section-subtitle">
+          {moment().format("MMMM Do YYYY, h:mm:ss a")}
+        </p>
+        {complete && (
+          <p
+            className="section-subtitle underline hover:text-blue-500 cursor-pointer"
+            onClick={saveBet}
+          >
+            Propose
+          </p>
+        )}
+      </div>
+      <div>
+        {eqArray.map((eq, i) => (
+          <Equation eqIdx={i} equation={eq} dispatch={dispatch} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export function Equation({ eqIdx, equation, dispatch }) {
+  const { operator = {}, expressions = [] } = equation;
+  const leftExpressions = expressions
+    .map((exp, i) => [exp, i])
+    .filter(expArr => expArr[0].isLeft);
+  const rightExpressions = expressions
+    .map((exp, i) => [exp, i])
+    .filter(expArr => !expArr[0].isLeft);
+  const lstLft = leftExpressions[leftExpressions.length - 1][0];
+  const lstRgt = rightExpressions[rightExpressions.length - 1][0];
+  const addLeft = expressionComplete(lstLft) && !lstLft?.metric?.leftOnly;
+  const addRight = expressionComplete(lstRgt) && !lstLft?.metric?.leftOnly;
+  const hideRight = lstLft?.metric?.rightExpressionValue != null;
+
+  const onSelect = operator =>
+    dispatch({ type: "addOperator", operator, eqIdx });
+  const onClear = () =>
+    dispatch({ type: "addOperator", operator: undefined, eqIdx });
+
+  return (
+    <div
+      className="flex items-center content-center justify-center"
+      key={eqIdx}
+    >
+      <div className="flex flex-col lg:flex-row px-4 py-2 m-2">
+        <div className="m-4">
+          {leftExpressions.map(([expr, i]) => (
+            <div key={i}>
+              <Expression
+                eqIdx={eqIdx}
+                exprIdx={i}
+                expression={expr}
+                dispatch={dispatch}
+              />
+            </div>
+          ))}
+          {addLeft && (
+            <button
+              className="bg-indigo-800 text-white font-serif mt-2 p-2 rounded w-full"
+              onClick={() =>
+                dispatch({ type: "addExpression", isLeft: true, eqIdx })
+              }
+            >
+              Add Player
+            </button>
+          )}
+        </div>
+        <div className="m-4">
+          {!hideRight && (
+            <OperatorSearch
+              operator={operator}
+              onSelect={onSelect}
+              onClear={onClear}
+            />
+          )}
+        </div>
+        <div className="m-4">
+          {!hideRight && (
+            <div>
+              {rightExpressions.map(([expr, i]) => (
+                <div key={i}>
+                  <Expression
+                    eqIdx={eqIdx}
+                    exprIdx={i}
+                    expression={expr}
+                    dispatch={dispatch}
+                  />
+                </div>
+              ))}
+              {addRight && (
+                <button
+                  className="bg-indigo-800 text-white font-serif mt-2 p-2 rounded"
+                  onClick={() =>
+                    dispatch({ type: "addExpression", isLeft: false, eqIdx })
+                  }
+                >
+                  Add Player
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function Expression({ eqIdx, exprIdx, expression, dispatch }) {
+  const { data } = useQuery(GET_BET_MAPS, {
+    variables: { betType: "Operator" }
+  });
+  const { player, team, game, value, metric = {} } = expression;
+  const subject = player || team;
+  const operators = data?.getBetMaps || [];
+
+  if (!subject && value != null) {
+    const onSelect = staticValue =>
+      dispatch({
+        type: "addSubject",
+        eqIdx,
+        exprIdx,
+        value: staticValue
+      });
+    const onClear = () =>
+      dispatch({
+        type: "addSubject",
+        eqIdx,
+        exprIdx,
+        value: undefined
+      });
+
+    return (
+      <div>
+        <div className="fact-wrapper flex flex-col bg-gray-200">
+          <div className="m-1">
+            <StaticInput value={value} onSelect={onSelect} onClear={onClear} />
+          </div>
+        </div>
+      </div>
+    );
   }
-`;
+
+  const onSelectSubject = subject =>
+    dispatch({ type: "addSubject", eqIdx, exprIdx, ...subject });
+
+  const onSelectMetric = metric =>
+    dispatch({ type: "addMetric", eqIdx, exprIdx, operators, metric });
+
+  return (
+    <div>
+      <div className="fact-wrapper flex flex-col bg-gray-200">
+        <div className="m-1">
+          <SubjectSearch
+            subject={subject}
+            game={game}
+            onSelect={onSelectSubject}
+          />
+        </div>
+        <div className="m-1">
+          <MetricSelect
+            subject={subject}
+            metric={metric}
+            onSelect={onSelectMetric}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const initialExpression = {
   isLeft: true,
@@ -289,242 +457,82 @@ const betComplete = bet => {
   return equations.length > 0 && recipient ? true : false;
 };
 
-export function NewBet({ setAlertMsg }) {
-  const [{ recipient, equations, leagueId }, dispatch] = useReducer(
-    reducer,
-    initialState
-  );
-  const [createBet] = useMutation(CREATE_BET, {
-    onCompleted(data) {
-      // setAlertMsg("Bet sent!");
+const CREATE_BET = gql`
+  mutation createBet($changes: NewBet!) {
+    createBet(changes: $changes) {
+      id
+      createdAt
+      betStatus
+      proposer {
+        name
+        userName
+      }
+      recipient {
+        name
+        userName
+        twitterUser {
+          screenName
+        }
+      }
+      equations {
+        id
+        operator {
+          id
+          name
+        }
+        expressions {
+          ... on StaticExpression {
+            id
+            isLeft
+            value
+          }
+          ... on PlayerExpression {
+            id
+            isLeft
+            value
+            player {
+              id
+              teamFk
+              leagueId
+              firstName
+              lastName
+              position
+              updatedAt
+            }
+            game {
+              id
+              homeTeamFk
+              homeTeamName
+              awayTeamName
+            }
+            metric {
+              name
+            }
+          }
+          ... on TeamExpression {
+            isLeft
+            value
+            team {
+              id
+              leagueId
+              fk
+              name
+              url
+              updatedAt
+              location
+            }
+            game {
+              id
+              homeTeamFk
+              homeTeamName
+              awayTeamName
+            }
+            metric {
+              name
+            }
+          }
+        }
+      }
     }
-  });
-  const complete = betComplete({ recipient, equations });
-
-  console.log("leagueId", leagueId);
-
-  const saveBet = () => {
-    const changes = {
-      leagueId,
-      betRecipient: {
-        userId: recipient.id,
-        twitterScreenName: recipient?.twitterUser?.screenName
-      },
-      newEquations: equations.map(eq => {
-        return {
-          operatorId: eq.operator.id,
-          newExpressions: eq.expressions.map(exp => {
-            const newExp = { isLeft: exp.isLeft };
-            if (exp.player?.id) {
-              newExp.playerId = exp.player.id;
-            }
-            if (exp.team?.id) {
-              newExp.teamId = exp.team.id;
-            }
-            if (exp.value != null) {
-              newExp.value = exp.value;
-            }
-            if (exp.metric?.id) {
-              newExp.metricId = exp.metric.id;
-            }
-            if (exp.game?.id) {
-              newExp.gameId = exp.game.id;
-            }
-            return newExp;
-          })
-        };
-      })
-    };
-
-    createBet({
-      variables: { changes },
-      refetchQueries: [{ query: GET_BETS }]
-    });
-    dispatch({ type: "clearBet" });
-  };
-
-  const recipientName =
-    (recipient &&
-      (recipient.userName ||
-        (recipient.twitterUser && "@" + recipient.twitterUser.screenName))) ||
-    "";
-
-  return (
-    <div className="fact-section m-2">
-      <div className="section-title-wrapper inline-flex">
-        <h1 className="section-title">
-          <div className="text-black font-serif">New Bet with</div>
-          <div className="section-subtitle">
-            <UserSearch
-              value={recipientName}
-              onSelect={({ user: recipient }) =>
-                dispatch({ type: "addRecipient", recipient })
-              }
-              onClear={() =>
-                dispatch({ type: "addRecipient", recipient: undefined })
-              }
-            />
-          </div>
-        </h1>
-        <p className="section-subtitle">
-          {moment().format("MMMM Do YYYY, h:mm:ss a")}
-        </p>
-        {complete && (
-          <p
-            className="section-subtitle underline hover:text-blue-500 cursor-pointer"
-            onClick={saveBet}
-          >
-            Propose
-          </p>
-        )}
-      </div>
-      {equations &&
-        Object.values(equations).map((eq, i) => (
-          <div key={i}>
-            <Equation eqIdx={i} equation={eq} dispatch={dispatch} />
-          </div>
-        ))}
-    </div>
-  );
-}
-
-export function Equation({ eqIdx, equation, dispatch }) {
-  const { operator = {}, expressions = [] } = equation;
-  const leftExpressions = expressions
-    .map((exp, i) => [exp, i])
-    .filter(expArr => expArr[0].isLeft);
-  const rightExpressions = expressions
-    .map((exp, i) => [exp, i])
-    .filter(expArr => !expArr[0].isLeft);
-  const lstLft = leftExpressions[leftExpressions.length - 1][0];
-  const lstRgt = rightExpressions[rightExpressions.length - 1][0];
-  const addLeft = expressionComplete(lstLft) && !lstLft?.metric?.leftOnly;
-  const addRight = expressionComplete(lstRgt) && !lstLft?.metric?.leftOnly;
-  const hideRight = lstLft?.metric?.rightExpressionValue != null;
-
-  const onSelect = operator =>
-    dispatch({ type: "addOperator", operator, eqIdx });
-  const onClear = () =>
-    dispatch({ type: "addOperator", operator: undefined, eqIdx });
-
-  return (
-    <div className="flex w-full">
-      <div className="flex flex-col px-4 py-2 m-2 w-full">
-        {leftExpressions.map(([expr, i]) => (
-          <div key={i}>
-            <Expression
-              eqIdx={eqIdx}
-              exprIdx={i}
-              expression={expr}
-              dispatch={dispatch}
-            />
-          </div>
-        ))}
-        {addLeft && (
-          <button
-            className="bg-indigo-800 text-white font-serif mt-2 p-2 rounded"
-            onClick={() =>
-              dispatch({ type: "addExpression", isLeft: true, eqIdx })
-            }
-          >
-            Add Player
-          </button>
-        )}
-      </div>
-      {!hideRight && (
-        <Fragment>
-          <OperatorSearch
-            operator={operator}
-            onSelect={onSelect}
-            onClear={onClear}
-          />
-          <div className="flex flex-col px-4 py-2 m-2 w-full">
-            {rightExpressions.map(([expr, i]) => (
-              <div key={i}>
-                <Expression
-                  eqIdx={eqIdx}
-                  exprIdx={i}
-                  expression={expr}
-                  dispatch={dispatch}
-                />
-              </div>
-            ))}
-            {addRight && (
-              <button
-                className="bg-indigo-800 text-white font-serif mt-2 p-2 rounded"
-                onClick={() =>
-                  dispatch({ type: "addExpression", isLeft: false, eqIdx })
-                }
-              >
-                Add Player
-              </button>
-            )}
-          </div>
-        </Fragment>
-      )}
-    </div>
-  );
-}
-
-export function Expression({ eqIdx, exprIdx, expression, dispatch }) {
-  const { data } = useQuery(GET_BET_MAPS, {
-    variables: { betType: "Operator" }
-  });
-  const { player, team, game, value, metric = {} } = expression;
-  const subject = player || team;
-  const operators = data?.getBetMaps || [];
-
-  if (!subject && value != null) {
-    const onSelect = staticValue =>
-      dispatch({
-        type: "addSubject",
-        eqIdx,
-        exprIdx,
-        value: staticValue
-      });
-    const onClear = () =>
-      dispatch({
-        type: "addSubject",
-        eqIdx,
-        exprIdx,
-        value: undefined
-      });
-
-    return (
-      <div>
-        <div className="fact-wrapper flex flex-col bg-gray-200">
-          <div className="m-1">
-            <StaticInput value={value} onSelect={onSelect} onClear={onClear} />
-          </div>
-        </div>
-      </div>
-    );
   }
-
-  const onSelectSubject = subject =>
-    dispatch({ type: "addSubject", eqIdx, exprIdx, ...subject });
-
-  const onSelectMetric = metric =>
-    dispatch({ type: "addMetric", eqIdx, exprIdx, operators, metric });
-
-  return (
-    <div>
-      <div className="fact-wrapper flex flex-col bg-gray-200">
-        <div className="m-1">
-          <SubjectSearch
-            subject={subject}
-            game={game}
-            onSelect={onSelectSubject}
-          />
-        </div>
-        <div className="m-1">
-          <MetricSelect
-            subject={subject}
-            metric={metric}
-            onSelect={onSelectMetric}
-          />
-        </div>
-      </div>
-    </div>
-  );
-}
+`;

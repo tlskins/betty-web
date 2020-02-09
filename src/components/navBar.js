@@ -10,58 +10,6 @@ import gql from "graphql-tag";
 import { Alert } from "../components/alert";
 import { toMoment } from "../utils";
 
-export const SUBSCRIBE_USER_PROFILE = gql`
-  subscription subscribeUserNotifications {
-    subscribeUserNotifications {
-      id
-      name
-      userName
-      email
-      viewedProfileLast
-      betsWon
-      betsLost
-      inProgressBetIds
-      pendingYouBetIds
-      pendingThemBetIds
-      twitterUser {
-        idStr
-        screenName
-        name
-      }
-      notifications {
-        id
-        sentAt
-        title
-        type
-        message
-      }
-    }
-  }
-`;
-
-const LOG_OUT = gql`
-  mutation signOut {
-    signOut
-  }
-`;
-
-function newNotifications(profile) {
-  if (
-    !profile ||
-    !profile.notifications ||
-    profile.notifications.length === 0
-  ) {
-    return 0;
-  }
-  if (!profile.viewedProfileLast) {
-    return profile.notifications.length;
-  }
-  const lastView = toMoment(profile.viewedProfileLast);
-  return profile.notifications.filter(n =>
-    lastView.isBefore(toMoment(n.sentAt))
-  ).length;
-}
-
 export function NavBar({ clickRoto, clickProfile, profile, setProfile }) {
   const client = useApolloClient();
   const [logout] = useMutation(LOG_OUT, {
@@ -104,12 +52,6 @@ export function NavBar({ clickRoto, clickProfile, profile, setProfile }) {
             BETTY
           </a>
         </div>
-        <a
-          className="nav-link-m-left hover:text-blue-500 cursor-pointer"
-          href="/info"
-        >
-          INFO
-        </a>
         {profile && (
           <a
             className="nav-link-m-left hover:text-blue-500 cursor-pointer"
@@ -136,18 +78,20 @@ export function NavBar({ clickRoto, clickProfile, profile, setProfile }) {
               ROTO
             </button>
             <button
-              className="nav-link-m-left hover:text-blue-500 cursor-pointer"
+              className="nav-link hover:text-blue-500 cursor-pointer ml-4"
               onClick={clickProfile}
             >
-              PROFILE{" "}
-              {newNotesCount > 0 && (
-                <span className="bg-indigo-400 text-white rounded-full py-1 px-2">
-                  {newNotesCount}
-                </span>
-              )}
+              <div className="">
+                PROFILE
+                {newNotesCount > 0 && (
+                  <span className="bg-indigo-400 text-white rounded-full mx-2 py-1 px-2">
+                    {newNotesCount}
+                  </span>
+                )}
+              </div>
             </button>
             <button
-              className="nav-link-m-left hover:text-blue-500 cursor-pointer"
+              className="nav-link hover:text-blue-500 cursor-pointer ml-4"
               onClick={logout}
             >
               LOGOUT
@@ -173,3 +117,55 @@ export function NavBar({ clickRoto, clickProfile, profile, setProfile }) {
     </nav>
   );
 }
+
+function newNotifications(profile) {
+  if (
+    !profile ||
+    !profile.notifications ||
+    profile.notifications.length === 0
+  ) {
+    return 0;
+  }
+  if (!profile.viewedProfileLast) {
+    return profile.notifications.length;
+  }
+  const lastView = toMoment(profile.viewedProfileLast);
+  return profile.notifications.filter(n =>
+    lastView.isBefore(toMoment(n.sentAt))
+  ).length;
+}
+
+export const SUBSCRIBE_USER_PROFILE = gql`
+  subscription subscribeUserNotifications {
+    subscribeUserNotifications {
+      id
+      name
+      userName
+      email
+      viewedProfileLast
+      betsWon
+      betsLost
+      inProgressBetIds
+      pendingYouBetIds
+      pendingThemBetIds
+      twitterUser {
+        idStr
+        screenName
+        name
+      }
+      notifications {
+        id
+        sentAt
+        title
+        type
+        message
+      }
+    }
+  }
+`;
+
+const LOG_OUT = gql`
+  mutation signOut {
+    signOut
+  }
+`;
