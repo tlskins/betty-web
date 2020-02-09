@@ -91,9 +91,9 @@ export function Bet({ bet, onClick, setAlertMsg, profile }) {
     statusColor = "bg-red-300";
   }
   const betClass = onClick
-    ? "rounded-lg border-gray-500 shadow-xl hover:bg-gray-100 cursor-pointer"
-    : "rounded-lg border-gray-500 shadow-xl";
-  const statusClass = `section-subtitle ${statusColor} rounded border border-black p-1`;
+    ? "rounded-lg border-gray-500 mt-6 shadow-xl hover:bg-gray-100 cursor-pointer"
+    : "rounded-lg border-gray-500 mt-6 shadow-xl";
+  const statusClass = `section-subtitle ${statusColor} rounded border border-black p-1 my-4`;
   const created = dateToString(createdAt);
   const expires = dateToString(expiresAt);
   const finalized = dateToString(finalizedAt);
