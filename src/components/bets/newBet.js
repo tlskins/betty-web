@@ -74,7 +74,7 @@ export function NewBet({ setAlertMsg }) {
   const eqArray = (equations && Object.values(equations)) || [];
 
   return (
-    <div className="bg-gray-300 rounded shadow-2xl my-14 mx-4 w-11/12 lg:w-2/3 lg:m-12 p-2">
+    <div className="bg-gray-300 rounded shadow-2xl my-14 mx-4 w-full lg:w-2/3 lg:m-12 p-2">
       <div className="flex flex-col items-center text-center">
         <div className="mt-2 p-2">
           <div className=" w-auto text-black font-serif my-5">

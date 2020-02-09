@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Redirect } from "@reach/router";
 import { useLazyQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
@@ -38,18 +38,24 @@ export function SignIn({ setProfile, setAlertMsg }) {
   const [password, setPassword] = useState("");
   const [redirect, setRedirect] = useState(false);
 
-  const [signIn] = useLazyQuery(SIGN_IN, {
+  const [signIn, { error }] = useLazyQuery(SIGN_IN, {
     onError(error) {
       setAlertMsg(error.message);
     },
     onCompleted(data) {
-      if (data && data.signIn) {
+      if (data?.signIn) {
         localStorage.setItem("profile", JSON.stringify(data.signIn));
         setProfile(data.signIn);
         setRedirect(true);
       }
     }
   });
+
+  useEffect(() => {
+    if (error?.message) {
+      setAlertMsg(error.message);
+    }
+  }, [error]);
 
   return (
     <div className="page-layout-wrapper">

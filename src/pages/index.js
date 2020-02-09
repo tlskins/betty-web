@@ -73,6 +73,11 @@ export default function Pages() {
           setShowSideBar("profile");
         }}
       />
+      <Alert
+        title={alertMsg}
+        open={alertMsg != undefined}
+        onClose={() => setAlertMsg(undefined)}
+      />
       {profile && (
         <Fragment>
           <ProfileSideBar
@@ -87,11 +92,6 @@ export default function Pages() {
           <RotoSideBar
             show={showSideBar === "roto"}
             hide={() => setShowSideBar(undefined)}
-          />
-          <Alert
-            title={alertMsg}
-            open={alertMsg !== undefined}
-            onClose={() => setAlertMsg(undefined)}
           />
         </Fragment>
       )}
