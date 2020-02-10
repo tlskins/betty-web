@@ -23,11 +23,7 @@ export function NavBar({ clickRoto, clickProfile, profile, setProfile }) {
   });
   useSubscription(SUBSCRIBE_USER_PROFILE, {
     onSubscriptionData(data) {
-      const profile =
-        data &&
-        data.subscriptionData &&
-        data.subscriptionData.data &&
-        data.subscriptionData.data.subscribeUserNotifications;
+      const profile = data?.subscriptionData?.data?.subscribeUserNotifications;
       if (profile) {
         if (profile.id.length > 0) {
           // workaround for single ws and non persisted push notes
@@ -42,61 +38,33 @@ export function NavBar({ clickRoto, clickProfile, profile, setProfile }) {
   });
   const [redirectTo, setRedirectTo] = useState(undefined);
   const [alertMsg, setAlertMsg] = useState(undefined);
+  const [showDropdown, setShowDropdown] = useState(false);
   const newNotesCount = newNotifications(profile);
 
   return (
-    <nav className="nav-bar">
+    <nav className="nav-bar sm:absolute md:sticky">
       <div className="nav-hdr-content">
         <div className="nav_logo">
           <a className="logo" href="/">
             BETTY
           </a>
-        </div>
-        {profile && (
-          <a
-            className="nav-link-m-left hover:text-blue-500 cursor-pointer"
-            href="/bets"
+          <label
+            className="nav_hamburger"
+            onClick={() => setShowDropdown(!showDropdown)}
           >
-            MY BETS
-          </a>
-        )}
-        <div
-          className="nav-link m-6"
-          style={{
-            borderLeft: `3px solid lightgray`,
-            height: `20px`,
-            borderRadius: `8px`
-          }}
-        />
+            <span className="hamburger_slice" />
+            <span className="hamburger_slice" />
+            <span className="hamburger_slice" />
+          </label>
+        </div>
 
         {profile && (
-          <Fragment>
-            <button
-              className="nav-link hover:text-blue-500 cursor-pointer"
-              onClick={clickRoto}
-            >
-              ROTO
-            </button>
-            <button
-              className="nav-link hover:text-blue-500 cursor-pointer ml-4"
-              onClick={clickProfile}
-            >
-              <div className="">
-                PROFILE
-                {newNotesCount > 0 && (
-                  <span className="bg-indigo-400 text-white rounded-full mx-2 py-1 px-2">
-                    {newNotesCount}
-                  </span>
-                )}
-              </div>
-            </button>
-            <button
-              className="nav-link hover:text-blue-500 cursor-pointer ml-4"
-              onClick={logout}
-            >
-              LOGOUT
-            </button>
-          </Fragment>
+          <button
+            className="nav-link hover:text-blue-500 cursor-pointer ml-4"
+            onClick={logout}
+          >
+            LOGOUT
+          </button>
         )}
 
         {!profile && (
@@ -113,6 +81,51 @@ export function NavBar({ clickRoto, clickProfile, profile, setProfile }) {
           open={alertMsg !== undefined}
           onClose={() => setAlertMsg(undefined)}
         />
+      </div>
+      <div
+        class={`absolute max-w-sm bg-white rounded border-2 border-teal-700 overflow-hidden shadow-lg ml-16 z-20 text-teal-700 font-sans uppercase tracking-wider font-bold text-xs items-center content-center justify-center text-center`}
+        style={{
+          transition: `all 600ms ease 0s`,
+          top: showDropdown ? `65px` : `-420px`
+        }}
+      >
+        <div
+          class="cursor-pointer px-4 py-6 shadow hover:bg-teal-300 hover:underline"
+          onClick={() => {
+            setShowDropdown(false);
+            setRedirectTo("/");
+          }}
+        >
+          Marketplace
+        </div>
+        <div class="cursor-pointer px-4 py-6 shadow hover:bg-teal-300 hover:underline">
+          Current Games
+        </div>
+        <div class="border-b-4 m-0"></div>
+        <div
+          class="cursor-pointer px-4 py-6 shadow hover:bg-teal-300 hover:underline"
+          onClick={() => {
+            setShowDropdown(false);
+            setRedirectTo("/bets");
+          }}
+        >
+          My Bets
+        </div>
+        <div
+          class="cursor-pointer px-4 py-6 shadow hover:bg-teal-300 hover:underline"
+          onClick={clickRoto}
+        >
+          Roto
+        </div>
+        <div class="cursor-pointer px-4 py-6 shadow hover:bg-teal-300 hover:underline">
+          Profile
+        </div>
+        <div
+          class="cursor-pointer px-4 py-6 shadow hover:bg-teal-300 hover:underline"
+          onClick={clickProfile}
+        >
+          Notifications
+        </div>
       </div>
     </nav>
   );
