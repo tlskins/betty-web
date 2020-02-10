@@ -3,7 +3,6 @@ import { useQuery } from "@apollo/react-hooks";
 import "typeface-roboto";
 import gql from "graphql-tag";
 
-import { CurrentGames } from "../components/currentGames";
 import { BetTabs } from "../components/betTabs";
 import BetFrags from "../fragments/bet";
 
@@ -18,15 +17,6 @@ export function BrowseBets({ profile }) {
     <div className="page-layout-wrapper">
       <div className="page-layout">
         <div className="w-full">
-          <div className="page-wrapper my-10">
-            <div className="page-content">
-              <div className="page-content-area flex justify-center">
-                <div className="page-section">
-                  <CurrentGames />
-                </div>
-              </div>
-            </div>
-          </div>
           <div className="page-hdr-box">
             <h3 className="page-hdr">Current Bets</h3>
           </div>

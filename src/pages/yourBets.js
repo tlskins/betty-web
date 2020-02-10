@@ -4,7 +4,6 @@ import { Redirect } from "@reach/router";
 import gql from "graphql-tag";
 import "typeface-roboto";
 
-import { CurrentGames } from "../components/currentGames";
 import { BetTabs } from "../components/betTabs";
 import { NewBet } from "../components/bets/newBet";
 import BetFrags from "../fragments/bet";
@@ -28,15 +27,6 @@ export function YourBets({ profile, setAlertMsg }) {
         <div className="w-full">
           <div className="page-wrapper flex mt-8 items-center content-center justify-center">
             <NewBet setAlertMsg={setAlertMsg} />
-          </div>
-          <div className="page-wrapper my-24">
-            <div className="page-content">
-              <div className="page-content-area flex justify-center">
-                <div className="page-section">
-                  <CurrentGames />
-                </div>
-              </div>
-            </div>
           </div>
           <div className="page-hdr-box">
             <h3 className="page-hdr">Your Bets</h3>

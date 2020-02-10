@@ -10,7 +10,13 @@ import gql from "graphql-tag";
 import { Alert } from "../components/alert";
 import { toMoment } from "../utils";
 
-export function NavBar({ clickRoto, clickProfile, profile, setProfile }) {
+export function NavBar({
+  clickGames,
+  clickRoto,
+  clickProfile,
+  profile,
+  setProfile
+}) {
   const client = useApolloClient();
   const [logout] = useMutation(LOG_OUT, {
     onCompleted(data) {
@@ -41,9 +47,11 @@ export function NavBar({ clickRoto, clickProfile, profile, setProfile }) {
   const [showDropdown, setShowDropdown] = useState(false);
   const newNotesCount = newNotifications(profile);
 
+  console.log("newNotesCount", newNotesCount);
+
   return (
     <nav className="nav-bar sm:absolute md:sticky">
-      <div className="nav-hdr-content">
+      <div className="nav-hdr-content px-10 lg:px-40">
         <div className="nav_logo">
           <a className="logo" href="/">
             BETTY
@@ -83,14 +91,14 @@ export function NavBar({ clickRoto, clickProfile, profile, setProfile }) {
         />
       </div>
       <div
-        class={`absolute max-w-sm bg-white rounded border-2 border-teal-700 overflow-hidden shadow-lg ml-16 z-20 text-teal-700 font-sans uppercase tracking-wider font-bold text-xs items-center content-center justify-center text-center`}
+        className={`absolute max-w-sm bg-white rounded border-2 border-teal-700 overflow-hidden shadow-lg ml-0 md:ml-32 z-20 text-teal-700 font-sans uppercase tracking-wider font-bold text-xs items-center content-center justify-center text-center`}
         style={{
           transition: `all 600ms ease 0s`,
           top: showDropdown ? `65px` : `-420px`
         }}
       >
         <div
-          class="cursor-pointer px-4 py-6 shadow hover:bg-teal-300 hover:underline"
+          className="cursor-pointer px-4 py-6 shadow hover:bg-teal-300 hover:underline"
           onClick={() => {
             setShowDropdown(false);
             setRedirectTo("/");
@@ -98,12 +106,15 @@ export function NavBar({ clickRoto, clickProfile, profile, setProfile }) {
         >
           Marketplace
         </div>
-        <div class="cursor-pointer px-4 py-6 shadow hover:bg-teal-300 hover:underline">
+        <div
+          className="cursor-pointer px-4 py-6 shadow hover:bg-teal-300 hover:underline"
+          onClick={clickGames}
+        >
           Current Games
         </div>
-        <div class="border-b-4 m-0"></div>
+        <div className="border-b-4 m-0"></div>
         <div
-          class="cursor-pointer px-4 py-6 shadow hover:bg-teal-300 hover:underline"
+          className="cursor-pointer px-4 py-6 shadow hover:bg-teal-300 hover:underline"
           onClick={() => {
             setShowDropdown(false);
             setRedirectTo("/bets");
@@ -112,19 +123,26 @@ export function NavBar({ clickRoto, clickProfile, profile, setProfile }) {
           My Bets
         </div>
         <div
-          class="cursor-pointer px-4 py-6 shadow hover:bg-teal-300 hover:underline"
+          className="cursor-pointer px-4 py-6 shadow hover:bg-teal-300 hover:underline"
           onClick={clickRoto}
         >
           Roto
         </div>
-        <div class="cursor-pointer px-4 py-6 shadow hover:bg-teal-300 hover:underline">
+        <div className="cursor-pointer px-4 py-6 shadow hover:bg-teal-300 hover:underline">
           Profile
         </div>
         <div
-          class="cursor-pointer px-4 py-6 shadow hover:bg-teal-300 hover:underline"
+          className="cursor-pointer px-4 py-6 shadow hover:bg-teal-300 hover:underline"
           onClick={clickProfile}
         >
-          Notifications
+          <div>
+            Notifications
+            {newNotesCount > 0 && (
+              <span className="bg-indigo-400 text-white rounded-full mx-2 py-1 px-2">
+                {newNotesCount}
+              </span>
+            )}
+          </div>
         </div>
       </div>
     </nav>

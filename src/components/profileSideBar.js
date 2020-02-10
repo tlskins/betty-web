@@ -67,12 +67,11 @@ function ProfileForm({ profile = {}, setAlertMsg }) {
   const twtName = (profile.twitterUser && profile.twitterUser.name) || "";
   const twtScreenName =
     (profile.twitterUser && profile.twitterUser.screenName) || "";
-  const notifications =
-    profile && profile.notifications
-      ? profile.notifications.sort(
-          (a, b) => toMoment(b.sentAt) - toMoment(a.sentAt)
-        )
-      : [];
+  const notifications = profile?.notifications
+    ? profile.notifications.sort(
+        (a, b) => toMoment(b.sentAt) - toMoment(a.sentAt)
+      )
+    : [];
   const {
     betsWon,
     betsLost,
