@@ -1,22 +1,14 @@
-import React, { useState } from "react";
+import React from "react";
 import { useQuery } from "@apollo/react-hooks";
-import { Redirect } from "@reach/router";
 import "typeface-roboto";
 import gql from "graphql-tag";
 
 import { CurrentGames } from "../components/currentGames";
-import { Bet } from "../components/bets/bet";
-import { FilterButton } from "../components/filterButton";
 import { BetTabs } from "../components/betTabs";
 import BetFrags from "../fragments/bet";
 
 export function BrowseBets({ profile }) {
-  const [redirectTo, setRedirectTo] = useState(undefined);
   const { data } = useQuery(BROWSE_BETS);
-
-  const onRedirectBet = id => () => {
-    setRedirectTo("/bet/" + id);
-  };
 
   const publicBets = data?.currentBets?.publicPendingBets || [];
   const finalBets = data?.currentBets?.finalBets || [];

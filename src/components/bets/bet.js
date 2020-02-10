@@ -79,10 +79,14 @@ export function Bet({ bet, onClick, setAlertMsg, profile }) {
 
   const acceptable =
     betStatus === "Pending Approval" &&
-    ((!proposerReplyFk && isProposer) || (!recipientReplyFk && isRecipient));
+    ((!proposerReplyFk && isProposer) ||
+      (!recipientReplyFk && isRecipient) ||
+      (!recipient && !isProposer && profile));
+
   const rejectable =
     betStatus === "Pending Approval" &&
     ((proposerReplyFk && isProposer) || (recipientReplyFk && isRecipient));
+
   let statusColor = "bg-yellow-200";
   if (betStatus === "Accepted") {
     statusColor = "bg-green-200";
@@ -116,7 +120,7 @@ export function Bet({ bet, onClick, setAlertMsg, profile }) {
           {acceptable && (
             <button
               id="accept-btn"
-              className="section-subtitle hover:text-blue-500 bg-green-200 rounded border border-black p-1 mx-3"
+              className="section-subtitle hover:text-blue-500 bg-green-200 rounded border border-black p-1 mx-3 my-4"
               onClick={onAccept}
             >
               Accept
@@ -160,32 +164,26 @@ export function Equation({ equation }) {
   const lastLeft = leftExpressions[leftExpressions.length - 1];
 
   return (
-    <div className="flex items-center content-center justify-center">
-      <div className="flex flex-col lg:flex-row px-4 py-2 m-2">
-        <div className="m-4">
-          {leftExpressions.map((expr, i) => (
-            <div key={"leftExpr" + i}>
-              <Expression expression={expr} />
-            </div>
+    <div className="flex flex-col items-center justify-center lg:w-full lg:flex-row px-4 pb-10 my-4">
+      <div className="mx-4 w-full">
+        {leftExpressions.map((expr, i) => (
+          <Expression key={"leftExpr" + i} expression={expr} />
+        ))}
+      </div>
+
+      {!lastLeft?.rightExpressionValue && (
+        <div className="mx-4">
+          <Operator operator={operator} />
+        </div>
+      )}
+
+      {!lastLeft?.rightExpressionValue && (
+        <div className="mx-4 w-full">
+          {rightExpressions.map((expr, i) => (
+            <Expression key={"rightExpr" + i} expression={expr} />
           ))}
         </div>
-
-        {!lastLeft?.rightExpressionValue && (
-          <div className="m-4">
-            <Operator operator={operator} />
-          </div>
-        )}
-
-        {!lastLeft?.rightExpressionValue && (
-          <div className="m-4">
-            {rightExpressions.map((expr, i) => (
-              <div key={"rightExpr" + i}>
-                <Expression expression={expr} />
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+      )}
     </div>
   );
 }
@@ -196,22 +194,18 @@ export function Expression({ expression }) {
 
   if (!subject && value != null) {
     return (
-      <div>
-        <div className="fact-wrapper flex flex-col bg-gray-200">
-          <div className="m-1">
-            <StaticInput value={value} disabled={true} />
-          </div>
+      <div className="fact-wrapper flex flex-grow flex-col bg-gray-200">
+        <div className="m-1">
+          <StaticInput value={value} disabled={true} />
         </div>
       </div>
     );
   }
 
   return (
-    <div>
-      <div className="fact-wrapper">
-        <Subject subject={subject} game={game} />
-        <Metric metric={metric} />
-      </div>
+    <div className="fact-wrapper">
+      <Subject subject={subject} game={game} />
+      <Metric metric={metric} />
     </div>
   );
 }
