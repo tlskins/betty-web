@@ -7,6 +7,7 @@ import gql from "graphql-tag";
 import { CurrentGames } from "../components/currentGames";
 import { Bet } from "../components/bets/bet";
 import { FilterButton } from "../components/filterButton";
+import { BetTabs } from "../components/betTabs";
 import BetFrags from "../fragments/bet";
 
 export function BrowseBets({ profile }) {
@@ -16,6 +17,10 @@ export function BrowseBets({ profile }) {
   const onRedirectBet = id => () => {
     setRedirectTo("/bet/" + id);
   };
+
+  const publicBets = data?.currentBets?.publicPendingBets || [];
+  const finalBets = data?.currentBets?.finalBets || [];
+  const acceptedBets = data?.currentBets?.acceptedBets || [];
 
   return (
     <div className="page-layout-wrapper">
@@ -34,29 +39,14 @@ export function BrowseBets({ profile }) {
             <h3 className="page-hdr">Current Bets</h3>
           </div>
           <div className="page-wrapper">
-            <div className="page-summary">
-              <div className="page-summary-item">
-                <div className="flex-row">
-                  <FilterButton />
-                </div>
-              </div>
-            </div>
             <div className="page-content">
-              <div className="page-content-area flex justify-center">
-                <div className="page-section">
-                  {data &&
-                    data.currentBets &&
-                    data.currentBets.map((bet, idx) => (
-                      <div key={idx}>
-                        <Bet
-                          bet={bet}
-                          onClick={onRedirectBet(bet.id)}
-                          profile={profile}
-                        />
-                      </div>
-                    ))}
-                  {redirectTo && <Redirect to={redirectTo} noThrow />}
-                </div>
+              <div className="page-content-area flex items-center content-center justify-center">
+                <BetTabs
+                  profile={profile}
+                  acceptedBets={acceptedBets}
+                  finalBets={finalBets}
+                  publicPendingBets={publicBets}
+                />
               </div>
             </div>
           </div>
@@ -69,7 +59,15 @@ export function BrowseBets({ profile }) {
 export const BROWSE_BETS = gql`
   query {
     currentBets {
-      ...BetDetail
+      acceptedBets {
+        ...BetDetail
+      }
+      finalBets {
+        ...BetDetail
+      }
+      publicPendingBets {
+        ...BetDetail
+      }
     }
   }
   ${BetFrags.fragments.bet}

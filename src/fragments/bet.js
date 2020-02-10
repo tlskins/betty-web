@@ -10,6 +10,8 @@ BetFrags.fragments = {
       finalizedAt
       expiresAt
       betStatus
+      proposerReplyFk
+      recipientReplyFk
       proposer {
         id
         name

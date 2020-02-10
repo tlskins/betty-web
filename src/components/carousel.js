@@ -21,20 +21,20 @@ export function GamesCarousel({ games }) {
     <div className="flex flex-wrap -mx-4">
       <div className="w-full mb-6 px-4 flex flex-col">
         <div className="flex-grow flex flex-col bg-white border-t border-b sm:rounded sm:border shadow overflow-hidden">
-          <div className="border-b">
-            <div className="flex justify-between px-6 -mb-px">
-              <h3 className="text-blue-700 py-4 font-normal text-lg">
+          <div className="border-b w-full justify-between">
+            <div className="px-6 flex flex-grow">
+              <div className="text-blue-700 py-4 font-normal text-lg w-1/2 items-start">
                 Current NBA Games
-              </h3>
-              <div className="flex">
+              </div>
+              <div className="ml-8 py-4 w-1/2 content-end">
                 <button
                   type="button"
-                  className="appearance-none py-4 text-blue-700 border-b border-blue-700 mr-3"
+                  className="appearance-none text-blue-700 border-b border-blue-700 ml-5"
                   onClick={prevPage}
                 >{`<`}</button>
                 <button
                   type="button"
-                  className="appearance-none py-4 text-blue-700 border-b border-blue-700 mr-3"
+                  className="appearance-none text-blue-700 border-b border-blue-700 ml-5"
                   onClick={nextPage}
                 >
                   >

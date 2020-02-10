@@ -67,11 +67,16 @@ export function Bet({ bet, onClick, setAlertMsg, profile }) {
     }
   };
 
-  let rcptName = `${recipient.name} (${recipient.userName})`;
-  if (!recipient.Name && recipient.twitterUser) {
-    rcptName = "@" + recipient.twitterUser.screenName;
+  let rcptName = "*Anyone";
+  if (recipient) {
+    rcptName = `${recipient.name} (${recipient.userName})`;
+    if (!recipient.Name && recipient.twitterUser) {
+      rcptName = "@" + recipient.twitterUser.screenName;
+    }
   }
+
   const title = `${proposer.name} (${proposer.userName})'s Bet with ${rcptName}`;
+
   const acceptable =
     betStatus === "Pending Approval" &&
     ((!proposerReplyFk && isProposer) || (!recipientReplyFk && isRecipient));
@@ -84,9 +89,11 @@ export function Bet({ bet, onClick, setAlertMsg, profile }) {
   } else if (betStatus === "Declined" || betStatus === "Withdrawn") {
     statusColor = "bg-red-300";
   }
+
   const betClass = onClick
     ? "rounded-lg border-gray-500 mt-6 shadow-xl hover:bg-gray-100 cursor-pointer"
     : "rounded-lg border-gray-500 mt-6 shadow-xl";
+
   const statusClass = `section-subtitle ${statusColor} rounded border border-black p-1 my-4`;
   const created = dateToString(createdAt);
   const expires = dateToString(expiresAt);
