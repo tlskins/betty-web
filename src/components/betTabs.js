@@ -3,6 +3,7 @@ import { Redirect } from "@reach/router";
 import "typeface-roboto";
 
 import { Bet } from "../components/bets/bet";
+import { BetSearch } from "../components/betSearch";
 
 export function BetTabs({
   profile,
@@ -14,6 +15,7 @@ export function BetTabs({
 }) {
   const [redirectTo, setRedirectTo] = useState(undefined);
   const [tab, setTab] = useState("Public");
+  const [search, setSearch] = useState("");
 
   const onRedirectBet = id => () => {
     setRedirectTo("/bet/" + id);
@@ -37,6 +39,9 @@ export function BetTabs({
       bets = rejectedBets;
       break;
   }
+  if (search.length > 0) {
+    bets = searchBets(bets, search);
+  }
 
   const publicBd = tab === "Public" && "border-b-2";
   const acceptBd = tab === "Accepted" && "border-b-2";
@@ -48,10 +53,7 @@ export function BetTabs({
     <div className="page-section items-center content-center justify-center flex flex-col">
       <div className="w-full">
         <div className="bg-white px-8 pt-2 shadow-md">
-          <div
-            className="-mb-px p-1 lg:flex justify-center font-sans overflow-x-auto"
-            style={{ transition: `all 600ms ease 0s` }}
-          >
+          <div className="-mb-px p-1 lg:flex justify-center font-sans overflow-x-auto">
             <div
               className={`cursor-pointer text-teal-700 ${publicBd} border-teal-700 rounded-t uppercase tracking-wider font-bold text-xs py-3 px-2 mr-8 hover:bg-teal-300`}
               onClick={() => setTab("Public")}
@@ -89,6 +91,8 @@ export function BetTabs({
           </div>
         </div>
 
+        <BetSearch search={search} setSearch={setSearch} />
+
         <div>
           {bets.map((bet, idx) => (
             <Bet
@@ -108,4 +112,45 @@ export function BetTabs({
       </div>
     </div>
   );
+}
+
+function searchBets(bets, search) {
+  return bets.filter(bet => {
+    const rgx = new RegExp(search, "i");
+
+    const proposer =
+      rgx.test(bet.proposer.name) ||
+      rgx.test(bet.proposer.userName) ||
+      rgx.test(bet.proposer.twitterUser?.screenName);
+
+    const recipient =
+      rgx.test(bet.recipient?.name) ||
+      rgx.test(bet.recipient?.userName) ||
+      rgx.test(bet.recipient?.twitterUser?.screenName);
+
+    const player = bet.equations.some(eq => {
+      return eq.expressions.some(expr => {
+        return (
+          rgx.test(expr.player?.name) ||
+          rgx.test(expr.player?.position) ||
+          rgx.test(expr.player?.teamFk) ||
+          rgx.test(expr.player?.teamName) ||
+          rgx.test(expr.player?.leagueId)
+        );
+      });
+    });
+
+    const team = bet.equations.some(eq => {
+      return eq.expressions.some(expr => {
+        return (
+          rgx.test(expr.team?.name) ||
+          rgx.test(expr.team?.location) ||
+          rgx.test(expr.team?.teamFk) ||
+          rgx.test(expr.team?.leagueId)
+        );
+      });
+    });
+
+    return proposer || recipient || player || team;
+  });
 }

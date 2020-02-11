@@ -62,7 +62,9 @@ BetFrags.fragments = {
             player {
               id
               teamFk
+              teamName
               leagueId
+              name
               firstName
               lastName
               position

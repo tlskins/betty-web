@@ -56,14 +56,16 @@ export function NavBar({
           <a className="logo" href="/">
             BETTY
           </a>
-          <label
-            className="nav_hamburger"
-            onClick={() => setShowDropdown(!showDropdown)}
-          >
-            <span className="hamburger_slice" />
-            <span className="hamburger_slice" />
-            <span className="hamburger_slice" />
-          </label>
+          {profile && (
+            <label
+              className="nav_hamburger"
+              onClick={() => setShowDropdown(!showDropdown)}
+            >
+              <span className="hamburger_slice" />
+              <span className="hamburger_slice" />
+              <span className="hamburger_slice" />
+            </label>
+          )}
         </div>
 
         {profile && (

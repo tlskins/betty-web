@@ -22,7 +22,7 @@ export function BrowseBets({ profile }) {
           </div>
           <div className="page-wrapper">
             <div className="page-content">
-              <div className="page-content-area flex items-center content-center justify-center">
+              <div className="page-content-area flex flex-col items-center content-center justify-center">
                 <BetTabs
                   profile={profile}
                   acceptedBets={acceptedBets}
