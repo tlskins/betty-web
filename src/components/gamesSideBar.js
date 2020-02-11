@@ -21,6 +21,14 @@ export function GamesSideBar({ show, hide }) {
 function CurrentGames() {
   const { data } = useQuery(CURRENT_GAMES);
   const games = data?.currentGames || [];
+  const gamesByDate = {};
+  games.forEach(game => {
+    const date = toMoment(game.gameTime).format("MMMM Do");
+    if (!gamesByDate[date]) {
+      gamesByDate[date] = [];
+    }
+    gamesByDate[date].push(game);
+  });
 
   return (
     <div className="leading-loose">
@@ -30,25 +38,35 @@ function CurrentGames() {
             <span className="nav-sidebar-list-txt">Current Games</span>
           </label>
         </div>
-        {games.map(game => {
-          const { id, homeTeamName, awayTeamName, gameTime } = game;
-          const title = `${awayTeamName} @ ${homeTeamName}`;
-          const time = toMoment(gameTime).format("MMMM Do, h:mm a");
-
-          return (
-            <li key={id} className={`nav-sidebar-list-item my-2 shadow-md`}>
-              <label className="nav-sidebar-list-label ml-2">
-                <div className="article-title">
-                  <div className={`article-title-span font-serif`}>
-                    <div className="my-4">{title}</div>
-                    <hr />
-                    <div className="my-4">{time}</div>
-                  </div>
+        <div className="p-4">
+          {Object.entries(gamesByDate).map(([date, games]) => {
+            return (
+              <li
+                key={date}
+                className={`nav-sidebar-list-item my-2 shadow-md p-4`}
+              >
+                <div className="article-title font-extrabold underline tracking-wider">
+                  {date}
                 </div>
-              </label>
-            </li>
-          );
-        })}
+                <label className="nav-sidebar-list-label ml-2 flex flex-col">
+                  {games.map(game => {
+                    const { id, homeTeamName, awayTeamName, gameTime } = game;
+                    const title = `${awayTeamName} @ ${homeTeamName}`;
+                    const time = toMoment(gameTime).format("h:mm a");
+
+                    return (
+                      <div key={id} className="article-title">
+                        <div className="my-4">
+                          {title} | {time}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </label>
+              </li>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
