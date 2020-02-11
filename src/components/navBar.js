@@ -50,7 +50,7 @@ export function NavBar({
   console.log("newNotesCount", newNotesCount);
 
   return (
-    <nav className="nav-bar sm:absolute md:sticky">
+    <nav className="nav-bar sm:absolute md:sticky w-full">
       <div className="nav-hdr-content px-10 lg:px-40">
         <div className="nav_logo">
           <a className="logo" href="/">
