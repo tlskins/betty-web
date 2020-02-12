@@ -1,4 +1,4 @@
-import React, { useState, Fragment } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 import { Redirect } from "@reach/router";
 import {
   useMutation,
@@ -9,18 +9,19 @@ import gql from "graphql-tag";
 
 import { Alert } from "../components/alert";
 import { toMoment } from "../utils";
+import UserFrags from "../fragments/user";
 
 export function NavBar({
   clickGames,
   clickRoto,
-  clickProfile,
+  clickNotifications,
   profile,
   setProfile
 }) {
   const client = useApolloClient();
   const [logout] = useMutation(LOG_OUT, {
     onCompleted(data) {
-      if (data && data.signOut) {
+      if (data?.signOut) {
         client.resetStore();
         localStorage.clear();
         setRedirectTo("/login");
@@ -43,11 +44,14 @@ export function NavBar({
     }
   });
   const [redirectTo, setRedirectTo] = useState(undefined);
+  useEffect(() => {
+    if (redirectTo) {
+      setRedirectTo(undefined);
+    }
+  }, [redirectTo, setRedirectTo]);
   const [alertMsg, setAlertMsg] = useState(undefined);
   const [showDropdown, setShowDropdown] = useState(false);
   const newNotesCount = newNotifications(profile);
-
-  console.log("newNotesCount", newNotesCount);
 
   return (
     <nav className="nav-bar sm:absolute md:sticky w-full">
@@ -57,14 +61,21 @@ export function NavBar({
             BETTY
           </a>
           {profile && (
-            <label
-              className="nav_hamburger"
-              onClick={() => setShowDropdown(!showDropdown)}
-            >
-              <span className="hamburger_slice" />
-              <span className="hamburger_slice" />
-              <span className="hamburger_slice" />
-            </label>
+            <Fragment>
+              <label
+                className="nav_hamburger"
+                onClick={() => setShowDropdown(!showDropdown)}
+              >
+                <span className="hamburger_slice" />
+                <span className="hamburger_slice" />
+                <span className="hamburger_slice" />
+              </label>
+              {newNotesCount > 0 && (
+                <span className="bg-indigo-400 text-white rounded-full mx-2 mb-3 py-1 px-2 font-sans">
+                  {newNotesCount}
+                </span>
+              )}
+            </Fragment>
           )}
         </div>
 
@@ -114,6 +125,12 @@ export function NavBar({
         >
           Current Games
         </div>
+        <div
+          className="cursor-pointer px-4 py-6 shadow hover:bg-teal-300 hover:underline"
+          onClick={clickRoto}
+        >
+          Sports News
+        </div>
         <div className="border-b-4 m-0"></div>
         <div
           className="cursor-pointer px-4 py-6 shadow hover:bg-teal-300 hover:underline"
@@ -126,16 +143,16 @@ export function NavBar({
         </div>
         <div
           className="cursor-pointer px-4 py-6 shadow hover:bg-teal-300 hover:underline"
-          onClick={clickRoto}
+          onClick={() => {
+            setShowDropdown(false);
+            setRedirectTo(`/users/${profile.id}`);
+          }}
         >
-          Roto
-        </div>
-        <div className="cursor-pointer px-4 py-6 shadow hover:bg-teal-300 hover:underline">
           Profile
         </div>
         <div
           className="cursor-pointer px-4 py-6 shadow hover:bg-teal-300 hover:underline"
-          onClick={clickProfile}
+          onClick={clickNotifications}
         >
           <div>
             Notifications
@@ -171,30 +188,10 @@ function newNotifications(profile) {
 export const SUBSCRIBE_USER_PROFILE = gql`
   subscription subscribeUserNotifications {
     subscribeUserNotifications {
-      id
-      name
-      userName
-      email
-      viewedProfileLast
-      betsWon
-      betsLost
-      inProgressBetIds
-      pendingYouBetIds
-      pendingThemBetIds
-      twitterUser {
-        idStr
-        screenName
-        name
-      }
-      notifications {
-        id
-        sentAt
-        title
-        type
-        message
-      }
+      ...Profile
     }
   }
+  ${UserFrags.fragments.profile}
 `;
 
 const LOG_OUT = gql`

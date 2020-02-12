@@ -38,6 +38,8 @@ export function BetTabs({
     case "Rejected":
       bets = rejectedBets;
       break;
+    default:
+      break;
   }
   if (search.length > 0) {
     bets = searchBets(bets, search);

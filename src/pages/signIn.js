@@ -55,7 +55,7 @@ export function SignIn({ setProfile, setAlertMsg }) {
     if (error?.message) {
       setAlertMsg(error.message);
     }
-  }, [error]);
+  }, [error, setAlertMsg]);
 
   return (
     <div className="page-layout-wrapper">

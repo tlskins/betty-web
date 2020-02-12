@@ -6,13 +6,14 @@ import gql from "graphql-tag";
 import { YourBets } from "./yourBets";
 import { BrowseBets } from "./browseBets";
 import { BetDetail } from "./betDetail";
-import { Info } from "./info";
 import { SignIn } from "./signIn";
+import { UserProfile } from "./userProfile";
 import { NavBar } from "../components/navBar";
 import { RotoSideBar } from "../components/rotoSideBar";
-import { ProfileSideBar } from "../components/profileSideBar";
+import { NotificationsSideBar } from "../components/notificationsSideBar";
 import { GamesSideBar } from "../components/gamesSideBar";
 import { Alert } from "../components/alert";
+import UserFrags from "../fragments/user";
 
 export default function Pages() {
   let sessionProfile = localStorage.getItem("profile");
@@ -41,22 +42,21 @@ export default function Pages() {
         setProfile={setProfile}
         clickGames={() => setShowSideBar("games")}
         clickRoto={() => setShowSideBar("roto")}
-        clickProfile={() => {
+        clickNotifications={() => {
           viewProfile({ variables: { sync: false } });
-          setShowSideBar("profile");
+          setShowSideBar("notifications");
         }}
       />
       <Alert
         title={alertMsg}
-        open={alertMsg != undefined}
+        open={alertMsg !== undefined}
         onClose={() => setAlertMsg(undefined)}
       />
       {profile && (
         <Fragment>
-          <ProfileSideBar
+          <NotificationsSideBar
             profile={profile}
-            setProfile={setProfile}
-            show={showSideBar === "profile"}
+            show={showSideBar === "notifications"}
             hide={() => {
               setShowSideBar(undefined);
               viewProfile({ variables: { sync: true } });
@@ -75,7 +75,7 @@ export default function Pages() {
 
       <Router primary={false} component={Fragment}>
         <BrowseBets path="/" profile={profile} />
-        <Info path="/info" profile={profile} />
+        <UserProfile path="/users/:userId" profileId={profile?.id} />
         <YourBets path="/bets" profile={profile} setAlertMsg={setAlertMsg} />
         <SignIn
           path="/login"
@@ -95,28 +95,8 @@ export default function Pages() {
 export const VIEW_PROFILE = gql`
   mutation viewProfile($sync: Boolean!) {
     viewProfile(sync: $sync) {
-      id
-      name
-      userName
-      email
-      viewedProfileLast
-      betsWon
-      betsLost
-      inProgressBetIds
-      pendingYouBetIds
-      pendingThemBetIds
-      twitterUser {
-        idStr
-        screenName
-        name
-      }
-      notifications {
-        id
-        sentAt
-        title
-        type
-        message
-      }
+      ...Profile
     }
   }
+  ${UserFrags.fragments.profile}
 `;

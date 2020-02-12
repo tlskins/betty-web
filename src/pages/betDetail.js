@@ -12,7 +12,7 @@ export function BetDetail({ profile, setAlertMsg, betId }) {
   });
   const [registration, setRegistration] = useState(false);
   const signedIn = !!(profile && profile.id);
-  const bet = data && data.bet;
+  const bet = data?.bet;
 
   return (
     <div className="page-layout-wrapper">

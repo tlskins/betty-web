@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useApolloClient, useQuery } from "@apollo/react-hooks";
+import { useQuery } from "@apollo/react-hooks";
 
 import { GET_BET_MAPS } from "../../components/bets/metric";
 import { ExitButton } from "../exitButton";
