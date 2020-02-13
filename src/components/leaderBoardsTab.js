@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import "typeface-roboto";
+
 import { TrophyIcon } from "./trophyIcon";
+import { toMoment } from "../utils";
 
 export function LeaderBoardTabs({ leaderBoards }) {
   const [tab, setTab] = useState(0);
@@ -11,16 +13,27 @@ export function LeaderBoardTabs({ leaderBoards }) {
     case 0:
       leaderBoard = leaderBoards[0];
       break;
+    case 1:
+      leaderBoard = leaderBoards[1];
+      break;
+    case 2:
+      leaderBoard = leaderBoards[2];
+      break;
     default:
       break;
   }
+
+  const oneWeek = leaderBoards.length > 1;
+  const twoWeek = leaderBoards.length > 2;
 
   let leaders = leaderBoard?.leaders || [];
   if (search.length > 0) {
     leaders = searchLeaders(leaders, search);
   }
 
-  const currentBd = tab === "Current" && "border-b-2";
+  const currentBd = tab === 0 && "border-b-2";
+  const oneBd = tab === 1 && "border-b-2";
+  const twoBd = tab === 2 && "border-b-2";
 
   return (
     <div className="page-section items-center content-center justify-center flex flex-col">
@@ -33,6 +46,22 @@ export function LeaderBoardTabs({ leaderBoards }) {
             >
               Current
             </div>
+            {oneWeek && (
+              <div
+                className={`cursor-pointer text-teal-700 ${oneBd} border-teal-700 rounded-t uppercase tracking-wider font-bold text-xs py-3 px-2 mr-8 hover:bg-teal-300`}
+                onClick={() => setTab(1)}
+              >
+                {toMoment(leaderBoards[1].startTime).format("MMM Do")}
+              </div>
+            )}
+            {twoWeek && (
+              <div
+                className={`cursor-pointer text-teal-700 ${twoBd} border-teal-700 rounded-t uppercase tracking-wider font-bold text-xs py-3 px-2 mr-8 hover:bg-teal-300`}
+                onClick={() => setTab(2)}
+              >
+                {toMoment(leaderBoards[2].startTime).format("MMM Do")}
+              </div>
+            )}
           </div>
         </div>
 
