@@ -117,7 +117,7 @@ export function NavBar({
             setRedirectTo("/");
           }}
         >
-          Marketplace
+          Arena
         </div>
         <div
           className="cursor-pointer px-4 py-6 shadow hover:bg-teal-300 hover:underline"
