@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Redirect } from "@reach/router";
 import "typeface-roboto";
 
 import { TrophyIcon } from "./trophyIcon";
@@ -7,6 +8,11 @@ import { toMoment } from "../utils";
 export function LeaderBoardTabs({ leaderBoards }) {
   const [tab, setTab] = useState(0);
   const [search, setSearch] = useState("");
+  const [redirectTo, setRedirectTo] = useState(undefined);
+
+  const onRedirectUser = id => () => {
+    setRedirectTo("/users/" + id);
+  };
 
   let leaderBoard;
   switch (tab) {
@@ -70,11 +76,12 @@ export function LeaderBoardTabs({ leaderBoards }) {
         <div className="-mb-px p-1 flex flex-col font-sans overflow-x-auto shadow-md bg-white">
           {leaders.map((leader, idx) => {
             const { rank, wins, losses, user } = leader;
-            const { name, userName } = user;
+            const { id, name, userName } = user;
             return (
               <div
                 key={idx}
                 className="rounded-lg border-gray-500 mt-6 p-4 shadow hover:bg-gray-100 cursor-pointer items-center content-center justify-center"
+                onClick={onRedirectUser(id)}
               >
                 <div className="flex items-center content-center justify-center">
                   <div>
@@ -101,6 +108,7 @@ export function LeaderBoardTabs({ leaderBoards }) {
               No Leaders
             </div>
           )}
+          {redirectTo && <Redirect to={redirectTo} noThrow />}
         </div>
       </div>
     </div>
