@@ -3,7 +3,6 @@ import { useMutation } from "@apollo/react-hooks";
 import { Router } from "@reach/router";
 import gql from "graphql-tag";
 
-import { YourBets } from "./yourBets";
 import { BrowseBets } from "./browseBets";
 import { BetDetail } from "./betDetail";
 import { SignIn } from "./signIn";
@@ -12,6 +11,7 @@ import { NavBar } from "../components/navBar";
 import { RotoSideBar } from "../components/rotoSideBar";
 import { NotificationsSideBar } from "../components/notificationsSideBar";
 import { GamesSideBar } from "../components/gamesSideBar";
+import { NewBetSideBar } from "../components/newBetSideBar";
 import { Alert } from "../components/alert";
 import UserFrags from "../fragments/user";
 
@@ -40,6 +40,7 @@ export default function Pages() {
       <NavBar
         profile={profile}
         setProfile={setProfile}
+        clickNewBet={() => setShowSideBar("newBet")}
         clickGames={() => setShowSideBar("games")}
         clickRoto={() => setShowSideBar("roto")}
         clickNotifications={() => {
@@ -67,7 +68,12 @@ export default function Pages() {
             hide={() => setShowSideBar(undefined)}
           />
           <GamesSideBar
+            setAlertMsg={setAlertMsg}
             show={showSideBar === "games"}
+            hide={() => setShowSideBar(undefined)}
+          />
+          <NewBetSideBar
+            show={showSideBar === "newBet"}
             hide={() => setShowSideBar(undefined)}
           />
         </Fragment>
@@ -75,8 +81,7 @@ export default function Pages() {
 
       <Router primary={false} component={Fragment}>
         <BrowseBets path="/" profile={profile} />
-        <UserProfile path="/users/:userId" profileId={profile?.id} />
-        <YourBets path="/bets" profile={profile} setAlertMsg={setAlertMsg} />
+        <UserProfile path="/users/:userId" profile={profile} />
         <SignIn
           path="/login"
           setProfile={setProfile}

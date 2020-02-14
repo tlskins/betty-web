@@ -23,8 +23,8 @@ export function RotoSideBar({ show, hide }) {
   let { data } = queryResults;
   const [showing, setShowing] = useState(false);
   const [expanded, setExpanded] = useState(undefined);
-  const articles = (data && data.currentRotoArticles) || [];
-  const navClass = show ? "nav-sidebar" : "nav-sidebar-hidden";
+  const articles = data?.currentRotoArticles || [];
+  const navClass = show ? "nav-sidebar w-9/12 max-w-2xl" : "nav-sidebar-hidden";
   const overlayClass = show ? "nav-overlay" : "nav-overlay-hidden";
 
   if (!showing && show) {

@@ -673,8 +673,8 @@
   position: fixed;
   top: 0px;
   bottom: 0px;
-  width: 375px;
-  max-width: 70%;
+  /* width: 375px;
+  max-width: 70%; */
   z-index: 902;
   opacity: 1;
   overflow-x: hidden;

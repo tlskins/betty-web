@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { toMoment } from "../utils";
 
 export function NotificationsSideBar({ show, hide, profile }) {
-  const navClass = show ? "nav-sidebar" : "nav-sidebar-hidden";
+  const navClass = show ? "nav-sidebar w-9/12 max-w-2xl" : "nav-sidebar-hidden";
   const overlayClass = show ? "nav-overlay" : "nav-overlay-hidden";
   let notifications = profile?.notifications || [];
   notifications = notifications.sort(

@@ -12,62 +12,6 @@ import { ExitButton } from "../exitButton";
 import { Player, PlayerCard } from "./player";
 import { Team, TeamCard } from "./team";
 
-export const SEARCH_SUBJECT = gql`
-  query searchSubjects($search: String!) {
-    searchSubjects(search: $search) {
-      __typename
-      ... on Player {
-        id
-        leagueId
-        fk
-        name
-        url
-        updatedAt
-        game {
-          id
-          fk
-          leagueId
-          name
-          awayTeamFk
-          awayTeamName
-          homeTeamFk
-          homeTeamName
-          gameTime
-          gameResultsAt
-          url
-        }
-        firstName
-        lastName
-        teamFk
-        teamName
-        position
-      }
-      ... on Team {
-        id
-        leagueId
-        fk
-        name
-        url
-        updatedAt
-        game {
-          id
-          fk
-          leagueId
-          name
-          awayTeamFk
-          awayTeamName
-          homeTeamFk
-          homeTeamName
-          gameTime
-          gameResultsAt
-          url
-        }
-        location
-      }
-    }
-  }
-`;
-
 export function SubjectSearch({ subject, game, onSelect }) {
   const [searchSubject, { data }] = useLazyQuery(SEARCH_SUBJECT);
   const [searchIdx, setSearchIdx] = useState(0);
@@ -91,7 +35,10 @@ export function SubjectSearch({ subject, game, onSelect }) {
     if (e.keyCode === 27) {
       onSearchExit(); // esc
     } else if (e.keyCode === 13 && subjects.length > 0) {
-      cardRefs.current[searchIdx].current.onClick();
+      const cardRef = cardRefs.current[searchIdx].current;
+      if (cardRef) {
+        cardRef.onClick();
+      }
     } else if (e.keyCode === 40) {
       const idx = searchIdx === subjects.length - 1 ? 0 : searchIdx + 1;
       setSearchIdx(idx); // down
@@ -197,3 +144,59 @@ const SubjectCard = forwardRef(
     return null;
   }
 );
+
+export const SEARCH_SUBJECT = gql`
+  query searchSubjects($search: String!) {
+    searchSubjects(search: $search) {
+      __typename
+      ... on Player {
+        id
+        leagueId
+        fk
+        name
+        url
+        updatedAt
+        game {
+          id
+          fk
+          leagueId
+          name
+          awayTeamFk
+          awayTeamName
+          homeTeamFk
+          homeTeamName
+          gameTime
+          gameResultsAt
+          url
+        }
+        firstName
+        lastName
+        teamFk
+        teamName
+        position
+      }
+      ... on Team {
+        id
+        leagueId
+        fk
+        name
+        url
+        updatedAt
+        game {
+          id
+          fk
+          leagueId
+          name
+          awayTeamFk
+          awayTeamName
+          homeTeamFk
+          homeTeamName
+          gameTime
+          gameResultsAt
+          url
+        }
+        location
+      }
+    }
+  }
+`;

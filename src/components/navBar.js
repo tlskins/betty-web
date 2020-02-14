@@ -12,6 +12,7 @@ import { toMoment } from "../utils";
 import UserFrags from "../fragments/user";
 
 export function NavBar({
+  clickNewBet,
   clickGames,
   clickRoto,
   clickNotifications,
@@ -134,12 +135,9 @@ export function NavBar({
         <div className="border-b-4 m-0"></div>
         <div
           className="cursor-pointer px-4 py-6 shadow hover:bg-teal-300 hover:underline"
-          onClick={() => {
-            setShowDropdown(false);
-            setRedirectTo("/bets");
-          }}
+          onClick={clickNewBet}
         >
-          My Bets
+          New Bet
         </div>
         <div
           className="cursor-pointer px-4 py-6 shadow hover:bg-teal-300 hover:underline"

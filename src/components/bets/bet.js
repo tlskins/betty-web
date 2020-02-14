@@ -3,7 +3,7 @@ import { useMutation } from "@apollo/react-hooks";
 import moment from "moment-timezone";
 import gql from "graphql-tag";
 
-import { GET_BETS } from "../../pages/yourBets";
+import { GET_BETS } from "../../pages/userProfile";
 import { Operator } from "./operator";
 import { Metric } from "./metric";
 import { StaticInput } from "./static";
@@ -170,13 +170,12 @@ export function Equation({ equation }) {
           <Expression key={"leftExpr" + i} expression={expr} />
         ))}
       </div>
-
       {!lastLeft?.rightExpressionValue && (
         <div className="mx-4">
           <Operator operator={operator} />
         </div>
       )}
-
+      f
       {!lastLeft?.rightExpressionValue && (
         <div className="mx-4 w-full">
           {rightExpressions.map((expr, i) => (

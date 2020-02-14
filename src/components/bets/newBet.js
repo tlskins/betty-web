@@ -3,7 +3,7 @@ import { useMutation, useQuery } from "@apollo/react-hooks";
 import moment from "moment-timezone";
 import gql from "graphql-tag";
 
-import { GET_BETS } from "../../pages/yourBets";
+import { GET_BETS } from "../../pages/userProfile";
 import { GET_BET_MAPS } from "../../components/bets/metric";
 import { UserSearch } from "../userSearch";
 import { OperatorSearch } from "./operator";
@@ -56,7 +56,7 @@ export function NewBet({ setAlertMsg }) {
       })
     };
 
-    if (recipient && recipient.id !== "-1") {
+    if (recipient?.id !== "-1") {
       changes.betRecipient = {
         userId: recipient.id,
         twitterScreenName: recipient.twitterUser?.screenName
@@ -77,7 +77,7 @@ export function NewBet({ setAlertMsg }) {
   const eqArray = (equations && Object.values(equations)) || [];
 
   return (
-    <div className="bg-gray-300 rounded shadow-2xl my-14 mx-4 w-full lg:w-2/3 lg:m-12 p-2">
+    <div className="bg-gray-300 rounded shadow-2xl p-2 my-14 mx-4 w-full">
       <div className="flex flex-col items-center text-center">
         <div className="mt-2 p-2">
           <div className=" w-auto text-black font-serif my-5 text-xl">

@@ -2,14 +2,18 @@ import React, { useState } from "react";
 import { useQuery, useMutation } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
+import { BetTabs } from "../components/betTabs";
 import UserFrags from "../fragments/user";
+import BetFrags from "../fragments/bet";
 
-export function UserProfile({ userId, profileId, setAlertMsg }) {
+export function UserProfile({ userId, profile, setAlertMsg }) {
   const { data } = useQuery(GET_USER, {
     variables: { userId }
   });
+  const { data: betsData } = useQuery(GET_BETS, {
+    variables: { userId }
+  });
 
-  console.log("data", data);
   const {
     name,
     userName,
@@ -21,7 +25,13 @@ export function UserProfile({ userId, profileId, setAlertMsg }) {
   } = data?.getUser || {};
   const twtName = data?.getUser?.twitterUser?.name || "";
   const twtScreenName = data?.getUser?.twitterUser?.screenName || "";
-  const isMyProfile = userId === profileId;
+  const isMyProfile = userId === profile?.id;
+
+  const publicBets = betsData?.bets?.publicPendingBets || [];
+  const finalBets = betsData?.bets?.finalBets || [];
+  const acceptedBets = betsData?.bets?.acceptedBets || [];
+  const pendingBets = betsData?.bets?.pendingBets || [];
+  const rejectedBets = betsData?.bets?.closedBets || [];
 
   return (
     <div className="page-layout-wrapper">
@@ -81,6 +91,27 @@ export function UserProfile({ userId, profileId, setAlertMsg }) {
                 />
               </div>
             )}
+          </div>
+
+          <div className="page-hdr-box">
+            <h3 className="page-hdr">User Bets</h3>
+          </div>
+
+          <div className="page-wrapper mt-10">
+            <div className="page-content">
+              <div className="page-content-area flex justify-center">
+                <div className="page-content-area flex items-center content-center justify-center">
+                  <BetTabs
+                    profile={profile}
+                    acceptedBets={acceptedBets}
+                    finalBets={finalBets}
+                    publicPendingBets={publicBets}
+                    pendingBets={pendingBets}
+                    rejectedBets={rejectedBets}
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -217,4 +248,27 @@ export const UPDATE_USER = gql`
     }
   }
   ${UserFrags.fragments.profile}
+`;
+
+export const GET_BETS = gql`
+  query bets {
+    bets {
+      acceptedBets {
+        ...BetDetail
+      }
+      finalBets {
+        ...BetDetail
+      }
+      publicPendingBets {
+        ...BetDetail
+      }
+      pendingBets {
+        ...BetDetail
+      }
+      closedBets {
+        ...BetDetail
+      }
+    }
+  }
+  ${BetFrags.fragments.bet}
 `;
