@@ -32,6 +32,7 @@ export function LeaderBoardTabs({ leaderBoards }) {
   const oneWeek = leaderBoards.length > 1;
   const twoWeek = leaderBoards.length > 2;
 
+  const { final } = leaderBoard || {};
   let leaders = leaderBoard?.leaders || [];
   if (search.length > 0) {
     leaders = searchLeaders(leaders, search);
@@ -74,6 +75,13 @@ export function LeaderBoardTabs({ leaderBoards }) {
         <LeaderSearch search={search} setSearch={setSearch} />
 
         <div className="-mb-px p-1 flex flex-col font-sans overflow-x-auto shadow-md bg-white">
+          {final && (
+            <div className="flex items-center content-center justify-center">
+              <div className="text-center text-xl	rounded-lg bg-yellow-700 text-white uppercase underline bold mt-6 px-4 py-1">
+                Final
+              </div>
+            </div>
+          )}
           {leaders.map((leader, idx) => {
             const { rank, wins, losses, user } = leader;
             const { id, name, userName } = user;
