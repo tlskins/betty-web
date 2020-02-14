@@ -251,8 +251,8 @@ export const UPDATE_USER = gql`
 `;
 
 export const GET_BETS = gql`
-  query bets {
-    bets {
+  query bets($userId: String!) {
+    bets(userId: $userId) {
       acceptedBets {
         ...BetDetail
       }

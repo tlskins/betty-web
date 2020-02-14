@@ -18,7 +18,7 @@ export function NewBetSideBar({ show, hide, setAlertMsg }) {
         <div className="page-wrapper flex mt-8 items-center content-center justify-center">
           <NewBet setAlertMsg={setAlertMsg} />
         </div>
-        <div className="p-8 mt-10">
+        <div className="page-wrapper flex flex-col p-8 mt-10">
           <label className="nav-sidebar-list-label p-8">
             <span className="nav-sidebar-list-txt">Current Games</span>
           </label>

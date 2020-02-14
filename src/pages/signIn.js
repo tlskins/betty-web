@@ -81,7 +81,7 @@ export function SignIn({ setProfile, setAlertMsg }) {
               >
                 Log In
               </button>
-              {redirect && <Redirect to="/bets" noThrow />}
+              {redirect && <Redirect to="/" noThrow />}
             </div>
             <div className="p-8 font-sans">
               <RegistrationDetails />

@@ -80,7 +80,7 @@ export function NewBet({ setAlertMsg }) {
     <div className="bg-gray-300 rounded shadow-2xl p-2 my-14 mx-4 w-full">
       <div className="flex flex-col items-center text-center">
         <div className="mt-2 p-2">
-          <div className=" w-auto text-black font-serif my-5 text-xl">
+          <div className="w-auto text-black font-serif my-5 text-xl">
             <div>New Bet with</div>
           </div>
           <div className="my-5">

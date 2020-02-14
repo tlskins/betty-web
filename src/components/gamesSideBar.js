@@ -54,7 +54,6 @@ export function CurrentGames() {
     });
   };
 
-  console.log(rosterData);
   let roster = rosterData?.findTeamRoster || [];
   roster = roster.sort((a, b) => {
     if (a.position < b.position) {

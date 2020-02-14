@@ -112,13 +112,13 @@ export function NavBar({
         }}
       >
         <div
-          className="cursor-pointer px-4 py-6 shadow hover:bg-teal-300 hover:underline"
+          className="cursor-pointer px-4 py-6 shadow bg-teal-700 text-white hover:bg-white hover:text-teal-700 hover:underline"
           onClick={() => {
             setShowDropdown(false);
             setRedirectTo("/");
           }}
         >
-          Arena
+          Leaderboard
         </div>
         <div
           className="cursor-pointer px-4 py-6 shadow hover:bg-teal-300 hover:underline"
