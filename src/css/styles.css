@@ -716,7 +716,7 @@
   align-items: center;
   font-size: 10px;
   font-family: Plain-Medium;
-  line-height: 100%;
+  /* line-height: 100%; */
   letter-spacing: 1.5px;
   text-transform: uppercase;
   border-bottom: 1px solid rgb(182, 182, 182);
@@ -773,7 +773,7 @@
 .article-title {
   -webkit-tap-highlight-color: transparent;
   -webkit-font-smoothing: antialiased;
-  cursor: pointer;
+  /* cursor: pointer; */
   -webkit-box-direction: normal;
   color: #101820;
   font: 12px/14px "Calibre-Medium";
@@ -784,7 +784,7 @@
 .article-title-span {
   -webkit-tap-highlight-color: transparent;
   -webkit-font-smoothing: antialiased;
-  cursor: pointer;
+  /* cursor: pointer; */
   -webkit-box-direction: normal;
   /* color: #101820; */
   /* font: 12px/14px "Calibre-Medium"; */

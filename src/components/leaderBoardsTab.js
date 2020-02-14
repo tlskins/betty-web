@@ -80,7 +80,7 @@ export function LeaderBoardTabs({ leaderBoards }) {
             return (
               <div
                 key={idx}
-                className="rounded-lg border-gray-500 mt-6 p-4 shadow hover:bg-gray-100 cursor-pointer items-center content-center justify-center"
+                className="rounded-lg border-gray-500 mt-6 px-4 py-6 shadow-xl hover:bg-gray-100 cursor-pointer items-center content-center justify-center"
                 onClick={onRedirectUser(id)}
               >
                 <div className="flex items-center content-center justify-center">

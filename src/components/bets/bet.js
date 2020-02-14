@@ -175,7 +175,6 @@ export function Equation({ equation }) {
           <Operator operator={operator} />
         </div>
       )}
-      f
       {!lastLeft?.rightExpressionValue && (
         <div className="mx-4 w-full">
           {rightExpressions.map((expr, i) => (

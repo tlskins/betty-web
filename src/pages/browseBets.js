@@ -11,13 +11,10 @@ export function BrowseBets({ profile }) {
   const { data: betData } = useQuery(BROWSE_BETS);
   const { data: leaderData } = useQuery(CURRENT_LEADERBOARDS);
 
-  console.log(leaderData);
-
   const publicBets = betData?.currentBets?.publicPendingBets || [];
   const finalBets = betData?.currentBets?.finalBets || [];
   const acceptedBets = betData?.currentBets?.acceptedBets || [];
-
-  const leaderBaords = leaderData?.currentLeaderBoards || [];
+  const leaderBoards = leaderData?.currentLeaderBoards || [];
 
   return (
     <div className="page-layout-wrapper">
@@ -29,7 +26,7 @@ export function BrowseBets({ profile }) {
           <div className="page-wrapper">
             <div className="page-content">
               <div className="page-content-area flex flex-col items-center content-center justify-center p-8">
-                <LeaderBoardTabs leaderBoards={leaderBaords} />
+                <LeaderBoardTabs leaderBoards={leaderBoards} />
               </div>
             </div>
           </div>
