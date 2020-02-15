@@ -4,16 +4,6 @@ import gql from "graphql-tag";
 
 import { ExitButton } from "../exitButton";
 
-export const GET_BET_MAPS = gql`
-  query getBetMaps($leagueId: String, $betType: String) {
-    getBetMaps(leagueId: $leagueId, betType: $betType) {
-      id
-      name
-      type
-    }
-  }
-`;
-
 export function Metric({ metric }) {
   const { name } = metric || { name: "?" };
   return (
@@ -117,3 +107,17 @@ export function MetricSelect({ subject = {}, metric, onSelect }) {
     </div>
   );
 }
+
+export const GET_BET_MAPS = gql`
+  query getBetMaps($leagueId: String, $betType: String) {
+    getBetMaps(leagueId: $leagueId, betType: $betType) {
+      id
+      name
+      type
+      leftOnly
+      operatorId
+      rightExpressionValue
+      rightExpressionTypes
+    }
+  }
+`;

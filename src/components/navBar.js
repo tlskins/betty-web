@@ -122,20 +122,29 @@ export function NavBar({
         </div>
         <div
           className="cursor-pointer px-4 py-6 shadow hover:bg-teal-300 hover:underline"
-          onClick={clickGames}
+          onClick={() => {
+            setShowDropdown(false);
+            clickGames();
+          }}
         >
           Current Games
         </div>
         <div
           className="cursor-pointer px-4 py-6 shadow hover:bg-teal-300 hover:underline"
-          onClick={clickRoto}
+          onClick={() => {
+            setShowDropdown(false);
+            clickRoto();
+          }}
         >
           Sports News
         </div>
         <div className="border-b-4 m-0"></div>
         <div
           className="cursor-pointer px-4 py-6 shadow hover:bg-teal-300 hover:underline"
-          onClick={clickNewBet}
+          onClick={() => {
+            setShowDropdown(false);
+            clickNewBet();
+          }}
         >
           New Bet
         </div>
@@ -150,7 +159,10 @@ export function NavBar({
         </div>
         <div
           className="cursor-pointer px-4 py-6 shadow hover:bg-teal-300 hover:underline"
-          onClick={clickNotifications}
+          onClick={() => {
+            setShowDropdown(false);
+            clickNotifications();
+          }}
         >
           <div>
             Notifications

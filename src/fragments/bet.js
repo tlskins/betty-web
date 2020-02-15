@@ -79,6 +79,7 @@ BetFrags.fragments = {
             metric {
               name
               leftOnly
+              rightExpressionValue
             }
           }
           ... on TeamExpression {
@@ -102,6 +103,7 @@ BetFrags.fragments = {
             metric {
               name
               leftOnly
+              rightExpressionValue
             }
           }
         }

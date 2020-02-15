@@ -170,12 +170,12 @@ export function Equation({ equation }) {
           <Expression key={"leftExpr" + i} expression={expr} />
         ))}
       </div>
-      {!lastLeft?.rightExpressionValue && (
+      {!lastLeft?.metric?.rightExpressionValue && (
         <div className="mx-4">
           <Operator operator={operator} />
         </div>
       )}
-      {!lastLeft?.rightExpressionValue && (
+      {!lastLeft?.metric?.rightExpressionValue && (
         <div className="mx-4 w-full">
           {rightExpressions.map((expr, i) => (
             <Expression key={"rightExpr" + i} expression={expr} />

@@ -27,7 +27,7 @@ export default function Pages() {
   const [alertMsg, setAlertMsg] = useState(undefined);
   const [viewProfile] = useMutation(VIEW_PROFILE, {
     onCompleted(data) {
-      const profile = data && data.viewProfile;
+      const profile = data?.viewProfile;
       if (profile) {
         localStorage.setItem("profile", JSON.stringify(profile));
         setProfile(profile);
@@ -73,6 +73,7 @@ export default function Pages() {
             hide={() => setShowSideBar(undefined)}
           />
           <NewBetSideBar
+            profileId={profile.id}
             show={showSideBar === "newBet"}
             hide={() => setShowSideBar(undefined)}
           />

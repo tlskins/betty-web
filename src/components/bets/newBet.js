@@ -11,7 +11,7 @@ import { SubjectSearch } from "./subject";
 import { MetricSelect } from "./metric";
 import { StaticInput } from "./static";
 
-export function NewBet({ setAlertMsg }) {
+export function NewBet({ setAlertMsg, profileId }) {
   const [{ recipient, equations, leagueId }, dispatch] = useReducer(
     reducer,
     initialState
@@ -65,7 +65,7 @@ export function NewBet({ setAlertMsg }) {
 
     createBet({
       variables: { changes },
-      refetchQueries: [{ query: GET_BETS }]
+      refetchQueries: [{ query: GET_BETS, variables: { userId: profileId } }]
     });
     dispatch({ type: "clearBet" });
   };
@@ -215,19 +215,12 @@ export function Expression({ eqIdx, exprIdx, expression, dispatch }) {
         exprIdx,
         value: staticValue
       });
-    const onClear = () =>
-      dispatch({
-        type: "addSubject",
-        eqIdx,
-        exprIdx,
-        value: undefined
-      });
 
     return (
       <div>
         <div className="fact-wrapper flex flex-col bg-gray-200">
           <div className="m-1">
-            <StaticInput value={value} onSelect={onSelect} onClear={onClear} />
+            <StaticInput value={value} onSelect={onSelect} />
           </div>
         </div>
       </div>
@@ -320,13 +313,13 @@ const reducer = (state, action) => {
     case "addSubject": {
       const { eqIdx, exprIdx, type, ...subject } = action;
 
-      const { equations } = state;
+      const { equations, leagueId } = state;
       const equation = equations[eqIdx];
       const { expressions } = equation;
 
       return {
         ...state,
-        leagueId: subject?.game?.leagueId,
+        leagueId: subject?.game?.leagueId || leagueId,
         equations: [
           ...equations.slice(0, eqIdx),
           {
@@ -361,11 +354,11 @@ const reducer = (state, action) => {
       };
 
       // add metric dependencies
-      if (metric && metric.operatorId) {
+      if (metric?.operatorId) {
         const operator = operators.find(op => op.id === metric.operatorId);
         newEq.operator = operator;
       }
-      if (metric && metric.rightExpressionValue != null) {
+      if (metric?.rightExpressionValue != null) {
         const firstRight = newEq.expressions.findIndex(exp => !exp.isLeft);
         newEq.expressions = [
           ...newEq.expressions.slice(0, firstRight),
@@ -377,7 +370,7 @@ const reducer = (state, action) => {
           ...newEq.expressions.slice(firstRight + 1)
         ];
       }
-      if (metric && metric.rightExpressionTypes?.includes("Static")) {
+      if (metric?.rightExpressionTypes?.includes("Static")) {
         const firstRight = newEq.expressions.findIndex(exp => !exp.isLeft);
         newEq.expressions = [
           ...newEq.expressions.slice(0, firstRight),
@@ -464,78 +457,6 @@ const CREATE_BET = gql`
   mutation createBet($changes: NewBet!) {
     createBet(changes: $changes) {
       id
-      createdAt
-      betStatus
-      proposer {
-        name
-        userName
-      }
-      recipient {
-        name
-        userName
-        twitterUser {
-          screenName
-        }
-      }
-      equations {
-        id
-        operator {
-          id
-          name
-        }
-        expressions {
-          ... on StaticExpression {
-            id
-            isLeft
-            value
-          }
-          ... on PlayerExpression {
-            id
-            isLeft
-            value
-            player {
-              id
-              teamFk
-              leagueId
-              firstName
-              lastName
-              position
-              updatedAt
-            }
-            game {
-              id
-              homeTeamFk
-              homeTeamName
-              awayTeamName
-            }
-            metric {
-              name
-            }
-          }
-          ... on TeamExpression {
-            isLeft
-            value
-            team {
-              id
-              leagueId
-              fk
-              name
-              url
-              updatedAt
-              location
-            }
-            game {
-              id
-              homeTeamFk
-              homeTeamName
-              awayTeamName
-            }
-            metric {
-              name
-            }
-          }
-        }
-      }
     }
   }
 `;
